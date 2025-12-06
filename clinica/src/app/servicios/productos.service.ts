@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { InProducto } from '../modelos/modeloProductos/InProducto';
+import { InProducto, InProductoDetalle } from '../modelos/modeloProductos/InProducto';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 
@@ -16,9 +16,9 @@ export class productosService {
 
   
 
-  LproductosEstado (estado: boolean): Observable<InProducto[]> {
+  LproductosEstado (estado: number): Observable<InProductoDetalle[]> {
 
-    return this.http.get<InProducto[]>(`${this.urlServidor}/productos/listar/${estado}`);
+    return this.http.get<InProductoDetalle[]>(`${this.urlServidor}/productos/listar/${estado}`);
   }
 
   Lproductos (): Observable<InProducto[]> {
@@ -34,18 +34,18 @@ export class productosService {
     return this.http.get<InProducto[]>(`${this.urlServidor}/productos/ListarSinUsuario`);
   }
 
-  CrearMedico(medico: InProducto): Observable<any> {
+  CrearProducto(producto: InProducto): Observable<any> {
 
-    return this.http.post(`${this.urlServidor}/productos/Registrar`, medico);
+    return this.http.post(`${this.urlServidor}/productos/Registrar`, producto);
   }
 
-  EliminarMedico(id:number):Observable<any>{
+  EliminarProducto(id:number):Observable<any>{
     return this.http.delete(`${this.urlServidor}/productos/Eliminar/${id}`);
 
   }
-  ActualizarMedico(medico: InProducto): Observable<any> {
+  Actualizarproducto(producto: InProducto): Observable<any> {
 
-    return this.http.put(`${this.urlServidor}/productos/Actualizar`, medico);
+    return this.http.put(`${this.urlServidor}/productos/Actualizar`, producto);
   }
 
 

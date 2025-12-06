@@ -1,123 +1,158 @@
-const poolsec = require('../../configuracion/dbmini');
+const { getConnection, oracledb } = require('../../configuracion/oraclePool');
+
+// helper para convertir llaves a minúsculas
+function formatearSalida(rows) {
+    if (!rows || rows.length === 0) return [];
+    return rows.map(obj => {
+        const nuevo = {};
+        Object.keys(obj).forEach(k => nuevo[k.toLowerCase()] = obj[k]);
+        return nuevo;
+    });
+}
 
 exports.getProductosEstado = async (req, res) => {
-     
-    const {estado} = req.params;
-    const query = 'SELECT * FROM listarProductosEstado($1)';
-    const values = [estado]
+    const { estado } = req.params;
+    let connection;
+
     try {
-        const result = await poolsec.query(query,values);
-        res.json(result.rows);
+        connection = await getConnection();
+
+        const result = await connection.execute(
+            `SELECT * FROM VW_PRODUCTO_DETALLE WHERE prod_estado = :estado`,
+            { estado },
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        // Formatear claves a minúscula
+        res.json(formatearSalida(result.rows));
+
     } catch (error) {
+        console.error(error);
         res.status(500).json({ message: error.message });
+
+    } finally {
+        if (connection) await connection.close();
     }
 };
 
 
+
 exports.getProductos = async (req, res) => {
-     
-    const query = 'SELECT * FROM producto;';
+    let connection;
+
     try {
-        const result = await poolsec.query(query);
-        res.json(result.rows);
+        connection = await getConnection();
+
+        const result = await connection.execute(
+            `SELECT * FROM vw_producto_detalle`,
+            [],
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        res.json(formatearSalida(result.rows));
+
     } catch (error) {
+        console.log(error);
         res.status(500).json({ message: error.message });
+    } finally {
+        if (connection) await connection.close();
     }
 };
 
 exports.getProductoId = async (req, res) => {
-   
-    const {id} = req.params;
-    const query ='select* from producto where codigo=$1'
-    const values = [id]
-    try {
-        const result = await poolsec.query(query,values);
-        
-        if (result.rowCount>0){
-            res.json(result.rows[0]);
-        }else{
-            res.status(400).json({error:"NO EXISTE ESE producto"});
+    const { id } = req.params;
+    let connection;
 
+    try {
+        connection = await getConnection();
+
+        const result = await connection.execute(
+            `SELECT * FROM producto WHERE codigo = :id`,
+            { id },
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        if (result.rows.length > 0) {
+            res.json(formatearSalida(result.rows)[0]);
+        } else {
+            res.status(404).json({ error: "NO EXISTE ESE PRODUCTO" });
         }
-        
+
     } catch (error) {
         console.log(error);
-        res.status(500).json({error:"ERROR EN EL SERVIDOR"});
-
-        
+        res.status(500).json({ error: "ERROR EN EL SERVIDOR" });
+    } finally {
+        if (connection) await connection.close();
     }
-
-    };
+};
 
 exports.RegistrarProducto = async (req, res) => {
+    const { id_subcat, id_prov, nombre, descripcion, precioventa, stock, stock_min } = req.body;
+    let connection;
 
-
-    const {id_subcat,id_prov,nombre,descripcion,precioventa,stock,stock_min} = req.body;
-    const query ='select registrarproducto( $1,$2,$3,$4,$5,$6,$7);';
-    const values = [id_subcat,id_prov,nombre,descripcion,precioventa,stock,stock_min];
-
-    console.log(values);
     try {
-        const actor = await poolsec.connect();
-        const result = await poolsec.query(query,values);
-        actor.release();
-        res.status(200).json({message:'producto registrado'});
-    
+        connection = await getConnection();
+
+        const query = `BEGIN registrarProducto(:1, :2, :3, :4, :5, :6, :7); END;`;
+
+        const params = [
+            id_subcat, id_prov, nombre, descripcion, precioventa, stock, stock_min
+        ];
+
+        await connection.execute(query, params, { autoCommit: true });
+
+        res.json({ message: "producto registrado" });
+
     } catch (error) {
         console.log(error);
-        res.status(400).json({error:"No se pudo registar al producto"});
-
-        
+        res.status(400).json({ error: error.message });
+    } finally {
+        if (connection) await connection.close();
     }
 };
 
 exports.Actualizarproducto = async (req, res) => {
+    const { id_prod, id_subcat, id_prov, nombre, descripcion, precioventa, stock, stock_min } = req.body;
+    let connection;
 
-    const {id_prod,id_subcat,id_prov,nombre,descripcion,precioventa,stock,stock_min} = req.body;
-    const query ='select actualizarproducto( $1,$2,$3,$4,$5,$6,$7,$8);';
-    const values = [id_prod,id_subcat,id_prov,nombre,descripcion,precioventa,stock,stock_min];
-    console.log(values);
     try {
-        const actor = await poolsec.connect();
-        const result = await poolsec.query(query,values);
-        actor.release();
-        res.status(200).json({message:'producto actualizado '});
-    
+        connection = await getConnection();
+
+        const query = `BEGIN actualizarProducto(:1, :2, :3, :4, :5, :6, :7, :8); END;`;
+
+        const params = [
+            id_prod, id_subcat, id_prov, nombre, descripcion, precioventa, stock, stock_min
+        ];
+
+        await connection.execute(query, params, { autoCommit: true });
+
+        res.json({ message: "producto actualizado" });
+
     } catch (error) {
         console.log(error);
-        res.status(400).json({error:error.message});
-    
-        
+        res.status(400).json({ error: error.message });
+    } finally {
+        if (connection) await connection.close();
     }
-    };
-
+};
 
 exports.eliminarproducto = async (req, res) => {
+    const { id } = req.params;
+    let connection;
 
-    const {id} = req.params;
-        const query ='select from eliminarproducto($1);'
-        const values = [id]
-    
-        console.log(values);
-        try {
-            const actor = await poolsec.connect();
-            const result = await poolsec.query(query,values,(error,result)=>{
-    
-                if (error){
-                    res.status(400).json({error: error.message});
-    
-                }else{
-                    res.status(200).json({message:"El registro se elimino correctamente"});
-                }
-    
-            });
-            actor.release();
-            
-        } catch (error) {
-            console.log(error);
-            res.status(500).json({error:"ERROR EN EL SERVIDOR"});
-    
-            
-        }
-    };
+    try {
+        connection = await getConnection();
 
+        const query = `BEGIN eliminarProducto(:1); END;`;
+
+        await connection.execute(query, [id], { autoCommit: true });
+
+        res.json({ message: "producto eliminado correctamente" });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: error.message });
+    } finally {
+        if (connection) await connection.close();
+    }
+};

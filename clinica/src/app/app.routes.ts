@@ -27,6 +27,7 @@ import { RecuperarContraseniaComponent } from './components/pages/login/recupera
 import { VerificacionOtpComponent } from './components/pages/verificacion-otp/verificacion-otp.component';
 import { ListaclientesComponent } from './components/pages/clientes/listaclientes/listaclientes.component';
 import { frmClientesComponent } from './components/pages/clientes/frmclientes/frmclientes.component';
+import { ListaproductosComponent } from './components/pages/productos/listaproductos/listaproductos.component';
 
 export const routes: Routes = [
   { path: '', redirectTo:'home/dashboard', pathMatch:'full' },
@@ -52,7 +53,7 @@ export const routes: Routes = [
       { path: 'dashboard', component: DashboardComponent },
 
 
-      // Pacientes (Ejemplo: solo rol "admin" puede crear/actualizar)
+      // Clientes (Ejemplo: solo rol "admin" puede crear/actualizar)
       {
         path: 'listarclientes',
         component: ListaclientesComponent,
@@ -61,6 +62,26 @@ export const routes: Routes = [
       },
       {
         path: 'crearCliente',
+        component: frmClientesComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['administrador'] },
+      },
+      {
+        path: 'actualizarCliente/:id',
+        component: frmClientesComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['administrador'] },
+      },
+
+      // Productos (Ejemplo: solo rol "admin" puede crear/actualizar)
+      {
+        path: 'listarproductos',
+        component: ListaproductosComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['administrador'] },
+      },
+      {
+        path: 'creaproductos',
         component: frmClientesComponent,
         canActivate: [RoleGuard],
         data: { roles: ['administrador'] },
