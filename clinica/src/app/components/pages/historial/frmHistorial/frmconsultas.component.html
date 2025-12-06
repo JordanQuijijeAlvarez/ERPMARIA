@@ -1,0 +1,263 @@
+<form [formGroup]="formConsultas" (ngSubmit)="guardarConsulta()">
+  <div class="space-y-12">
+    <h2
+      style="text-align: center"
+      class="text-base/7 font-semibold text-gray-900"
+    >
+      INFORME DE CONSULTA MEDICA
+    </h2>
+    <div class="border-b border-gray-900/10 pb-12">
+      <div class="border-b border-gray-900/10 pb-12">
+        <h2 class="text-base/7 font-semibold text-gray-900">
+          Información del Paciente
+        </h2>
+
+        <div class="grid grid-cols-4 divide-4;" style="gap: 10px">
+          <div>
+            <label for="city" class="block text-sm/6 font-medium text-gray-900"
+              >Cedula de Identidad</label
+            >
+            <div class="mt-2">
+              <input
+                formControlName="txtCedulaPaciente"
+                type="text"
+                autocomplete="address-level2"
+                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+              />
+            </div>
+          </div>
+          <div>
+            <label
+              for="region"
+              class="block text-sm/6 font-medium text-gray-900"
+              >Nombres</label
+            >
+            <div class="mt-2">
+              <input
+                formControlName="txtNombresPaciente"
+                type="text"
+                autocomplete="given-name"
+                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="city" class="block text-sm/6 font-medium text-gray-900"
+              >Edad</label
+            >
+            <div class="mt-2">
+              <input
+                formControlName="txtEdadPaciente"
+                type="text"
+                autocomplete="address-level2"
+                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="city" class="block text-sm/6 font-medium text-gray-900"
+              >Peso</label
+            >
+            <div class="mt-2">
+              <input
+                formControlName="txtPesoPaciente"
+                type="text"
+                placeholder="Ingrese el peso en Kg"
+                autocomplete="address-level2"
+                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+              />
+
+              <div
+                *ngIf="
+                  formConsultas.get('txtPesoPaciente')?.invalid &&
+                  formConsultas.get('txtPesoPaciente')?.touched
+                "
+                class="msgerro"
+              >
+                <small
+                  *ngIf="formConsultas.get('txtPesoPaciente')?.errors?.['required']"
+                  >* Dato obligatorio.</small
+                >
+              </div>
+            </div>
+          </div>
+          <div>
+            <label for="city" class="block text-sm/6 font-medium text-gray-900"
+              >Estatura</label
+            >
+            <div class="mt-2">
+              <input
+                formControlName="txtEstaturaPaciente"
+                placeholder="Ingrese la estatura en 'cm'"
+                type="text"
+                autocomplete="address-level2"
+                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+              />
+
+              <div
+                *ngIf="
+                  formConsultas.get('txtEstaturaPaciente')?.invalid &&
+                  formConsultas.get('txtEstaturaPaciente')?.touched
+                "
+                class="msgerro"
+              >
+                <small
+                  *ngIf="formConsultas.get('txtEstaturaPaciente')?.errors?.['required']"
+                  >* Dato obligatorio.</small
+                >
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label for="city" class="block text-sm/6 font-medium text-gray-900"
+              >Precion Arterial</label
+            >
+            <div class="mt-2">
+              <input
+                formControlName="txtPresionPaciente"
+                type="text"
+                placeholder="Ingrese la precion arterial en PPM"
+                autocomplete="address-level2"
+                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+              />
+
+              <div
+                *ngIf="
+                  formConsultas.get('txtPresionPaciente')?.invalid &&
+                  formConsultas.get('txtPresionPaciente')?.touched
+                "
+                class="msgerro"
+              >
+                <small
+                  *ngIf="formConsultas.get('txtPresionPaciente')?.errors?.['required']"
+                  >* Dato obligatorio.</small
+                >
+              </div>
+            </div>
+          </div>
+          <div>
+            <label for="city" class="block text-sm/6 font-medium text-gray-900"
+              >Temperatura</label
+            >
+            <div class="mt-2">
+              <input
+                formControlName="txtTemperaturaPaciente"
+                type="text"
+                placeholder="Ingrese la temperatura en °C"
+                autocomplete="address-level2"
+                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+              />
+
+              <div
+                *ngIf="
+                  formConsultas.get('txtTemperaturaPaciente')?.invalid &&
+                  formConsultas.get('txtTemperaturaPaciente')?.touched
+                "
+                class="msgerro"
+              >
+                <small
+                  *ngIf="formConsultas.get('txtTemperaturaPaciente')?.errors?.['required']"
+                  >* Dato obligatorio.</small
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h2 class="text-base/7 font-semibold text-gray-900">
+        Diagnostico - Tartamientos
+      </h2>
+
+      <br />
+
+      <div class="grid grid-cols-2 divide-2;" style="gap: 10px">
+        <div class="mt-2">
+          <textarea
+            formControlName="txtDiagnostico"
+            name="direccion"
+            id="doreccion"
+            rows="3"
+            class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+          ></textarea>
+
+          <div
+            *ngIf="
+              formConsultas.get('txtDiagnostico')?.invalid &&
+              formConsultas.get('txtDiagnostico')?.touched
+            "
+            class="msgerro"
+          >
+            <small
+              *ngIf="formConsultas.get('txtDiagnostico')?.errors?.['required']"
+              >* Dato obligatorio.</small
+            >
+          </div>
+        </div>
+
+        <div class="mt-2">
+          <textarea
+            formControlName="txtTratamiento"
+            name="direccion"
+            id="doreccion"
+            rows="3"
+            class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+          ></textarea>
+
+          <div
+            *ngIf="
+              formConsultas.get('txtTratamiento')?.invalid &&
+              formConsultas.get('txtTratamiento')?.touched
+            "
+            class="msgerro"
+          >
+            <small
+              *ngIf="formConsultas.get('txtTratamiento')?.errors?.['required']"
+              >* Dato obligatorio.</small
+            >
+          </div>
+        </div>
+      </div>
+      <h2 class="text-base/7 font-semibold text-gray-900">Observaciones</h2>
+      <div class="col-span-full">
+        <div class="mt-2">
+          <textarea
+            formControlName="txtObservaciones"
+            name="direccion"
+            id="doreccion"
+            rows="3"
+            class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+          ></textarea>
+
+          <div
+          *ngIf="
+            formConsultas.get('txtObservaciones')?.invalid &&
+            formConsultas.get('txtObservaciones')?.touched
+          "
+          class="msgerro"
+        >
+          <small
+            *ngIf="formConsultas.get('txtObservaciones')?.errors?.['required']"
+            >* Dato obligatorio.</small
+          >
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-6 flex items-center justify-end gap-x-6">
+    <button type="button" class="text-sm/6 font-semibold text-gray-900">
+      Cancelar
+    </button>
+    <button
+      type="submit"
+      class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+    >
+      Guardar
+    </button>
+  </div>
+</form>
+

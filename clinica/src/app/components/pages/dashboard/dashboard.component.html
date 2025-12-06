@@ -1,0 +1,156 @@
+<div class="min-h-screen bg-gray-50 p-6">
+  <!-- Header de Bienvenida -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-2">
+      ¡Bienvenido, {{nombreUserAccedido}}!
+    </h1>
+    <p class="text-gray-600">
+      Panel de control del Sistema de Gestión Clínica
+    </p>
+  </div>
+
+   <!-- Accesos Rápidos -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Panel de Accesos Rápidos -->
+    <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+      <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+        <i class="fas fa-bolt text-blue-600 mr-2"></i>
+        Accesos Rápidos
+      </h3>
+      <div class="grid grid-cols-2 gap-4">
+        <button   *appMostrarSiRol="['administrador', 'recepcionista']"
+          routerLink="../frmcitas" class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-center">
+          <i class="fas fa-calendar-plus text-blue-600 text-2xl mb-2"></i>
+          <p class="text-sm font-medium text-gray-700">Nueva Cita</p>
+        </button>
+        <button   *appMostrarSiRol="['administrador', 'recepcionista']"
+          routerLink="../crearPaciente"
+        class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-center">
+          <i class="fas fa-user-plus text-green-600 text-2xl mb-2"></i>
+          <p class="text-sm font-medium text-gray-700">Nuevo Paciente</p>
+        </button>
+        <button 
+        
+         *appMostrarSiRol="['administrador', 'medico']"
+                   routerLink="../listaconsultas"
+
+        class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-center">
+          <i class="fas fa-clipboard-list text-purple-600 text-2xl mb-2"></i>
+          <p class="text-sm font-medium text-gray-700">Consultas</p>
+        </button>
+        <button 
+            *appMostrarSiRol="['administrador', 'medico']"
+                   routerLink="../listahistorial"
+        class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-center">
+          <i class="fas fa-chart-bar text-orange-600 text-2xl mb-2"></i>
+          <p class="text-sm font-medium text-gray-700">Reportes</p>
+        </button>
+      </div>
+    </div>
+
+    <!-- Actividad Reciente -->
+    <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+      <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+        <i class="fas fa-history text-green-600 mr-2"></i>
+        Actividad Reciente
+      </h3>
+      <div class="space-y-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+          <div class="flex-1">
+            <p class="text-sm text-gray-700">Nueva cita programada para Juan Pérez</p>
+            <p class="text-xs text-gray-500">Hace 5 minutos</p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-3">
+          <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+          <div class="flex-1">
+            <p class="text-sm text-gray-700">Consulta completada - Dr. García</p>
+            <p class="text-xs text-gray-500">Hace 15 minutos</p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-3">
+          <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+          <div class="flex-1">
+            <p class="text-sm text-gray-700">Paciente registrado: María López</p>
+            <p class="text-xs text-gray-500">Hace 1 hora</p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-3">
+          <div class="w-2 h-2 bg-purple-500 rounded-full"></div>
+          <div class="flex-1">
+            <p class="text-sm text-gray-700">Horario actualizado - Dr. Martínez</p>
+            <p class="text-xs text-gray-500">Hace 2 horas</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Información del Sistema -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Estado del Sistema -->
+    <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+      <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+        <i class="fas fa-server text-blue-600 mr-2"></i>
+        Estado del Sistema
+      </h3>
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-600">Servidor</span>
+          <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Activo</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-600">Base de Datos</span>
+          <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Conectada</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-600">Respaldos</span>
+          <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Al día</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Próximas Citas -->
+    <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+      <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+        <i class="fas fa-calendar-alt text-purple-600 mr-2"></i>
+        Próximas Citas
+      </h3>
+      <div class="space-y-3">
+        <div class="border-l-4 border-blue-500 pl-3">
+          <p class="text-sm font-medium text-gray-700">Dr. García</p>
+          <p class="text-xs text-gray-500">09:00 AM - Consulta General</p>
+        </div>
+        <div class="border-l-4 border-green-500 pl-3">
+          <p class="text-sm font-medium text-gray-700">Dra. Rodríguez</p>
+          <p class="text-xs text-gray-500">10:30 AM - Cardiología</p>
+        </div>
+        <div class="border-l-4 border-yellow-500 pl-3">
+          <p class="text-sm font-medium text-gray-700">Dr. Martínez</p>
+          <p class="text-xs text-gray-500">11:15 AM - Pediatría</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notificaciones -->
+    <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+      <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+        <i class="fas fa-bell text-orange-600 mr-2"></i>
+        Notificaciones
+      </h3>
+      <div class="space-y-3">
+        <div class="p-3 bg-blue-50 border-l-4 border-blue-500 rounded">
+          <p class="text-sm text-blue-800">3 citas programadas para mañana</p>
+        </div>
+        <div class="p-3 bg-yellow-50 border-l-4 border-yellow-500 rounded">
+          <p class="text-sm text-yellow-800">Recordar actualizar inventario</p>
+        </div>
+        <div class="p-3 bg-green-50 border-l-4 border-green-500 rounded">
+          <p class="text-sm text-green-800">Sistema actualizado correctamente</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div>

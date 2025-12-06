@@ -1,0 +1,441 @@
+<form [formGroup]="frmMedico" (ngSubmit)="guardarMedico()">
+  <div class="min-h-screen p-6">
+    <div class="max-w-7xl mx-auto">
+      <!-- Header Section -->
+      <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-8">
+        <div class="text-center">
+          <h2 class="text-3xl font-bold text-gray-800 mb-2">
+            {{ eventoUpdate ? 'ACTUALIZAR MÉDICO' : 'REGISTRO DE MÉDICO' }}
+          </h2>
+          <p class="text-gray-500 text-sm">
+            {{ eventoUpdate ? 'Modifique la información del médico según sea necesario' : 'Complete la información personal y profesional del nuevo médico' }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Main Form Container -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <!-- Left Column - Personal Information -->
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+              <i class="fas fa-user-edit text-gray-600 mr-2"></i>
+              Información Personal
+            </h3>
+          </div>
+          
+          <div class="p-6">
+            <div class="space-y-6">
+              <!-- Cédula -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  <i class="fas fa-id-card text-gray-500 mr-1"></i>
+                  Cédula de Identidad *
+                </label>
+                <input
+                  formControlName="txtCedula"
+                  type="text"
+                  id="cedula"
+                  autocomplete="address-level2"
+                  placeholder="Ingresa tu cédula (10 dígitos)"
+                  maxlength="10"
+                  class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
+                />
+                <app-validators 
+                  [control]="frmMedico.get('txtCedula')!"
+                  [showCounter]="true"
+                  [expectedLength]="10">
+                </app-validators>
+              </div>
+
+              <!-- Nombres -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  <i class="fas fa-user text-gray-500 mr-1"></i>
+                  Nombres *
+                </label>
+                <input
+                  formControlName="txtNombres"
+                  type="text"
+                  id="nombres"
+                  autocomplete="given-name"
+                  placeholder="Ejemplo: Juan Sebastián"
+                  class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
+                />
+                <app-validators [control]="frmMedico.get('txtNombres')!"></app-validators>
+              </div>
+
+              <!-- Apellidos -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  <i class="fas fa-user-tag text-gray-500 mr-1"></i>
+                  Apellidos *
+                </label>
+                <input
+                  formControlName="txtApellidos"
+                  type="text"
+                  name="last-name"
+                  id="apellidos"
+                  autocomplete="family-name"
+                  placeholder="Ejemplo: Pérez Pazmiño"
+                  class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
+                />
+                <app-validators [control]="frmMedico.get('txtApellidos')!"></app-validators>
+              </div>
+
+              <!-- Fecha de Nacimiento -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  <i class="fas fa-calendar-alt text-gray-500 mr-1"></i>
+                  Fecha de Nacimiento *
+                </label>
+                <input
+                  formControlName="txtFechNac"
+                  type="date"
+                  id="fechaNacimiento"
+                  autocomplete="address-level2"
+                  class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm cursor-pointer"
+                />
+                <app-validators [control]="frmMedico.get('txtFechNac')!"></app-validators>
+              </div>
+
+              <!-- Teléfono -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  <i class="fas fa-phone text-gray-500 mr-1"></i>
+                  Número de Teléfono *
+                </label>
+                <input
+                  formControlName="txtNumTelefono"
+                  type="text"
+                  id="telefono"
+                  autocomplete="address-level1"
+                  placeholder="09999999999 (10 dígitos)"
+                  maxlength="10"
+                  class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
+                />
+                <app-validators 
+                  [control]="frmMedico.get('txtNumTelefono')!"
+                  [showCounter]="true"
+                  [expectedLength]="10">
+                </app-validators>
+              </div>
+
+              <!-- Email -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  <i class="fas fa-envelope text-gray-500 mr-1"></i>
+                  Correo Electrónico *
+                </label>
+                <input
+                  formControlName="txtCorreo"
+                  type="email"
+                  id="correo"
+                  autocomplete="email"
+                  placeholder="Ejemplo: usuario@email.com"
+                  class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
+                />
+                <app-validators [control]="frmMedico.get('txtCorreo')!"></app-validators>
+              </div>
+
+              <!-- Dirección -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  <i class="fas fa-map-marker-alt text-gray-500 mr-1"></i>
+                  Dirección Domiciliar *
+                </label>
+                <textarea
+                  formControlName="txtDireccion"
+                  id="direccion"
+                  rows="3"
+                  placeholder="Ejemplo: Av. Los Pinos 123, Edificio Primavera, Quito, Ecuador"
+                  class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm resize-vertical"
+                ></textarea>
+                <app-validators [control]="frmMedico.get('txtDireccion')!"></app-validators>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column - Professional Information -->
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+              <i class="fas fa-user-md text-gray-600 mr-2"></i>
+              Información Profesional
+            </h3>
+          </div>
+          
+          <div class="p-6">
+            <div class="space-y-6">
+              <!-- Licencia Médica -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  <i class="fas fa-certificate text-gray-500 mr-1"></i>
+                  Licencia Médica *
+                </label>
+                <input
+                  formControlName="txtLicenciaMedica"
+                  type="text"
+                  id="licencia"
+                  autocomplete="address-level1"
+                  placeholder="LM999"
+                  maxlength="10"
+                  class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
+                />
+                <app-validators [control]="frmMedico.get('txtLicenciaMedica')!"></app-validators>
+              </div>
+
+              <!-- Consultorio -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  <i class="fas fa-door-open text-gray-500 mr-1"></i>
+                  Consultorio *
+                </label>
+                <select
+                  formControlName="cbxConsultorio"
+                  id="consultorio"
+                  class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm cursor-pointer"
+                >
+                  <option value="" disabled selected class="text-gray-400">
+                    Seleccione un consultorio
+                  </option>
+                  <option
+                    *ngFor="let consultorio of listaConsultorios"
+                    [value]="consultorio.codigo"
+                  >
+                    {{ consultorio.nombre }}
+                  </option>
+                </select>
+                <app-validators [control]="frmMedico.get('cbxConsultorio')!"></app-validators>
+              </div>
+
+              <!-- Horario -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  <i class="fas fa-clock text-gray-500 mr-1"></i>
+                  Horario *
+                </label>
+                <div class="flex items-center gap-3">
+                  <div class="flex-1">
+                    <select
+                      formControlName="cbxHorario"
+                      id="horario"
+                      class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm cursor-pointer"
+                    >
+                      <option value="" disabled selected class="text-gray-400">
+                        Seleccione un horario
+                      </option>
+                      <option
+                        *ngFor="let horario of listaHorarios"
+                        [value]="horario.codigo"
+                      >
+                        {{ horario.hora_inicio }} - {{ horario.hora_fin }}
+                      </option>
+                    </select>
+                    <app-validators [control]="frmMedico.get('cbxHorario')!"></app-validators>
+                  </div>
+                  <button
+                    type="button"
+                    (click)="abrirModalAgregarHorario()"
+                    class="px-4 py-3 bg-gray-800 text-white font-semibold rounded-lg shadow-md hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 cursor-pointer"
+                    title="Agregar nuevo horario"
+                  >
+                    <i class="fas fa-plus"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Especialidades Selection -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  <i class="fas fa-stethoscope text-gray-500 mr-1"></i>
+                  Asignar Especialidad
+                </label>
+                <div class="flex items-center gap-3">
+                  <select
+                    formControlName="cbxEspecialidad"
+                    id="especialidad"
+                    name="especialidad"
+                    class="flex-1 px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm cursor-pointer"
+                  >
+                    <option value="" disabled selected class="text-gray-400">
+                      Seleccione una especialidad
+                    </option>
+                    <option
+                      *ngFor="let especialidad of listaEspecialidades"
+                      [value]="especialidad.codigo"
+                    >
+                      {{ especialidad.nombre }}
+                    </option>
+                  </select>
+                  <button
+                    type="button"
+                    (click)="seleccionarEspecialidad()"
+                    class="px-6 py-3 bg-gray-800 text-white font-semibold rounded-lg shadow-md hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 cursor-pointer"
+                  >
+                    <i class="fas fa-plus mr-2"></i>
+                    Asignar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Specialties Tables Section -->
+      <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Especialidades Seleccionadas (Pendientes) -->
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200 bg-yellow-50">
+            <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+              <i class="fas fa-hourglass-half text-yellow-600 mr-2"></i>
+              Especialidades Pendientes de Asignar
+            </h3>
+            <p class="text-sm text-gray-600 mt-1">Especialidades seleccionadas que serán asignadas al guardar</p>
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Especialidad
+                  </th>
+                  <th *ngIf="especialidadesSeleccionadas.length > 0" class="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider w-24">
+                    Acción
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngIf="especialidadesSeleccionadas.length === 0" class="border-b border-gray-200">
+                  <td colspan="2" class="px-6 py-8 text-center">
+                    <div class="flex flex-col items-center justify-center space-y-3">
+                      <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-stethoscope text-gray-400 text-2xl"></i>
+                      </div>
+                      <div class="text-gray-500">
+                        <p class="text-lg font-medium">No hay especialidades pendientes</p>
+                        <p class="text-sm mt-1">Seleccione especialidades para asignar al médico</p>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngFor="let especialidad of especialidadesSeleccionadas" class="hover:bg-gray-50 transition-colors duration-200">
+                  <td class="px-6 py-4">
+                    <div class="flex items-center">
+                      <div class="h-8 w-8 flex-shrink-0">
+                        <div class="h-8 w-8 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 flex items-center justify-center">
+                          <i class="fas fa-stethoscope text-white text-sm"></i>
+                        </div>
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">{{ especialidad.nombre }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <button
+                      type="button"
+                      (click)="eliminarEspecialidadSeleccionada(especialidad.codigo)"
+                      class="inline-flex items-center justify-center w-8 h-8 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200"
+                      title="Quitar especialidad"
+                    >
+                      <i class="fas fa-trash text-xs"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Especialidades Asignadas (Actuales) -->
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200 bg-green-50">
+            <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+              <i class="fas fa-check-circle text-green-600 mr-2"></i>
+              Especialidades Asignadas
+            </h3>
+            <p class="text-sm text-gray-600 mt-1">Especialidades actualmente asignadas al médico</p>
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Especialidad
+                  </th>
+                  <th *ngIf="listaEspecialidadesMedico.length > 0" class="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider w-24">
+                    Acción
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngIf="listaEspecialidadesMedico.length === 0" class="border-b border-gray-200">
+                  <td colspan="2" class="px-6 py-8 text-center">
+                    <div class="flex flex-col items-center justify-center space-y-3">
+                      <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user-md text-gray-400 text-2xl"></i>
+                      </div>
+                      <div class="text-gray-500">
+                        <p class="text-lg font-medium">No tiene especialidades asignadas</p>
+                        <p class="text-sm mt-1">Asigne especialidades para completar el perfil del médico</p>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngFor="let especialidad of listaEspecialidadesMedico" class="hover:bg-gray-50 transition-colors duration-200">
+                  <td class="px-6 py-4">
+                    <div class="flex items-center">
+                      <div class="h-8 w-8 flex-shrink-0">
+                        <div class="h-8 w-8 rounded-full bg-gradient-to-r from-green-400 to-green-600 flex items-center justify-center">
+                          <i class="fas fa-stethoscope text-white text-sm"></i>
+                        </div>
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">{{ especialidad.especialidad }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <button
+                      type="button"
+                      (click)="eliminarEspecialidadAsignada(especialidad.codigo)"
+                      class="inline-flex items-center justify-center w-8 h-8 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200"
+                      title="Eliminar especialidad"
+                    >
+                      <i class="fas fa-trash text-xs"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center justify-end gap-4 mt-8">
+        <button
+          type="button"
+          (click)="salirSinGuardar()"
+          class="px-6 py-3 bg-white text-gray-800 font-semibold rounded-lg shadow-md border border-gray-300 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 cursor-pointer"
+        >
+          <i class="fas fa-times mr-2"></i>
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="px-8 py-3 bg-gray-800 text-white font-semibold rounded-lg shadow-md hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 cursor-pointer"
+        >
+          <i class="fas fa-save mr-2"></i>
+          {{ eventoUpdate ? 'Actualizar Médico' : 'Guardar Médico' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</form>

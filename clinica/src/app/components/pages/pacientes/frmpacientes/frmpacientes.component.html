@@ -1,0 +1,179 @@
+<form [formGroup]="frmPaciente" (ngSubmit)="guardarPaciente()">
+  <div class="min-h-screen p-6 ">
+    <div class="max-w-4xl mx-auto">
+      <!-- Form Content -->
+      <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+          <h2 class="text-3xl font-bold text-center text-gray-800 mb-2 ">
+            {{ eventoUpdate ? 'ACTUALIZAR PACIENTE' : 'REGISTRO DE PACIENTE' }}
+          </h2>
+          <p class="text-center text-gray-500 text-sm">
+            {{ eventoUpdate ? 'Modifique la información del paciente según sea necesario' : 'Complete la información personal del nuevo paciente' }}
+          </p>
+        </div>
+        <!-- Section Header -->
+
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+            <i class="fas fa-user-edit text-gray-600 mr-2"></i>
+            Información Personal
+          </h3>
+        </div>
+
+        <!-- Form Fields -->
+        <div class="p-6">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Cédula -->
+            <div class="lg:col-span-1">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                <i class="fas fa-id-card text-gray-500 mr-1"></i>
+                Cédula *
+              </label>
+              <input
+                formControlName="txtCedula"
+                placeholder="Ingrese número de cédula"
+                maxlength="10"
+                type="text"
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
+              />
+              <app-validators 
+                [control]="frmPaciente.get('txtCedula')!"
+                [showCounter]="true"
+                [expectedLength]="10">
+              </app-validators>
+            </div>
+
+            <!-- Nombres -->
+            <div class="lg:col-span-1">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                <i class="fas fa-user text-gray-500 mr-1"></i>
+                Nombres *
+              </label>
+              <input
+                placeholder="Ingrese los nombres"
+                formControlName="txtNombres"
+                type="text"
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
+              />
+              <app-validators [control]="frmPaciente.get('txtNombres')!"></app-validators>
+            </div>
+
+            <!-- Apellidos -->
+            <div class="lg:col-span-1">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                <i class="fas fa-user-tag text-gray-500 mr-1"></i>
+                Apellidos *
+              </label>
+              <input
+                placeholder="Ingrese los apellidos"
+                formControlName="txtApellidos"
+                type="text"
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
+              />
+              <app-validators [control]="frmPaciente.get('txtApellidos')!"></app-validators>
+            </div>
+
+            <!-- Fecha de Nacimiento -->
+            <div class="lg:col-span-1">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                <i class="fas fa-calendar-alt text-gray-500 mr-1"></i>
+                Fecha de Nacimiento *
+              </label>
+              <input
+                formControlName="txtFechNac"
+                type="date"
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm cursor-pointer"
+              />
+              <app-validators [control]="frmPaciente.get('txtFechNac')!"></app-validators>
+            </div>
+
+            <!-- Teléfono -->
+            <div class="lg:col-span-1">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                <i class="fas fa-phone text-gray-500 mr-1"></i>
+                Número de Teléfono *
+              </label>
+              <input
+                formControlName="txtNumTelefono"
+                placeholder="Ingrese número de teléfono"
+                maxlength="10"
+                type="text"
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
+              />
+              <app-validators 
+                [control]="frmPaciente.get('txtNumTelefono')!"
+                [showCounter]="true"
+                [expectedLength]="10">
+              </app-validators>
+            </div>
+
+            <!-- Email -->
+            <div class="lg:col-span-1">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                <i class="fas fa-envelope text-gray-500 mr-1"></i>
+                Correo Electrónico
+              </label>
+              <input
+                formControlName="txtCorreo"
+                placeholder="ejemplo@correo.com"
+                type="email"
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
+              />
+              <app-validators [control]="frmPaciente.get('txtCorreo')!"></app-validators>
+            </div>
+
+            <!-- Dirección -->
+            <div class="lg:col-span-3">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                <i class="fas fa-map-marker-alt text-gray-500 mr-1"></i>
+                Dirección de Domicilio *
+              </label>
+              <textarea
+                formControlName="txtDireccion"
+                placeholder="Ingrese la dirección completa del paciente"
+                rows="3"
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm resize-vertical"
+              ></textarea>
+              <app-validators [control]="frmPaciente.get('txtDireccion')!"></app-validators>
+            </div>
+
+            <!-- Descripción/Detalles -->
+            <div class="lg:col-span-3">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                <i class="fas fa-notes-medical text-gray-500 mr-1"></i>
+                Descripción del Paciente
+              </label>
+              <textarea
+                formControlName="txtDetalles"
+                placeholder="Ingrese una descripción del paciente, en caso de necesitarlo"
+                rows="3"
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm resize-vertical"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center justify-end gap-4 mt-6">
+        <a>
+            <button
+            type="button"
+            (click)="salirSinGuardar()"
+            class="px-6 py-3 bg-white text-gray-800 font-semibold rounded-lg shadow-md border border-gray-300 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 cursor-pointer"
+          >
+            <i class="fas fa-times mr-2"></i>
+            Cancelar
+          </button>
+        </a>
+        <button
+          type="submit"
+          class="px-8 py-3 bg-white text-gray-800 font-semibold rounded-lg shadow-md border border-gray-300 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 cursor-pointer"
+        >
+          <i class="fas fa-save mr-2"></i>
+          {{ eventoUpdate ? 'Actualizar Paciente' : 'Guardar Paciente' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</form>

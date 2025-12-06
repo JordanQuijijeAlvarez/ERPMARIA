@@ -1,0 +1,329 @@
+<form [formGroup]="formCita" (ngSubmit)="guardarCitas()">
+  <div class="min-h-screen p-6">
+    <!-- Título Principal -->
+    <div class="mb-8">
+      <h2
+        class="text-3xl font-bold text-center text-blue-800 mb-6 bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent"
+      >
+        AGENDAR CITA MÉDICA
+      </h2>
+    </div>
+
+    <!-- Layout en Grid Responsive -->
+    <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Columna Izquierda -->
+      <div class="space-y-6">
+        <!-- Tarjeta: Búsqueda de Paciente -->
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+          <h3
+            class="text-lg font-semibold text-gray-800 mb-4 flex items-center"
+          >
+            <i class="fas fa-search text-blue-600 mr-2"></i>
+            Búsqueda de Paciente
+          </h3>
+
+          <label
+            for="postal-code"
+            class="block text-sm font-semibold text-gray-700 mb-2"
+          >
+            Buscar por cédula
+          </label>
+
+          <div class="flex items-center space-x-3 mb-4">
+            <input
+              formControlName="txtCedulaPaci"
+              placeholder="Ingrese el número de cédula del paciente"
+              minlength="10"
+              maxlength="10"
+              type="text"
+              name="cedulaPac"
+              id="cedulaPac"
+              autocomplete="address-level2"
+              class="flex-1 px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
+            />
+
+            <button
+              (click)="buscarPacienteCedula()"
+              type="button"
+              class="px-6 py-3 bg-gray-800 text-white font-semibold rounded-lg shadow-md hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 cursor-pointer"
+            >
+              Buscar
+            </button>
+          </div>
+
+          <!-- Componente de validación reutilizable -->
+          <app-validators 
+            [control]="formCita.get('txtCedulaPaci')!" 
+            [showCounter]="true"
+            [expectedLength]="10">
+          </app-validators>
+        </div>
+
+        <!-- Tarjeta: Datos del Paciente -->
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+          <h3
+            class="text-lg font-semibold text-gray-800 mb-4 flex items-center"
+          >
+            <i class="fas fa-user text-green-600 mr-2"></i>
+            Datos del Paciente
+          </h3>
+
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-2"
+              >Nombre</label
+            >
+            <input
+              type="text"
+              name="first-name"
+              formControlName="txtNombrePaci"
+              id="first-name"
+              autocomplete="given-name"
+              class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
+            />
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-2"
+              >Apellido</label
+            >
+            <input
+              type="text"
+              name="last-name"
+              formControlName="txtApellidoPaci"
+              id="last-name"
+              autocomplete="given-name"
+              class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
+            />
+          </div>
+
+          <div class="mb-4">
+            <label
+              for="region"
+              class="block text-sm font-semibold text-gray-700 mb-2"
+              >Edad</label
+            >
+            <input
+              formControlName="txtEdadPaci"
+              type="text"
+              name="first-name"
+              id="first-name"
+              autocomplete="given-name"
+              class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna Derecha -->
+      <div class="space-y-6">
+        <!-- Tarjeta: Selección de Especialidad y Médico -->
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+          <h3
+            class="text-lg font-semibold text-gray-800 mb-4 flex items-center"
+          >
+            <i class="fas fa-user-md text-purple-600 mr-2"></i>
+            Datos de Especialidad y Médico
+          </h3>
+
+          <div class="mb-4">
+            <label
+              for="selectEspecialidad"
+              class="block text-sm font-semibold text-gray-700 mb-2"
+            >
+              Seleccione la especialidad
+            </label>
+            <select
+              formControlName="selectEspecialidad"
+              name="selectEspecialidad"
+              id="selectEspecialidad"
+              (change)="onSelectChange($event)"
+              class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:bg-white hover:shadow-sm appearance-none cursor-pointer"
+              style="
+                background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;4&quot; height=&quot;5&quot; viewBox=&quot;0 0 4 5&quot;><path fill=&quot;%23666&quot; d=&quot;M2 0L0 2h4zm0 5L0 3h4z&quot;/></svg>');
+                background-repeat: no-repeat;
+                background-position: right 1rem center;
+                background-size: 0.75rem;
+              "
+            >
+              <option value="" disabled selected class="text-gray-400">
+                Seleccione una especialidad
+              </option>
+              <option
+                *ngFor="let especialidad of listaEspecialidades"
+                [value]="especialidad.codigo"
+              >
+                {{ especialidad.nombre }}
+              </option>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label
+              for="selectMedico"
+              class="block text-sm font-semibold text-gray-700 mb-2"
+            >
+              Seleccione al médico
+            </label>
+            <div class="relative">
+              <select
+                formControlName="selectMedico"
+                name="selectMedico"
+                id="selectMedico"
+                (change)="onSelectChange($event)"
+                [disabled]="!formCita.get('selectEspecialidad')?.value || listamedicos.length === 0"
+                [attr.tabindex]="(!formCita.get('selectEspecialidad')?.value || listamedicos.length === 0) ? -1 : 0"
+                class="w-full px-4 py-3 border rounded-lg text-gray-900 focus:outline-none transition-all duration-200 appearance-none"
+                [ngClass]="{
+                  'bg-gray-50 border-gray-300 hover:bg-white hover:shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer': formCita.get('selectEspecialidad')?.value && listamedicos.length > 0,
+                  'bg-gray-100 border-gray-200 cursor-not-allowed text-gray-400 pointer-events-none': !formCita.get('selectEspecialidad')?.value || listamedicos.length === 0
+                }"
+                style="
+                  background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;4&quot; height=&quot;5&quot; viewBox=&quot;0 0 4 5&quot;><path fill=&quot;%23666&quot; d=&quot;M2 0L0 2h4zm0 5L0 3h4z&quot;/></svg>');
+                  background-repeat: no-repeat;
+                  background-position: right 1rem center;
+                  background-size: 0.75rem;
+                "
+              >
+                <!-- Cuando no se ha seleccionado especialidad -->
+                <option value="" disabled selected *ngIf="!formCita.get('selectEspecialidad')?.value" class="text-gray-400">
+                  Primero seleccione una especialidad
+                </option>
+                
+                <!-- Cuando hay médicos disponibles -->
+                <option value="" disabled selected *ngIf="formCita.get('selectEspecialidad')?.value && listamedicos.length > 0" class="text-gray-400">
+                  Seleccione un médico
+                </option>
+                
+                <!-- Cuando no hay médicos disponibles en la especialidad -->
+                <option value="" disabled selected *ngIf="formCita.get('selectEspecialidad')?.value && listamedicos.length === 0" class="text-gray-400">
+                  No hay médicos disponibles
+                </option>
+                
+                <option
+                  *ngFor="let medico of listamedicos"
+                  [value]="medico.codigo"
+                >
+                  Dr. {{ medico.nombre }} {{ medico.apellido }}
+                </option>
+              </select>
+            </div>
+            
+            <!-- Mensaje informativo cuando no se ha seleccionado especialidad -->
+            <div 
+              *ngIf="!formCita.get('selectEspecialidad')?.value" 
+              class="mt-3 p-3 "
+            >
+              <div class="flex items-center">
+                <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                <span class="text-sm font-medium text-blue-800">
+                  Debe seleccionar una especialidad primero
+                </span>
+              </div>
+            </div>
+            
+            <!-- Mensaje informativo cuando no hay médicos -->
+            <div 
+              *ngIf="listamedicos.length === 0 && formCita.get('selectEspecialidad')?.value" 
+              class="mt-3 p-3 "
+            >
+              <div class="flex items-center">
+                <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>
+                <span class="text-sm font-medium text-red-800">
+                  No hay médicos disponibles para la especialidad seleccionada
+                </span>
+              </div>
+              <p class="text-xs text-red-700 mt-1">
+                Por favor, seleccione otra especialidad o contacte con administración
+              </p>
+            </div>
+            
+            <!-- Información del horario del médico -->
+            <div
+              *ngIf="objhorario && listamedicos.length > 0"
+              class="mt-3 p-3 "
+            >
+              <span class="text-sm font-medium text-blue-800">
+                <i class="fas fa-clock text-blue-600 mr-2"></i>
+                Horario del médico: {{ objhorario.hora_inicio }} -
+                {{ objhorario.hora_fin }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta: Información de la Cita -->
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+          <h3
+            class="text-lg font-semibold text-gray-800 mb-4 flex items-center"
+          >
+            <i class="fas fa-file-alt text-orange-600 mr-2"></i>
+            Información de la Cita
+          </h3>
+
+          <div
+            *ngIf="horaCita && fechaCita"
+            class="mb-6 p-4 "
+          >
+            <h4 class="text-sm font-semibold text-green-800 mb-2">
+              <i class="fas fa-calendar-check text-green-600 mr-2"></i>
+              Fecha seleccionada para la consulta
+            </h4>
+            <p class="text-green-700">{{ fechaCita }} - {{ horaCita }}</p>
+          </div>
+
+          <div class="mb-6">
+            <label
+              for="txtAntecedente"
+              class="block text-sm font-semibold text-gray-700 mb-2"
+            >
+              Antecedentes o síntomas con los que ingresa el paciente
+            </label>
+            <textarea
+              id="txtAntecedente"
+              formControlName="txtAntecedente"
+              cols="30"
+              rows="4"
+              placeholder="Ingrese algún antecedente del paciente..."
+              class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:bg-white hover:shadow-sm resize-vertical"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección de Calendario - Ancho Completo -->
+    <div class="max-w-6xl mx-auto mt-6">
+      <div
+        class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-6"
+      >
+        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+          <i class="fas fa-calendar text-indigo-600 mr-2"></i>
+          Seleccionar Fecha y Hora
+        </h3>
+        <full-calendar [options]="calendarOptions"></full-calendar>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div
+        class="flex items-center justify-end gap-x-4 pt-6"
+      >
+        <a routerLink="../dashboard">
+          <button
+            type="button"
+            class="px-6 py-2 text-sm font-semibold text-gray-200 transition-colors duration-200 cursor-pointer"
+          >
+            <i class="fas fa-arrow-left mr-2"></i>
+            Atrás
+          </button>
+        </a>
+        <button
+          type="submit"
+          class="px-8 py-3 bg-white text-gray-800 font-semibold rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform hover:scale-105 transition-all duration-200 cursor-pointer"
+        >
+          <i class="fas fa-calendar-plus mr-2"></i>
+          Agendar Cita
+        </button>
+      </div>
+    </div>
+  </div>
+</form>

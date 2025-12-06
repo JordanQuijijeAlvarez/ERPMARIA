@@ -1,0 +1,131 @@
+<div>
+  <div id="contenido">
+    <div class="w-full max-w-4xl bg-white rounded-lg shadow-lg p-6">
+      <!-- Logo o imagen circular -->
+      <div class="flex justify-left mb-6"></div>
+      <div class="grid grid-cols-3 gap-4">
+        <div>
+          <img src="/iconoestetocopio.png" style="height: 4cm; width: 4cm" />
+        </div>
+        <div><strong>CONSULTA MEDICA COD. {{listaHistorial?.codigo_consulta}}</strong></div>
+        <div> <strong><em>Fecha: {{ listaHistorial?.fecha_consulta }}</em></strong></div>
+
+      </div>
+
+      <br />
+
+      <div class="section-title">
+        <strong><em>Información del Paciente:</em></strong>
+      </div>
+
+      <hr />
+      <br />
+      <div class="grid grid-cols-3 gap-4">
+        <div>
+          <label class="block text-gray-700 mb-1">
+            <strong>Cédula:</strong>
+            {{ listaHistorial?.cedula_paciente }}
+          </label>
+        </div>
+        <div>
+          <strong>Nombres:</strong>
+          Sr(a). {{ listaHistorial?.nombre_paciente }}
+          {{ listaHistorial?.apellido_paciente }}
+        </div>
+      </div>
+
+      <br />
+
+
+      <br />
+
+      <div class="section-title">
+        <strong><em>Información del Medico</em></strong>
+      </div>
+
+      <hr />
+      <br />
+
+      <div class="grid grid-cols-3 gap-4">
+        <div class="dix">
+          <a
+            ><strong>Nombre:</strong> Dr. {{ listaHistorial?.nombre_medico
+            }}{{ listaHistorial?.apellido_medico }}</a
+          >
+        </div>
+        <div class="dix">
+          <a
+            ><strong>Especialidad:</strong>
+            {{ listaHistorial?.especialidad }}</a
+          >
+        </div>
+        <div class="dix">
+          <a><strong>Consultorio:</strong>{{ listaHistorial?.consultorio }}</a>
+        </div>
+      </div>
+
+      <br />
+
+
+      <br />
+
+      <div class="section-title">
+        <strong><em>Datos Adicionales</em></strong>
+      </div>
+
+      <hr />
+      <br />
+
+
+      <div class="grid grid-cols-3 gap-4">
+        <div><strong>Peso:</strong> {{ listaHistorial?.peso }} KG</div>
+        <div><strong>Estatura:</strong> {{ listaHistorial?.estatura }} CM</div>
+        <div>
+          <strong>Presión Arterial:</strong>
+          {{ listaHistorial?.presion_arterial }} PPM
+        </div>
+        <div>
+          <strong>Temperatura:</strong> {{ listaHistorial?.temperatura }} °C
+        </div>
+      </div>
+
+      <br />
+      <br />
+
+      <div class="section-title">
+        <strong><em>Detalles de la consulta</em></strong>
+      </div>
+
+      <hr />
+      <br />
+
+      <!-- Dos columnas -->
+      <div class="grid grid-cols-3 gap-4">
+        <div>
+          <div><strong>Diagnostico</strong></div>
+
+          {{ listaHistorial?.diagnostico }}
+        </div>
+        <div>
+          <div><strong>Tratamiento</strong></div>
+
+          {{ listaHistorial?.tratamiento }}
+        </div>
+        <div>
+          <div><strong>Observaciones</strong></div>
+          {{ listaHistorial?.observaciones }}
+        </div>
+      </div>
+    </div>
+    <br />
+
+    <!-- Bloque horizontal -->
+  </div>
+
+  <button
+    class="bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-700 dark:bg-teal-600 dark:text-white dark:hover:bg-teal-900"
+    (click)="generatePDFFromHTML()"
+  >
+    GENERAR REPORTE
+  </button>
+</div>

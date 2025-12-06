@@ -1,0 +1,232 @@
+<div class="flex h-screen w-full bg-transparent">
+  <!--Start SideBar-->
+  <aside
+    class="w-20 relative z-20 flex-shrink-0 px-2 overflow-y-auto bg-gray-800 sm:block"
+  >
+    <div class="mb-6">
+      <!--Start logo -->
+      <div class="flex justify-center">
+        <div
+          class="w-14 h-14 rounded-full bg-gray-300 border-2 border-white mt-2"
+        >
+          <img
+
+          routerLink="./dashboard"
+            src="/images/icons/iconoestetocopio.png"
+            class="rounded-full w-auto"
+          />
+        </div>
+      </div>
+      <!--End logo -->
+      <!--Start NavItem   error mover a .ts  @click="openMenu !== 1 ? openMenu = 1 : openMenu = null"-->
+      <div>
+        <ul class="mt-6 leading-10 px-4">
+          <li
+            class="mb-3 p-2 rounded-md flex items-center justify-center bg-blue-400 cursor-pointer"
+            (click)="toggleMenu(1)"
+          >
+            <i class="fas fa-align-left fa-sm text-white"></i>
+          </li>
+          
+
+          <li
+            class="absolute bottom-0 mb-3 p-2 rounded-full flex items-center mx-auto bg-white cursor-pointer"
+            (click)="cerrarSesion()"
+          >
+            <i class="fas fa-power-off fa-sm colorIconosSliderStandar"></i>
+          </li>
+        </ul>
+      </div>
+      <!--End NavItem -->
+    </div>
+  </aside>
+  <!-- Start Open Menu  "-->
+  <aside
+    class="animate__animated w-52 relative z-0 flex-shrink-0 px-4 overflow-y-auto bg-gray-800 sm:block sidebar-scroll"
+    [class.animate__fadeInLeft]="openMenu === 1 && !isClosing"
+    [class.animate__fadeOutLeft]="isClosing"
+    *ngIf="openMenu === 1 || isClosing"
+  >
+    <div class="mb-6">
+      <!--Start Sidebar for open menu -->
+      <div class="flex flex-col gap-1 mt-4 px-2">
+
+    <!-- CLIENTES -->
+        <div
+        *appMostrarSiRol="['administrador']"
+          class="mb-2 mt-3"
+        >
+          <p class="font-bold numletrasidebar text-sm mb-2 text-white">
+            Clientes
+          </p>
+        </div>
+
+        <!-- boton lista paciente -->
+        <a
+          *appMostrarSiRol="['administrador']"
+          routerLink="listarclientes"
+          class="flex items-center p-3 bg-white rounded-md shadow-sm cursor-pointer hover:bg-gray-100 hover:shadow-md hover:scale-105 transition-all duration-200 mb-1"
+        >
+          <div class="flex items-center justify-center w-8 h-8 mr-3">
+            <i class="fa fa-street-view colorIconosSliderStandar"></i>
+          </div>
+          <p class="text-sm font-semibold">Clientes</p>
+        </a>
+
+
+
+        <!-- CITAS -->
+        <div *appMostrarSiRol="['administrador', 'recepcionista']" class="mb-2">
+          <p class="font-bold numletrasidebar text-sm mb-2 text-white">Citas</p>
+        </div>
+
+        <a
+          *appMostrarSiRol="['medico']"
+          routerLink="dashboard"
+          class="flex items-center p-3 bg-white rounded-md shadow-sm cursor-pointer hover:bg-gray-100 hover:shadow-md hover:scale-105 transition-all duration-200 mb-1"
+        >
+          <div class="flex items-center justify-center w-8 h-8 mr-3">
+            <i class="fas fa-chart-pie fa-sm colorIconosSliderStandar"></i>
+          </div>
+          <p class="text-sm font-semibold">Dashboard</p>
+        </a>
+
+        <!-- boton lista citas -->
+        <a
+          *appMostrarSiRol="['administrador', 'recepcionista']"
+          routerLink="frmcitas"
+          class="flex items-center p-3 bg-white rounded-md shadow-sm cursor-pointer hover:bg-gray-100 hover:shadow-md hover:scale-105 transition-all duration-200 mb-1"
+        >
+          <div class="flex items-center justify-center w-8 h-8 mr-3">
+            <i class="fas fa-stethoscope colorIconosSliderStandar"></i>
+          </div>
+          <p class="text-sm font-semibold">Citas</p>
+        </a>
+
+        <!-- PACIENTES -->
+        <div
+          *appMostrarSiRol="['administrador', 'recepcionista']"
+          class="mb-2 mt-3"
+        >
+          <p class="font-bold numletrasidebar text-sm mb-2 text-white">
+            Pacientes
+          </p>
+        </div>
+
+        <!-- boton lista paciente -->
+        <a
+          *appMostrarSiRol="['administrador', 'recepcionista']"
+          routerLink="listapacientes"
+          class="flex items-center p-3 bg-white rounded-md shadow-sm cursor-pointer hover:bg-gray-100 hover:shadow-md hover:scale-105 transition-all duration-200 mb-1"
+        >
+          <div class="flex items-center justify-center w-8 h-8 mr-3">
+            <i class="fa fa-street-view colorIconosSliderStandar"></i>
+          </div>
+          <p class="text-sm font-semibold">Pacientes</p>
+        </a>
+
+        <!-- boton lista historial clinico -->
+        <a
+          *appMostrarSiRol="['administrador', 'medico', 'recepcionista']"
+          routerLink="listahistorial"
+          class="flex items-center p-3 bg-white rounded-md shadow-sm cursor-pointer hover:bg-gray-100 hover:shadow-md hover:scale-105 transition-all duration-200 mb-1"
+        >
+          <div class="flex items-center justify-center w-8 h-8 mr-3">
+            <i class="fa fa-history colorIconosSliderStandar"></i>
+          </div>
+          <p class="text-sm font-semibold">Historial</p>
+        </a>
+
+        <!-- MEDICOS -->
+        <div *appMostrarSiRol="['administrador']" class="mb-2 mt-3">
+          <p class="font-bold numletrasidebar text-sm mb-2 text-white">
+            Médicos
+          </p>
+        </div>
+
+        <!-- boton lista medico -->
+        <a
+          *appMostrarSiRol="['administrador']"
+          routerLink="listamedicos"
+          class="flex items-center p-3 bg-white rounded-md shadow-sm cursor-pointer hover:bg-gray-50 mb-1"
+        >
+          <div class="flex items-center justify-center w-8 h-8 mr-3">
+            <i class="fa fa-user-md colorIconosSliderStandar"></i>
+          </div>
+          <p class="text-sm font-semibold">Médicos</p>
+        </a>
+
+        <!-- boton lista especialidades -->
+        <a
+          *appMostrarSiRol="['administrador']"
+          routerLink="listaespecialidades"
+          class="flex items-center p-3 bg-white rounded-md shadow-sm cursor-pointer hover:bg-gray-50 mb-1"
+        >
+          <div class="flex items-center justify-center w-8 h-8 mr-3">
+            <i class="fa fa-book colorIconosSliderStandar"></i>
+          </div>
+          <p class="text-sm font-semibold">Especialidades</p>
+        </a>
+
+        <!-- boton lista consultas -->
+        <a
+          *appMostrarSiRol="['administrador', 'medico']"
+          routerLink="listaconsultas"
+          class="flex items-center p-3 bg-white rounded-md shadow-sm cursor-pointer hover:bg-gray-50 mb-1"
+        >
+          <div class="flex items-center justify-center w-8 h-8 mr-3">
+            <i class="fa fa-thermometer-empty colorIconosSliderStandar"></i>
+          </div>
+          <p class="text-sm font-semibold">Consultas</p>
+        </a>
+
+        <!-- boton lista horarios -->
+        <a
+          *appMostrarSiRol="['administrador']"
+          routerLink="listahorarios"
+          class="flex items-center p-3 bg-white rounded-md shadow-sm cursor-pointer hover:bg-gray-50 mb-1"
+        >
+          <div class="flex items-center justify-center w-8 h-8 mr-3">
+            <i class="fa fa-calendar colorIconosSliderStandar"></i>
+          </div>
+          <p class="text-sm font-semibold">Horarios</p>
+        </a>
+
+
+
+        <!-- Otros -->
+        <div *appMostrarSiRol="['administrador']" class="mb-2 mt-3">
+          <p class="font-bold numletrasidebar text-sm mb-2 text-white">Administración</p>
+        </div>
+
+        <!-- boton lista consultorios -->
+        <a
+          *appMostrarSiRol="['administrador']"
+          routerLink="listaconsultorios"
+          class="flex items-center p-3 bg-white rounded-md shadow-sm cursor-pointer hover:bg-gray-50 mb-1"
+        >
+          <div class="flex items-center justify-center w-8 h-8 mr-3">
+            <i class="fa fa-bed colorIconosSliderStandar"></i>
+          </div>
+          <p class="text-sm font-semibold">Consultorios</p>
+        </a>
+
+        <!-- boton lista usuarios -->
+        <a
+          *appMostrarSiRol="['administrador']"
+          routerLink="listausuarios"
+          class="flex items-center p-3 bg-white rounded-md shadow-sm cursor-pointer hover:bg-gray-50 mb-1"
+        >
+          <div class="flex items-center justify-center w-8 h-8 mr-3">
+            <i class="fa fa-users colorIconosSliderStandar"></i>
+          </div>
+          <p class="text-sm font-semibold">Usuarios</p>
+        </a>
+      </div>
+      <!--End Sidebar for open menu -->
+    </div>
+  </aside>
+  <!-- End Open Menu -->
+
+  <!-- End Sidebar -->
+</div>

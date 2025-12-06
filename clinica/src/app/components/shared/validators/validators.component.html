@@ -1,0 +1,67 @@
+<!-- Error de validación -->
+<div
+  *ngIf="control?.invalid && (control.dirty || control.touched)"
+  class="mt-2 flex items-center gap-2 p-2 bg-red-50 rounded-lg"
+>
+  <i class="fas fa-exclamation-circle text-red-500 text-sm"></i>
+  <span class="text-red-700 text-sm">
+    <span *ngIf="control.errors?.['required']">
+      Este campo es obligatorio.
+    </span>
+    <span *ngIf="control.errors?.['selectRequired']">
+      Debe seleccionar una opción válida.
+    </span>
+    <span *ngIf="control.errors?.['email']">
+      El formato del correo electrónico no es válido.
+    </span>
+    <span *ngIf="control.errors?.['minlength']">
+      Debe tener al menos {{ control.errors?.['minlength']?.requiredLength }} caracteres.
+    </span>
+    <span *ngIf="control.errors?.['maxlength']">
+      No debe exceder {{ control.errors?.['maxlength']?.requiredLength }} caracteres.
+    </span>
+    <span *ngIf="control.errors?.['onlyNumbers']">
+      Valor no válido, ingrese solo números.
+    </span>
+    <span *ngIf="control.errors?.['tenDigits']">
+      Debe contener exactamente 10 dígitos 
+      <span *ngIf="showCounter" class="font-semibold">({{ getCurrentLength() }}/10)</span>
+    </span>
+    <span *ngIf="control.errors?.['exactLength']">
+      Debe contener exactamente {{ control.errors?.['exactLength']?.requiredLength }} dígitos
+      <span *ngIf="showCounter" class="font-semibold">({{ getCurrentLength() }}/{{ control.errors?.['exactLength']?.requiredLength }})</span>
+    </span>
+    <span *ngIf="control.errors?.['pattern']">
+      Formato inválido.
+    </span>
+    <span *ngIf="control.errors?.['cedulaExists']">
+      Esta cédula ya está registrada en el sistema.
+    </span>
+    <span *ngIf="control.errors?.['pacienteNoEncontrado']">
+      No se encontró ningún paciente con la cédula ingresada. Verifique el número o registre al paciente primero.
+    </span>
+  </span>
+</div>
+
+<!-- Validación pendiente (para validadores asíncronos) -->
+<div
+  *ngIf="control?.pending"
+  class="mt-2 flex items-center gap-2 p-2 bg-yellow-50 rounded-lg"
+>
+  <i class="fas fa-spinner fa-spin text-yellow-500 text-sm"></i>
+  <span class="text-yellow-700 text-sm">
+    Verificando disponibilidad...
+  </span>
+</div>
+
+<!-- Confirmación de campo completado -->
+<div
+  *ngIf="isFieldComplete()"
+  class="mt-2 flex items-center gap-2 p-2 bg-green-50 rounded-lg"
+>
+  <i class="fas fa-check-circle text-green-500 text-sm"></i>
+  <span class="text-green-700 text-sm font-medium">
+    Campo completado correctamente 
+    <span class="font-semibold">({{ expectedLength }}/{{ expectedLength }} dígitos)</span>
+  </span>
+</div>

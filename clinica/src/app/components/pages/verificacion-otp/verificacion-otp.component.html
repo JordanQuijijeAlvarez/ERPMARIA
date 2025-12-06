@@ -1,0 +1,18 @@
+<div class="p-6 bg-white rounded shadow max-w-md mx-auto mt-10">
+  <h2 class="text-xl font-bold mb-4 text-center">Verificación de Código</h2>
+  <form [formGroup]="formOtp" (ngSubmit)="verificarOTP()">
+    <label class="block mb-2 text-sm font-medium text-gray-700">Código OTP</label>
+    <input type="text"
+           formControlName="codigo_otp"
+           class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+           placeholder="Ingresa el código de 6 dígitos" />
+
+    <div *ngIf="mensajeError" class="text-red-600 mt-2">{{ mensajeError }}</div>
+
+    <button type="submit"
+            [disabled]="!formOtp.valid"
+            class="mt-4 w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
+      Verificar
+    </button>
+  </form>
+</div>

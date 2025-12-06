@@ -1,0 +1,100 @@
+<form [formGroup]="frmEspecialidad" (ngSubmit)="guardarEspecialidad()">
+  <div class="min-h-screen p-6">
+    <div class="max-w-4xl mx-auto">
+      <!-- Header Section -->
+     <!-- Main Form Container -->
+      <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden mt-8">
+        <div class="text-center pt-6 pb-4">
+          <h2 class="text-3xl font-bold text-gray-800 mb-2">
+            {{ eventoUpdate ? 'ACTUALIZAR ESPECIALIDAD' : 'REGISTRO DE ESPECIALIDAD' }}
+          </h2>
+          <p class="text-gray-500 text-sm">
+            {{ eventoUpdate ? 'Modifique la información de la especialidad según sea necesario' : 'Complete la información de la nueva especialidad médica' }}
+          </p>
+        </div>
+ 
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+            <i class="fas fa-stethoscope text-gray-600 mr-2"></i>
+            Información de la Especialidad
+          </h3>
+        </div>
+        
+        <div class="p-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Nombre de la Especialidad -->
+            <div class="lg:col-span-1">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                <i class="fas fa-stethoscope text-gray-500 mr-1"></i>
+                Nombre de la Especialidad *
+              </label>
+              <input
+                formControlName="txtNombre"
+                type="text"
+                id="nombre"
+                autocomplete="off"
+                placeholder="Ejemplo: Cardiología, Neurología, Pediatría..."
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
+              />
+              <app-validators [control]="frmEspecialidad.get('txtNombre')!"></app-validators>
+            </div>
+
+            <!-- Descripción -->
+            <div class="lg:col-span-1">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                <i class="fas fa-align-left text-gray-500 mr-1"></i>
+                Descripción (Opcional)
+              </label>
+              <textarea
+                formControlName="txtDescripcion"
+                id="descripcion"
+                rows="3"
+                placeholder="Breve descripción de la especialidad..."
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm resize-vertical"
+              ></textarea>
+              <app-validators [control]="frmEspecialidad.get('txtDescripcion')!"></app-validators>
+            </div>
+
+          </div>
+
+          <!-- Information Card -->
+          <div class="mt-6  p-4">
+            <div class="flex items-start">
+              <div class="flex-shrink-0">
+                <i class="fas fa-info-circle text-blue-500 text-lg"></i>
+              </div>
+              <div class="ml-3">
+                <h4 class="text-sm font-medium text-blue-800">Información importante</h4>
+                <p class="text-sm text-blue-700 mt-1">
+                  Las especialidades médicas se utilizan para clasificar y organizar los servicios de atención médica.
+                  Asegúrese de que el nombre sea claro y específico.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center justify-end gap-4 mt-8">
+        <button
+          type="button"
+          (click)="salirSinGuardar()"
+          class="px-6 py-3 bg-white text-gray-800 font-semibold rounded-lg shadow-md border border-gray-300 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 cursor-pointer"
+        >
+          <i class="fas fa-times mr-2"></i>
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="px-8 py-3 bg-gray-800 text-white font-semibold rounded-lg shadow-md hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 cursor-pointer"
+        >
+          <i class="fas fa-save mr-2"></i>
+          {{ eventoUpdate ? 'Actualizar Especialidad' : 'Guardar Especialidad' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
+

@@ -1,0 +1,10 @@
+{
+  "name": "gestion-clinica",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "concurrently \"cd backendClinica && node server.js\" \"cd clinica && ng serve -o\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
