@@ -8,7 +8,7 @@ import {
 } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { ConsultoriosService } from '../../../../servicios/subcategorias.service';
+//import { ConsultoriosService } from '../../../../servicios/subcategorias.service';
 import { InConsultorios } from '../../../../modelos/modelConsultorios/InConsultorios';
 import { AlertService } from '../../../../servicios/Alertas/alertas.service';
 import { CommonModule } from '@angular/common';
@@ -32,7 +32,7 @@ export class FrmconsultoriosComponent {
     private formBuilder: FormBuilder,
     private http: HttpClient,
     private router: Router,
-    private consultorioServ: ConsultoriosService,
+   // private consultorioServ: ConsultoriosService,
         private alertaServ: AlertService,
     
     private route: ActivatedRoute
@@ -58,7 +58,7 @@ export class FrmconsultoriosComponent {
   }
 
   cargarConsultorio(id: number): void {
-    this.consultorioServ.LConsultoriosId(id).subscribe({
+   /* this.consultorioServ.LConsultoriosId(id).subscribe({
       next: (consultorio) => {
          
         this.frmConsultorio.patchValue({
@@ -74,7 +74,7 @@ export class FrmconsultoriosComponent {
           'No se pudo cargar la información del consultorio',
           'Comuniquese con su administrador de TI'
         );      },
-    });
+    });*/
   }
   
 
@@ -117,7 +117,7 @@ export class FrmconsultoriosComponent {
 
 
     if (this.eventoUpdate) {
-      consultorio.codigo = '' + this.codigo;
+      /*consultorio.codigo = '' + this.codigo;
       this.consultorioServ.ActualizarConsultorio(consultorio).subscribe({
         next: (res) => {
           this.alertaServ.success('Consultorio actualizado con éxito.', '');
@@ -142,7 +142,7 @@ export class FrmconsultoriosComponent {
             'ERROR AL REGISTRAR',
             'Hubo un problema al registrar el consultorio: revise que la información sea correcta'
           );        },
-      });
+      });*/
     }
   }
 

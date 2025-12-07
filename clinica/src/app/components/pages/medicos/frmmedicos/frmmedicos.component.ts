@@ -13,7 +13,7 @@ import { InEspecialidadMedico } from '../../../../modelos/modelMedicos/InEspecia
 import { CommonModule, NgClass } from '@angular/common';
 import { horariosService } from '../../../../servicios/horarios.service';
 import { InHorarios } from '../../../../modelos/modeloHorarios/InHorarios';
-import { ConsultoriosService } from '../../../../servicios/subcategorias.service';
+//import { ConsultoriosService } from '../../../../servicios/subcategorias.service';
 import { InConsultorios } from '../../../../modelos/modelConsultorios/InConsultorios';
 import Swal from 'sweetalert2';
 import { InEspecialidades } from '../../../../modelos/modeloEspecialidades/InEspecialidades';
@@ -52,7 +52,7 @@ export class FrmmedicosComponent {
     private router: Router,
     private medicoServ: MedicosService,
     private horarioServ: horariosService,
-    private consultorioServ: ConsultoriosService,
+   // private consultorioServ: ConsultoriosService,
     private especialidadServ: especialidadesService,
     private medicoEspecialidadServ: MedicoEspecialidadService,
     private alertaServ: AlertService,
@@ -204,7 +204,7 @@ export class FrmmedicosComponent {
   }
 
   listarConsultoriosEstado(estado: any): void {
-    this.consultorioServ.LConsultoriosEstado(estado).subscribe({
+    /*this.consultorioServ.LConsultoriosEstado(estado).subscribe({
       next: (res) => {
         this.listaConsultorios = res;
 
@@ -213,7 +213,7 @@ export class FrmmedicosComponent {
       error: (err) => {
         alert('NO EXISTEN REGISTROS');
       },
-    });
+    });*/
   }
 
   listarhorarioesEstado(estado: any): void {

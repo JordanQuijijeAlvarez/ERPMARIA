@@ -4,7 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ConsultoriosService } from '../../../../servicios/subcategorias.service';
+//import { ConsultoriosService } from '../../../../servicios/subcategorias.service';
 import { InConsultorios } from '../../../../modelos/modelConsultorios/InConsultorios';
 import { AlertService } from '../../../../servicios/Alertas/alertas.service';
 
@@ -32,7 +32,7 @@ export class ListaconsultoriosComponent {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private ServicioConsultorio: ConsultoriosService,
+   // private ServicioConsultorio: ConsultoriosService,
     private ServicioAlertas: AlertService
   ) {}
 
@@ -41,7 +41,7 @@ export class ListaconsultoriosComponent {
   }
 
   listarConsultoriosEstado(estado: any): void {
-    this.ServicioConsultorio.LConsultoriosEstado(estado).subscribe({
+    /*this.ServicioConsultorio.LConsultoriosEstado(estado).subscribe({
       next: (res) => {
         this.listaConsultorios = res;
         this.filteredConsultorios = [...res]; // Inicializar lista filtrada
@@ -58,7 +58,7 @@ export class ListaconsultoriosComponent {
           }
         );
       },
-    });
+    });*/
   }
 
   eliminarConsultorios(id: any, nombre: string): void {
@@ -69,7 +69,7 @@ export class ListaconsultoriosComponent {
       'Cancelar'
     ).then((result) => {
       if (result.isConfirmed) {
-        this.ServicioConsultorio.EliminarConsultorio(id).subscribe({
+      /*  this.ServicioConsultorio.EliminarConsultorio(id).subscribe({
           next: (res) => {
             this.listaConsultorios = this.listaConsultorios.filter(
               (consultorio) => parseInt(consultorio.codigo) !== id
@@ -92,7 +92,7 @@ export class ListaconsultoriosComponent {
             );
             console.log('ERROR  ' + err.error.error);
           },
-        });
+        });*/
       } 
     });
   }
