@@ -16,6 +16,7 @@ import { ValidatorsComponent } from '../../../shared/validators/validators.compo
 import { productosService } from '../../../../servicios/productos.service';
 import { InSubcategoria } from '../../../../modelos/modeloSubcategoria/InSubcategoria';
 import { InProducto } from '../../../../modelos/modeloProductos/InProducto';
+import { SubcategoriasService } from '../../../../servicios/subcategorias.service';
 
 @Component({
     selector: 'app-frmproductos',
@@ -34,29 +35,26 @@ export class FrmproductoComponent {
 
   //especialidadesSeleccionadas: InSubcategoria[] = [];
 
-  listaSubcategorias: InEspecialidades[] = [];
+  listaSubcategorias: InSubcategoria[] = [];
 
   constructor(
     private formBuilder: FormBuilder,
     private http: HttpClient,
     private router: Router,
     private productoServ: productosService,
-    private especialidadServ: especialidadesService,
+    private subcategoriaServ: SubcategoriasService,
     private alertaServ: AlertService,
     private route: ActivatedRoute
   ) {
     this.frmProducto = this.formBuilder.group({
-      txtCedula: ['', [Validators.required, ValidatorsComponent.numericTenDigits]],
+      txtCodigobarras: ['', [Validators.required, ValidatorsComponent.numericTenDigits]],
       txtNombres: ['', Validators.required],
-      txtApellidos: ['', Validators.required],
-      txtFechNac: ['', Validators.required],
-      txtNumTelefono: ['', [Validators.required, ValidatorsComponent.numericTenDigits]],
-      txtCorreo: ['', [Validators.required, Validators.email]],
-      txtDireccion: ['', Validators.required],
-      txtLicenciaMedica: ['', Validators.required],
-      cbxConsultorio: ['', [Validators.required, ValidatorsComponent.selectRequired]],
-      cbxHorario: ['', ValidatorsComponent.selectRequired],
-      cbxEspecialidad: [''],
+      txtDescripcion: ['', Validators.required],
+      txtpreciocompra: ['', Validators.required],
+      txtprecioventa: ['', [Validators.required]],
+      txtstock: ['', [Validators.required, Validators.email]],
+      txtstockminimo: ['', Validators.required],
+      cbxSubcategoria: ['', [Validators.required, ValidatorsComponent.selectRequired]]
     });
   }
   ngOnInit(): void {
@@ -77,16 +75,15 @@ export class FrmproductoComponent {
   }
 
  listarSubcategoriaEstado(estado: any): void {
-    this.especialidadServ.LespecialidadesEstado(estado).subscribe({
+    this.subcategoriaServ.LSubcategoriasEstado(estado).subscribe({
       next: (res) => {
         this.listaSubcategorias = res;
-
         console.log(res);
       },
       error: (err) => {
         alert('NO EXISTEN REGISTROS');
       },
-    });
+    }); 
   }
   marcarCamposComoTocados(): void {
     Object.keys(this.frmProducto.controls).forEach((campo) => {
@@ -103,14 +100,14 @@ export class FrmproductoComponent {
 
        
         this.frmProducto.patchValue({
-          txtCedula: producto.prod_codbarras,
+          txtCodigobarras: producto.prod_codbarras,
           txtNombres: producto.prod_nombre,
-          txtApellidos: producto.prod_descripcion,
-          txtCorreo: producto.prod_stock,
-          txtNumTelefono: producto.prod_stock_min,
-          txtDireccion: producto.prod_preciov,
-          txtFechNac: producto.prod_preciocompra,
-          cbxConsultorio: producto.prod_subcategoria
+          txtDescripcion: producto.prod_descripcion,
+          txtstock: producto.prod_stock,
+          txtprecioventa: producto.prod_stock_min,
+          txtstockminimo: producto.prod_preciov,
+          txtpreciocompra: producto.prod_preciocompra,
+          cbxSubcategoria: producto.prod_subcategoria
         });
       },
       error: (err) => {
@@ -132,14 +129,14 @@ export class FrmproductoComponent {
     }else{
 
       const producto: InProducto = {
-        prod_codbarras: this.frmProducto.value.txtCedula,
+        prod_codbarras: this.frmProducto.value.txtCodigobarras,
         prod_nombre: this.frmProducto.value.txtNombres,
-        prod_descripcion: this.frmProducto.value.txtApellidos,
-        prod_preciov: this.frmProducto.value.txtCorreo,
-        prod_preciocompra: this.frmProducto.value.txtNumTelefono,
-        prod_stock_min: this.frmProducto.value.txtDireccion,
-        prod_stock: this.frmProducto.value.txtFechNac,
-        prod_subcategoria: this.frmProducto.value.cbxConsultorio,
+        prod_descripcion: this.frmProducto.value.txtDescripcion,
+        prod_preciov: this.frmProducto.value.txtstock,
+        prod_preciocompra: this.frmProducto.value.txtprecioventa,
+        prod_stock_min: this.frmProducto.value.txtstockminimo,
+        prod_stock: this.frmProducto.value.txtpreciocompra,
+        prod_subcategoria: this.frmProducto.value.cbxSubcategoria,
         prod_id:0
       };
   
@@ -207,7 +204,7 @@ export class FrmproductoComponent {
       })
     );
 
-    this.productoEspecialidadServ
+    this.productosubcategoriaServ
       .CrearproductoEspecialidad(especialidadesAGuardar)
       .subscribe({
         next: () => {
