@@ -178,9 +178,9 @@
                   </option>
                   <option
                     *ngFor="let subcategoria of listaSubcategorias"
-                    [value]="subcategoria.codigo"
+                    [value]="subcategoria.subcat_id"
                   >
-                    {{ subcategoria.nombre }}
+                    {{ subcategoria.subcat_nombre }}
                   </option>
                 </select>
                 <app-validators [control]="frmProducto.get('cbxsubcategoria')!"></app-validators>

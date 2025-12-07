@@ -67,7 +67,7 @@ exports.getProductoId = async (req, res) => {
         connection = await getConnection();
 
         const result = await connection.execute(
-            `SELECT * FROM producto WHERE codigo = :id`,
+            `SELECT * FROM producto WHERE prod_id = :id`,
             { id },
             { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
@@ -87,16 +87,16 @@ exports.getProductoId = async (req, res) => {
 };
 
 exports.RegistrarProducto = async (req, res) => {
-    const { id_subcat, id_prov, nombre, descripcion, precioventa, stock, stock_min } = req.body;
+    const { subcat_id, prod_nombre, prod_codbarra,prod_descripcion,prod_preciocompra,prod_precioventa,prod_stock, prod_stockmin } = req.body;
     let connection;
 
     try {
         connection = await getConnection();
 
-        const query = `BEGIN registrarProducto(:1, :2, :3, :4, :5, :6, :7); END;`;
+        const query = `BEGIN registrarProducto(:1, :2, :3, :4, :5, :6, :7, :8); END;`;
 
         const params = [
-            id_subcat, id_prov, nombre, descripcion, precioventa, stock, stock_min
+            subcat_id, prod_nombre, prod_codbarra,prod_descripcion,prod_preciocompra,prod_precioventa,prod_stock, prod_stockmin
         ];
 
         await connection.execute(query, params, { autoCommit: true });
@@ -112,16 +112,16 @@ exports.RegistrarProducto = async (req, res) => {
 };
 
 exports.Actualizarproducto = async (req, res) => {
-    const { id_prod, id_subcat, id_prov, nombre, descripcion, precioventa, stock, stock_min } = req.body;
+    const { prod_id, subcat_id,  prod_nombre, prod_codbarra, prod_descripcion,prod_preciocompra,prod_precioventa, prod_stock, prod_stockmin } = req.body;
     let connection;
 
     try {
         connection = await getConnection();
 
-        const query = `BEGIN actualizarProducto(:1, :2, :3, :4, :5, :6, :7, :8); END;`;
+        const query = `BEGIN actualizarProducto(:1, :2, :3, :4, :5, :6, :7, :8, :9); END;`;
 
         const params = [
-            id_prod, id_subcat, id_prov, nombre, descripcion, precioventa, stock, stock_min
+            prod_id, subcat_id, prod_nombre, prod_codbarra, prod_descripcion,prod_preciocompra,prod_precioventa, prod_stock, prod_stockmin
         ];
 
         await connection.execute(query, params, { autoCommit: true });

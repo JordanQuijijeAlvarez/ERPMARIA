@@ -9,8 +9,6 @@ import {
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule, NgClass } from '@angular/common';
 import Swal from 'sweetalert2';
-import { InEspecialidades } from '../../../../modelos/modeloEspecialidades/InEspecialidades';
-import { especialidadesService } from '../../../../servicios/especialidades.service';
 import { AlertService } from '../../../../servicios/Alertas/alertas.service';
 import { ValidatorsComponent } from '../../../shared/validators/validators.component';
 import { productosService } from '../../../../servicios/productos.service';
@@ -52,7 +50,7 @@ export class FrmproductoComponent {
       txtDescripcion: ['', Validators.required],
       txtpreciocompra: ['', Validators.required],
       txtprecioventa: ['', [Validators.required]],
-      txtstock: ['', [Validators.required, Validators.email]],
+      txtstock: ['', [Validators.required]],
       txtstockminimo: ['', Validators.required],
       cbxSubcategoria: ['', [Validators.required, ValidatorsComponent.selectRequired]]
     });
@@ -100,14 +98,14 @@ export class FrmproductoComponent {
 
        
         this.frmProducto.patchValue({
-          txtCodigobarras: producto.prod_codbarras,
+          txtCodigobarras: producto.prod_codbarra,
           txtNombres: producto.prod_nombre,
           txtDescripcion: producto.prod_descripcion,
           txtstock: producto.prod_stock,
-          txtprecioventa: producto.prod_stock_min,
-          txtstockminimo: producto.prod_preciov,
+          txtstockminimo : producto.prod_stockmin,
+          txtprecioventa: producto.prod_precioventa,
           txtpreciocompra: producto.prod_preciocompra,
-          cbxSubcategoria: producto.prod_subcategoria
+          cbxSubcategoria: producto.subcat_id
         });
       },
       error: (err) => {
@@ -129,16 +127,16 @@ export class FrmproductoComponent {
     }else{
 
       const producto: InProducto = {
-        prod_codbarras: this.frmProducto.value.txtCodigobarras,
+        prod_codbarra: this.frmProducto.value.txtCodigobarras,
         prod_nombre: this.frmProducto.value.txtNombres,
         prod_descripcion: this.frmProducto.value.txtDescripcion,
-        prod_preciov: this.frmProducto.value.txtstock,
+        prod_precioventa: this.frmProducto.value.txtstock,
         prod_preciocompra: this.frmProducto.value.txtprecioventa,
-        prod_stock_min: this.frmProducto.value.txtstockminimo,
-        prod_stock: this.frmProducto.value.txtpreciocompra,
-        prod_subcategoria: this.frmProducto.value.cbxSubcategoria,
+        prod_stockmin: parseFloat( this.frmProducto.value.txtstockminimo),
+        prod_stock: parseFloat(this.frmProducto.value.txtpreciocompra),
+        subcat_id: this.frmProducto.value.cbxSubcategoria,
         prod_id:0
-      };
+        };
   
       if (this.eventoUpdate) {
         producto.prod_id = this.codigo;
@@ -147,12 +145,12 @@ export class FrmproductoComponent {
             //this.guardarEspecialidadesproducto(this.codigo!);
             //this.eliminarEspecialidadesproducto();
             Swal.fire({
-              title: 'Médico actualizado',
-              text: 'Los datos del médico fueron actualizados con éxito.',
+              title: 'Producto actualizado',
+              text: 'Los datos del Producto fueron actualizados con éxito.',
               icon: 'success',
               confirmButtonText: 'Aceptar',
             }).then(() => {
-              this.router.navigate(['/home/listaproductos']);
+              this.router.navigate(['/home/listarproductos']);
             });
           },
           error: (err) => {
@@ -176,7 +174,7 @@ export class FrmproductoComponent {
               icon: 'success',
               confirmButtonText: 'Aceptar',
             }).then(() => {
-              this.router.navigate(['/home/listaproductos']);
+              this.router.navigate(['/home/listarproductos']);
             });
           },
           error: (err) => {
@@ -229,7 +227,7 @@ export class FrmproductoComponent {
       cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        this.router.navigate(['/home/listaproductos']);
+        this.router.navigate(['/home/listarproductos']);
       }
     });
   }

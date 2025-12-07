@@ -1,13 +1,13 @@
 export interface InProducto {
     prod_id: number,	
-	prod_codbarras: string,
+	prod_codbarra: string,
 	prod_nombre: string,
 	prod_descripcion: string,
-	prod_preciov: number,
+	prod_precioventa: number,
 	prod_preciocompra:number,
 	prod_stock: number,
-	prod_stock_min:number,
-	prod_subcategoria:number
+	prod_stockmin:number,
+	subcat_id:number
 	    //estado: string,
     //usuario:string,
     //fecha_registro:string;
@@ -15,12 +15,12 @@ export interface InProducto {
 
 export interface InProductoDetalle {
     prod_id: number,	
-	prod_codbarras: string,
+	prod_codbarra: string,
 	prod_nombre: string,
 	prod_descripcion: string,
-	prod_preciov: number,
+	prod_precioventa: number,
 	prod_stock: number,
-	prod_stock_min:number,
+	prod_stockmin:number,
 	subcat_id:number,
 	subcat_nombre:string,
 	cat_id: number,

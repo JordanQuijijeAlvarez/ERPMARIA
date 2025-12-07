@@ -23,7 +23,7 @@ exports.getSubcategoriasEstado = async (req, res) => {
         connection = await getConnection();
 
         const result = await connection.execute(
-            `SELECT * FROM SUBCATEGORIA WHERE subcat_estado = :estado`,
+            `SELECT subcat_id,subcat_nombre,subcat_descripcion,cat_id FROM SUBCATEGORIA WHERE subcat_estado = :estado`,
             { estado },
             { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );

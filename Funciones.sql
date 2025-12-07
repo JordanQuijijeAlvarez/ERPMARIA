@@ -195,8 +195,14 @@ END;
 
 ------------------------------ PRODUCTOS ----------------------------------------------------------------
 
+select * from producto;
+ALTER TABLE PRODUCTO 
+ADD (
+    prod_codbarra           VARCHAR2(13),
+    prod_preciocompra  NUMBER(10,2)
+);
 
-select * from productos;
+
 CREATE OR REPLACE VIEW vw_producto_detalle AS
 SELECT 
     p.prod_id,
@@ -328,7 +334,6 @@ END;
 
 CREATE OR REPLACE PROCEDURE registrarproducto(
     p_id_subcat     IN NUMBER,
-    p_id_prov       IN NUMBER,
     p_nombre        IN VARCHAR2,
     p_codbarra      IN VARCHAR2, -- Nuevo parámetro
     p_descripcion   IN VARCHAR2,
@@ -340,7 +345,6 @@ CREATE OR REPLACE PROCEDURE registrarproducto(
 BEGIN
     INSERT INTO PRODUCTO (
         subcat_id,
-        prove_id,
         prod_nombre,
         prod_codbarra,      -- Nuevo campo
         prod_descripcion,
@@ -349,10 +353,10 @@ BEGIN
         prod_stock,
         prod_stockmin,
         prod_estado,
-        prod_fechregistro
+        prod_fechregistro,
+        prove_id
     ) VALUES (
         p_id_subcat,
-        p_id_prov,
         p_nombre,
         p_codbarra,
         p_descripcion,
@@ -361,7 +365,8 @@ BEGIN
         p_stock,
         p_stock_min,
         '1',
-        SYSDATE
+        SYSDATE,
+        1
     );
 
     COMMIT;
@@ -373,4 +378,53 @@ EXCEPTION
 END;
 /
 
+CREATE OR REPLACE PROCEDURE actualizarproducto(
+    p_prod_id       IN NUMBER,
+    p_id_subcat     IN NUMBER,
+    p_nombre        IN VARCHAR2,
+    p_codbarra      IN VARCHAR2, -- Nuevo parámetro
+    p_descripcion   IN VARCHAR2,
+    p_preciocompra  IN NUMBER,   -- Nuevo parámetro
+    p_precioventa   IN NUMBER,
+    p_stock         IN NUMBER,
+    p_stock_min     IN NUMBER
+) AS
+BEGIN
+    UPDATE PRODUCTO
+    SET 
+        subcat_id         = p_id_subcat,
+        prod_nombre       = p_nombre,
+        prod_codbarra     = p_codbarra,      -- Actualizamos código
+        prod_descripcion  = p_descripcion,
+        prod_preciocompra = p_preciocompra,  -- Actualizamos precio compra
+        prod_precioventa  = p_precioventa,
+        prod_stock        = p_stock,
+        prod_stockmin     = p_stock_min
+    WHERE prod_id = p_prod_id;
 
+    COMMIT;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
+END;
+/
+
+CREATE OR REPLACE PROCEDURE eliminarproducto(p_id IN NUMBER) 
+AS
+BEGIN
+    UPDATE PRODUCTO 
+    SET prod_estado = '0' 
+    WHERE prod_id = p_id;
+
+    COMMIT;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
+END;
+/
+
+select * from producto;

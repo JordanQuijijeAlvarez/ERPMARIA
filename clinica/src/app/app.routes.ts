@@ -88,8 +88,8 @@ export const routes: Routes = [
         data: { roles: ['administrador'] },
       },
       {
-        path: 'actualizarCliente/:id',
-        component: frmClientesComponent,
+        path: 'actualizarProducto/:id',
+        component: FrmproductoComponent,
         canActivate: [RoleGuard],
         data: { roles: ['administrador'] },
       },

@@ -130,10 +130,10 @@
                     <i class="fas fa-user-md text-gray-400 text-2xl" *ngIf="!isSearching"></i>
                   </div>
                   <div class="text-gray-500">
-                    <p class="text-lg font-medium" *ngIf="isSearching">No se encontraron médicos</p>
-                    <p class="text-lg font-medium" *ngIf="!isSearching">No hay médicos registrados</p>
+                    <p class="text-lg font-medium" *ngIf="isSearching">No se encontraron productos</p>
+                    <p class="text-lg font-medium" *ngIf="!isSearching">No hay productos registrados</p>
                     <p class="text-sm mt-1" *ngIf="isSearching">
-                      No hay médicos que coincidan con "{{ searchTerm }}"
+                      No hay productos que coincidan con "{{ searchTerm }}"
                     </p>
                     <p class="text-sm mt-1" *ngIf="!isSearching">
                       Comience agregando un nuevo médico al sistema
@@ -161,7 +161,7 @@
                     </div>
                   </div>
                   <div class="ml-2">
-                    <div class="text-sm font-medium text-gray-900">{{ productos.prod_codbarras }}</div>
+                    <div class="text-sm font-medium text-gray-900">{{ productos.prod_codbarra }}</div>
                   </div>
                 </div>
               </td>
@@ -182,7 +182,7 @@
               </td>
               <td class="px-3 py-3 whitespace-nowrap w-20">
                 <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                  {{ productos.prod_preciov }}
+                  {{ productos.prod_precioventa }}
                 </span>
               </td>
               <td class="px-3 py-3 whitespace-nowrap w-20">
@@ -224,7 +224,7 @@
           <!-- Results info y selector de items por página -->
           <div class="flex flex-col sm:flex-row items-center gap-4">
             <div class="text-sm text-gray-600">
-              Mostrando <span class="font-medium">{{ getItemRange().start }}-{{ getItemRange().end }}</span> de <span class="font-medium">{{ totalItems }}</span> médicos
+              Mostrando <span class="font-medium">{{ getItemRange().start }}-{{ getItemRange().end }}</span> de <span class="font-medium">{{ totalItems }}</span> productos
             </div>
             
             <!-- Selector de items por página -->

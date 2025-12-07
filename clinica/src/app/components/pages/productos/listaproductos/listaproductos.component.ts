@@ -37,9 +37,7 @@ export class ListaproductosComponent {
   }
 
   ngOnInit(): void {
-     
-    this.listarProductoEstado(1);
-    alert(this.listaProductos[0]);
+         this.listarProductoEstado(1);
   }
 
 
@@ -131,7 +129,7 @@ export class ListaproductosComponent {
     
     if (this.isSearching) {
       this.filteredProductos = this.listaProductos.filter(producto => 
-        producto.prod_codbarras.toLowerCase().includes(this.searchTerm) ||
+        producto.prod_codbarra.toLowerCase().includes(this.searchTerm) ||
         producto.prod_nombre.toLowerCase().includes(this.searchTerm)
       );
     } else {
@@ -268,7 +266,7 @@ export class ListaproductosComponent {
   }
   
   Actualizarproducto(id: any): void {
-    this.router.navigate(['/home/actualizarproducto', id]);
+    this.router.navigate(['/home/actualizarProducto', id]);
   }
 
 }
