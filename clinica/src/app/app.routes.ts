@@ -28,6 +28,7 @@ import { VerificacionOtpComponent } from './components/pages/verificacion-otp/ve
 import { ListaclientesComponent } from './components/pages/clientes/listaclientes/listaclientes.component';
 import { frmClientesComponent } from './components/pages/clientes/frmclientes/frmclientes.component';
 import { ListaproductosComponent } from './components/pages/productos/listaproductos/listaproductos.component';
+import { FrmproductoComponent } from './components/pages/productos/frmproductos/frmproductos.component';
 
 export const routes: Routes = [
   { path: '', redirectTo:'home/dashboard', pathMatch:'full' },
@@ -82,7 +83,7 @@ export const routes: Routes = [
       },
       {
         path: 'creaproductos',
-        component: frmClientesComponent,
+        component: FrmproductoComponent,
         canActivate: [RoleGuard],
         data: { roles: ['administrador'] },
       },

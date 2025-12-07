@@ -7,21 +7,15 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { MedicosService } from '../../../../servicios/medicos.service';
-import { InMedico } from '../../../../modelos/modelMedicos/InMedico';
-import { InEspecialidadMedico } from '../../../../modelos/modelMedicos/InEspecialidadMedico';
 import { CommonModule, NgClass } from '@angular/common';
-import { horariosService } from '../../../../servicios/horarios.service';
-import { InHorarios } from '../../../../modelos/modeloHorarios/InHorarios';
-import { ConsultoriosService } from '../../../../servicios/consultorios.service';
-import { InConsultorios } from '../../../../modelos/modelConsultorios/InConsultorios';
 import Swal from 'sweetalert2';
 import { InEspecialidades } from '../../../../modelos/modeloEspecialidades/InEspecialidades';
 import { especialidadesService } from '../../../../servicios/especialidades.service';
-import { MedicoEspecialidadService } from '../../../../servicios/medicoespecialidad.service';
-import { InMedicoEspecialidad } from '../../../../modelos/modeloEspecialidades/InMedicoEspecialidad';
 import { AlertService } from '../../../../servicios/Alertas/alertas.service';
 import { ValidatorsComponent } from '../../../shared/validators/validators.component';
+import { productosService } from '../../../../servicios/productos.service';
+import { InSubcategoria } from '../../../../modelos/modeloSubcategoria/InSubcategoria';
+import { InProducto } from '../../../../modelos/modeloProductos/InProducto';
 
 @Component({
     selector: 'app-frmproductos',
@@ -29,36 +23,29 @@ import { ValidatorsComponent } from '../../../shared/validators/validators.compo
     templateUrl: './frmproductos.component.html',
     styleUrl: './frmproductos.component.css'
 })
-export class FrmmedicosComponent {
-  frmMedico: FormGroup;
+export class FrmproductoComponent {
+  frmProducto: FormGroup;
   eventoUpdate: boolean = false;
-  codigo: number | null = null;
+  codigo: number = 0;
   estado: boolean = true;
   mostrarModal: boolean = false;
 
   @ViewChild('datepickerElement') datepickerElement!: ElementRef;
 
-  especialidadesSeleccionadas: InEspecialidades[] = [];
-  especialidadesEliminadas: InMedicoEspecialidad[] = [];
-  listaEspecialidadesMedico: InEspecialidadMedico[] = [];
+  //especialidadesSeleccionadas: InSubcategoria[] = [];
 
-  listaEspecialidades: InEspecialidades[] = [];
-  listaHorarios: InHorarios[] = [];
-  listaConsultorios: InConsultorios[] = [];
+  listaSubcategorias: InEspecialidades[] = [];
 
   constructor(
     private formBuilder: FormBuilder,
     private http: HttpClient,
     private router: Router,
-    private medicoServ: MedicosService,
-    private horarioServ: horariosService,
-    private consultorioServ: ConsultoriosService,
+    private productoServ: productosService,
     private especialidadServ: especialidadesService,
-    private medicoEspecialidadServ: MedicoEspecialidadService,
     private alertaServ: AlertService,
     private route: ActivatedRoute
   ) {
-    this.frmMedico = this.formBuilder.group({
+    this.frmProducto = this.formBuilder.group({
       txtCedula: ['', [Validators.required, ValidatorsComponent.numericTenDigits]],
       txtNombres: ['', Validators.required],
       txtApellidos: ['', Validators.required],
@@ -74,45 +61,25 @@ export class FrmmedicosComponent {
   }
   ngOnInit(): void {
     this.route.paramMap.subscribe((parametros) => {
-      const id = parametros.get('id');
-      this.listarhorarioesEstado(true);
-      this.listarConsultoriosEstado(true);
-      this.listarEspecialidadesEstado(true);
+      const id =  parametros.get('id');
+      
+      this.listarSubcategoriaEstado(1);
 
       if (id) {
         this.eventoUpdate = true;
         this.codigo = parseInt(id);
 
-        this.cargarMedico(this.codigo);
-        this.listarEspecialidadMedico(this.codigo);
-
-        console.log('ACTUALIZAR XD');
+        this.cargarProducto(this.codigo);
       } else {
         this.eventoUpdate = false;
       }
     });
   }
 
-  listarEspecialidadMedico(id: any): void {
-    this.medicoServ.LEspecialidadMedicoId(id).subscribe({
-      next: (res) => {
-        if (res.length === 0) {
-          this.listaEspecialidadesMedico = [];
-        } else {
-          this.listaEspecialidadesMedico = res;
-        }
-      },
-      error: (err) => {
-        console.error(err);
-        this.listaEspecialidadesMedico = [];
-      },
-    });
-  }
-
-  listarEspecialidadesEstado(estado: any): void {
+ listarSubcategoriaEstado(estado: any): void {
     this.especialidadServ.LespecialidadesEstado(estado).subscribe({
       next: (res) => {
-        this.listaEspecialidades = res;
+        this.listaSubcategorias = res;
 
         console.log(res);
       },
@@ -122,145 +89,40 @@ export class FrmmedicosComponent {
     });
   }
   marcarCamposComoTocados(): void {
-    Object.keys(this.frmMedico.controls).forEach((campo) => {
-      const control = this.frmMedico.get(campo);
+    Object.keys(this.frmProducto.controls).forEach((campo) => {
+      const control = this.frmProducto.get(campo);
       if (control) {
         control.markAsTouched();
       }
     });
   }
-  seleccionarEspecialidad(): void {
-    console.log(this.frmMedico.value.cbxEspecialidad);
+  
+  cargarProducto(id: number): void {
+    this.productoServ.LproductosId(id).subscribe({
+      next: (producto) => {
 
-    this.especialidadServ
-      .LespecialidadesId(this.frmMedico.value.cbxEspecialidad)
-      .subscribe({
-        next: (especialidad) => {
-          if (especialidad) {
-            const existe = this.especialidadesSeleccionadas.some(
-              (e) => e.codigo === especialidad.codigo
-            );
-
-            if (existe) {
-              Swal.fire({
-                icon: 'warning',
-                title: 'Especialidad duplicada',
-                text: 'Esta especialidad ya ha sido agregada.',
-              });
-              return; 
-            }
-
-            this.estado = Boolean(especialidad.estado);
-            this.especialidadesSeleccionadas.push(especialidad);
-
-            console.log(this.especialidadesSeleccionadas);
-          } else {
-            console.log('Especialidad no encontrada');
-          }
-        },
-        error: (err) => {
-          console.log('Error al cargar especialidad:', err);
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'No se pudo cargar la información de la especialidad.',
-          });
-        },
-      });
-  }
-
-  eliminarEspecialidadSeleccionada(id: string): void {
-    Swal.fire({
-      title: '¿Estás seguro?',
-      text: 'Esta especialidad será eliminada de la lista.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.especialidadesSeleccionadas =
-          this.especialidadesSeleccionadas.filter((e) => e.codigo !== id);
-
-        Swal.fire('Eliminado', 'La especialidad ha sido eliminada.', 'success');
-      }
-    });
-  }
-
- 
-
-  eliminarEspecialidadAsignada(id: any): void {
-    const especialidad = this.listaEspecialidadesMedico.find(
-      (esp) => esp.codigo === id
-    );
-
-    if (especialidad) {
-      this.especialidadesEliminadas.push({ codigo: id });
-    }
-
-    this.listaEspecialidadesMedico = this.listaEspecialidadesMedico.filter(
-      (esp) => esp.codigo !== id
-    );
-  }
-
-  listarConsultoriosEstado(estado: any): void {
-    this.consultorioServ.LConsultoriosEstado(estado).subscribe({
-      next: (res) => {
-        this.listaConsultorios = res;
-
-        console.log(res);
-      },
-      error: (err) => {
-        alert('NO EXISTEN REGISTROS');
-      },
-    });
-  }
-
-  listarhorarioesEstado(estado: any): void {
-    this.horarioServ.LhorariosEstado(estado).subscribe({
-      next: (res) => {
-        this.listaHorarios = res;
-
-        console.log(res);
-      },
-      error: (err) => {
-        alert('NO EXISTEN REGISTROS');
-      },
-    });
-  }
-
-  cargarMedico(id: number): void {
-    this.medicoServ.LMedicosId(id).subscribe({
-      next: (medico) => {
-        console.log(medico);
-
-        const fechaFormateada = medico.fecha_nacimiento
-          ? medico.fecha_nacimiento.split('T')[0] 
-          : null;
-
-        this.frmMedico.patchValue({
-          txtCedula: medico.cedula,
-          txtNombres: medico.nombre,
-          txtApellidos: medico.apellido,
-          txtCorreo: medico.email,
-          txtNumTelefono: medico.telefono,
-          txtDireccion: medico.direccion,
-          txtFechNac: fechaFormateada,
-          txtLicenciaMedica: medico.licencia_medica,
-          cbxConsultorio: medico.codigo_consultorio,
-          cbxHorario: medico.codigo_horario,
+       
+        this.frmProducto.patchValue({
+          txtCedula: producto.prod_codbarras,
+          txtNombres: producto.prod_nombre,
+          txtApellidos: producto.prod_descripcion,
+          txtCorreo: producto.prod_stock,
+          txtNumTelefono: producto.prod_stock_min,
+          txtDireccion: producto.prod_preciov,
+          txtFechNac: producto.prod_preciocompra,
+          cbxConsultorio: producto.prod_subcategoria
         });
       },
       error: (err) => {
-        console.log('Error al cargar medico:', err);
-        alert('No se pudo cargar la información del medico');
+        console.log('Error al cargar producto:', err);
+        alert('No se pudo cargar la información del producto');
       },
     });
   }
 
-  guardarMedico(): void {
+  guardarproducto(): void {
 
-    if (this.frmMedico.invalid) {
+    if (this.frmProducto.invalid) {
       this.alertaServ.info(
         '',
         'Por favor, complete todos los campos obligatorios *'
@@ -269,33 +131,31 @@ export class FrmmedicosComponent {
       return;
     }else{
 
-      const medico: InMedico = {
-        cedula: this.frmMedico.value.txtCedula,
-        licencia_medica: this.frmMedico.value.txtLicenciaMedica,
-        nombre: this.frmMedico.value.txtNombres,
-        apellido: this.frmMedico.value.txtApellidos,
-        email: this.frmMedico.value.txtCorreo,
-        telefono: this.frmMedico.value.txtNumTelefono,
-        direccion: this.frmMedico.value.txtDireccion,
-        fecha_nacimiento: this.frmMedico.value.txtFechNac,
-        codigo_consultorio: this.frmMedico.value.cbxConsultorio,
-        codigo_horario: this.frmMedico.value.cbxHorario,
-        codigo: '',
+      const producto: InProducto = {
+        prod_codbarras: this.frmProducto.value.txtCedula,
+        prod_nombre: this.frmProducto.value.txtNombres,
+        prod_descripcion: this.frmProducto.value.txtApellidos,
+        prod_preciov: this.frmProducto.value.txtCorreo,
+        prod_preciocompra: this.frmProducto.value.txtNumTelefono,
+        prod_stock_min: this.frmProducto.value.txtDireccion,
+        prod_stock: this.frmProducto.value.txtFechNac,
+        prod_subcategoria: this.frmProducto.value.cbxConsultorio,
+        prod_id:0
       };
   
       if (this.eventoUpdate) {
-        medico.codigo = '' + this.codigo;
-        this.medicoServ.ActualizarMedico(medico).subscribe({
+        producto.prod_id = this.codigo;
+        this.productoServ.Actualizarproducto(producto).subscribe({
           next: (res) => {
-            this.guardarEspecialidadesMedico(this.codigo!);
-            this.eliminarEspecialidadesMedico();
+            //this.guardarEspecialidadesproducto(this.codigo!);
+            //this.eliminarEspecialidadesproducto();
             Swal.fire({
               title: 'Médico actualizado',
               text: 'Los datos del médico fueron actualizados con éxito.',
               icon: 'success',
               confirmButtonText: 'Aceptar',
             }).then(() => {
-              this.router.navigate(['/home/listamedicos']);
+              this.router.navigate(['/home/listaproductos']);
             });
           },
           error: (err) => {
@@ -308,25 +168,25 @@ export class FrmmedicosComponent {
           },
         });
       } else {
-        this.medicoServ.CrearMedico(medico).subscribe({
+        this.productoServ.CrearProducto(producto).subscribe({
           next: (res: any) => {
             console.log(res)
-            const nuevoIdMedico = res.idMedico; 
-            this.guardarEspecialidadesMedico(nuevoIdMedico);
+            //const nuevoIdproducto = res.idproducto; 
+            //this.guardarEspecialidadesproducto(nuevoIdproducto);
             Swal.fire({
-              title: 'Médico registrado',
-              text: 'El médico fue registrado con éxito.',
+              title: 'Producto registrado',
+              text: 'El producto fue registrado con éxito.',
               icon: 'success',
               confirmButtonText: 'Aceptar',
             }).then(() => {
-              this.router.navigate(['/home/listamedicos']);
+              this.router.navigate(['/home/listaproductos']);
             });
           },
           error: (err) => {
-            console.log('Error al crear médico:', err);
+            console.log('Error al crear producto:', err);
             Swal.fire(
               'Error',
-              'Hubo un problema al registrar el médico.',
+              'Hubo un problema al registrar el producto.',
               'error'
             );
           },
@@ -338,16 +198,17 @@ export class FrmmedicosComponent {
    
   }
 
-  guardarEspecialidadesMedico(idMedico: number): void {
+
+  /*guardarEspecialidadesproducto(idproducto: number): void {
     const especialidadesAGuardar = this.especialidadesSeleccionadas.map(
       (especialidad) => ({
-        id_medico: idMedico,
+        id_producto: idproducto,
         id_especialidad: especialidad.codigo,
       })
     );
 
-    this.medicoEspecialidadServ
-      .CrearMedicoEspecialidad(especialidadesAGuardar)
+    this.productoEspecialidadServ
+      .CrearproductoEspecialidad(especialidadesAGuardar)
       .subscribe({
         next: () => {
           console.log('Especialidades guardadas correctamente');
@@ -357,27 +218,8 @@ export class FrmmedicosComponent {
         },
       });
   }
-
-  eliminarEspecialidadesMedico(): void {
-    console.log(this.especialidadesEliminadas);
-
-    if (this.especialidadesEliminadas.length > 0) {
-      const codigos = this.especialidadesEliminadas.map((e) => e.codigo); 
-
-      this.medicoEspecialidadServ
-        .EliminarMedicoEspecialidad(codigos)
-        .subscribe({
-          next: () => {
-            console.log('Especialidades eliminadas correctamente');
-            this.especialidadesEliminadas = []; 
-          },
-          error: (err) => {
-            console.log('Error al eliminar especialidades:', err);
-          },
-        });
-    }
-  }
-
+*/
+ 
   salirSinGuardar(): void {
     Swal.fire({
       title: '¿Está seguro que desea salir?',
@@ -390,11 +232,11 @@ export class FrmmedicosComponent {
       cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        this.router.navigate(['/home/listamedicos']);
+        this.router.navigate(['/home/listaproductos']);
       }
     });
   }
-
+/*
   abrirModalAgregarHorario(): void {
     Swal.fire({
       title: 'Agregar Horario',
@@ -458,4 +300,6 @@ export class FrmmedicosComponent {
       }
     });
   }
+
+  */
 }

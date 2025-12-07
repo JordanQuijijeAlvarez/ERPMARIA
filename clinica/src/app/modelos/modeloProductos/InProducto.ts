@@ -4,11 +4,11 @@ export interface InProducto {
 	prod_nombre: string,
 	prod_descripcion: string,
 	prod_preciov: number,
+	prod_preciocompra:number,
 	prod_stock: number,
 	prod_stock_min:number,
-	prod_subcategoria:number,
-	prod_proveedor:number,
-    //estado: string,
+	prod_subcategoria:number
+	    //estado: string,
     //usuario:string,
     //fecha_registro:string;
 }

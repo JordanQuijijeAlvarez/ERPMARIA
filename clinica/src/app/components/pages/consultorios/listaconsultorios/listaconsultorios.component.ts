@@ -4,7 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ConsultoriosService } from '../../../../servicios/consultorios.service';
+import { ConsultoriosService } from '../../../../servicios/subcategorias.service';
 import { InConsultorios } from '../../../../modelos/modelConsultorios/InConsultorios';
 import { AlertService } from '../../../../servicios/Alertas/alertas.service';
 

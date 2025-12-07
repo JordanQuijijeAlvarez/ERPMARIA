@@ -1,18 +1,47 @@
 const poolsec = require('../../configuracion/dbmini');
 
-// Listar subcategorías por estado
+
+const { getConnection, oracledb } = require('../../configuracion/oraclePool');
+
+// helper para convertir llaves a minúsculas
+function formatearSalida(rows) {
+    if (!rows || rows.length === 0) return [];
+    return rows.map(obj => {
+        const nuevo = {};
+        Object.keys(obj).forEach(k => nuevo[k.toLowerCase()] = obj[k]);
+        return nuevo;
+    });
+}
+
+
+
 exports.getSubcategoriasEstado = async (req, res) => {
-    const {estado} = req.params;
-    // Corregido: nombre de función en SQL
-    const query = 'SELECT * FROM listarsubcategoriasestado($1)';
-    const values = [estado];
+    const { estado } = req.params;
+    let connection;
+
     try {
-        const result = await poolsec.query(query,values);
-        res.json(result.rows);
+        connection = await getConnection();
+
+        const result = await connection.execute(
+            `SELECT * FROM SUBCATEGORIA WHERE subcat_estado = :estado`,
+            { estado },
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        // Formatear claves a minúscula
+        res.json(formatearSalida(result.rows));
+
     } catch (error) {
+        console.error(error);
         res.status(500).json({ message: error.message });
+
+    } finally {
+        if (connection) await connection.close();
     }
 };
+
+
+
 
 // Obtener todas (tabla cruda)
 exports.getSubCategorias = async (req, res) => {

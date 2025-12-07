@@ -13,7 +13,7 @@ import { InEspecialidadMedico } from '../../../../modelos/modelMedicos/InEspecia
 import { CommonModule, NgClass } from '@angular/common';
 import { horariosService } from '../../../../servicios/horarios.service';
 import { InHorarios } from '../../../../modelos/modeloHorarios/InHorarios';
-import { ConsultoriosService } from '../../../../servicios/consultorios.service';
+import { ConsultoriosService } from '../../../../servicios/subcategorias.service';
 import { InConsultorios } from '../../../../modelos/modelConsultorios/InConsultorios';
 import Swal from 'sweetalert2';
 import { InEspecialidades } from '../../../../modelos/modeloEspecialidades/InEspecialidades';
