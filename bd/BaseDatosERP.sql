@@ -31,7 +31,7 @@ CREATE TABLE SUBCATEGORIA (
 -- PROVEEDOR
 CREATE TABLE PROVEEDOR (
     prove_id          NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    prove_ruc         VARCHAR2(13) NOT NULL,
+    prove_ruc         VARCHAR2(13) NOT NULL UNIQUE,
     prove_nombre      VARCHAR2(70) NOT NULL,
     prove_telefono    VARCHAR2(10) NOT NULL,
     prove_direccion   VARCHAR2(100),
@@ -43,11 +43,12 @@ CREATE TABLE PROVEEDOR (
 -- CLIENTE
 CREATE TABLE CLIENTE (
     client_id           NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    client_cedula       VARCHAR2(13) NOT NULL,
+    client_cedula       VARCHAR2(13) NOT NULL UNIQUE,
     client_nombres      VARCHAR2(70) NOT NULL,
     client_apellidos    VARCHAR2(70) NOT NULL,
     client_direccion    VARCHAR2(100),
     client_correo       VARCHAR2(50),
+    client_telefono     VARCHAR2(10),
     client_estado       CHAR(1) DEFAULT '1' CHECK (client_estado IN ('0','1')) NOT NULL,
     client_fechregistro DATE DEFAULT SYSDATE
 );
@@ -75,7 +76,7 @@ CREATE TABLE USUARIO (
     user_id          NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     user_nombres     VARCHAR2(70) NOT NULL,
     user_apellidos   VARCHAR2(70) NOT NULL,
-    user_username    VARCHAR2(70) NOT NULL,
+    user_username    VARCHAR2(70) NOT NULL UNIQUE,
     user_contrasenia VARCHAR2(100) NOT NULL,
     user_correo      VARCHAR2(50),
     user_estado      CHAR(1) DEFAULT '1' CHECK (user_estado IN ('0','1')) NOT NULL,
@@ -85,13 +86,15 @@ CREATE TABLE USUARIO (
 -- PRODUCTO
 CREATE TABLE PRODUCTO (
     prod_id           NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    prod_codbarra     VARCHAR2 (13),
     prod_nombre       VARCHAR2(50) NOT NULL,
     prod_descripcion  VARCHAR2(70),
     prod_precioventa  NUMBER(10, 2) NOT NULL,
+    prod_preciocompra  NUMBER(10, 2) NOT NULL,
     prod_stock        NUMBER(10, 2) NOT NULL,
     prod_stockmin     NUMBER(10, 2) NOT NULL,
     subcat_id         NUMBER NOT NULL,
-    prove_id          NUMBER NOT NULL,
+    prove_id          NUMBER ,
     prod_estado       CHAR(1) DEFAULT '1' CHECK (prod_estado IN ('0','1')) NOT NULL,
     prod_fechregistro DATE DEFAULT SYSDATE
 );
