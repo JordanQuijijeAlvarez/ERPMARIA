@@ -35,21 +35,21 @@ app.use('/usuarios', rutasUsuarios);
 app.use('/roles', rutasRoles);
 
 
-//Ruta provisional 
+// Ruta provisional 
 app.post('/loginprov', login.validacionProvUsers);
 
 
 
 // Rutas de autenticación
-app.post('/login', login.validacionUsers);
-app.post('/logout', authenticateToken, login.logout);
-app.get('/sesiones-activas', authenticateToken, login.getSesionesActivas);
-app.post('/invalidar-otras-sesiones', authenticateToken, login.invalidarOtrasSesiones);
+// app.post('/login', login.validacionUsers);
+// app.post('/logout', authenticateToken, login.logout);
+// app.get('/sesiones-activas', authenticateToken, login.getSesionesActivas);
+// app.post('/invalidar-otras-sesiones', authenticateToken, login.invalidarOtrasSesiones);
 
 
-app.post('/recuperacion/enviarcodigo', login.enviarCodigo);
-app.post('/recuperacion/cambiarcontrasenia', login.cambiarContrasenia);
+// app.post('/recuperacion/enviarcodigo', login.enviarCodigo);
+// app.post('/recuperacion/cambiarcontrasenia', login.cambiarContrasenia);
 
-// Ruta para verificar OTP
-app.post('/validar-otp', verificacion.validarOTP);
+// // Ruta para verificar OTP
+// app.post('/validar-otp', verificacion.validarOTP);
 module.exports = app;

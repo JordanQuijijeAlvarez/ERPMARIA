@@ -1,160 +1,161 @@
-const pool = require('../configuracion/db');
 const crypto = require('crypto');
+const { getConnection, oracledb } = require('../configuracion/oraclePool');
 
 class SessionManager {
-    
-    // Crear una nueva sesión activa
+
+    // Crear una nueva sesión
     static async createSession(userId, tokenJti, deviceInfo = {}) {
-        const sessionId = crypto.randomUUID();
+        const sessionUuid = crypto.randomUUID();
         const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
-        
-        const query = `
-            INSERT INTO sesiones_activas 
-            (usuario_id, session_id, token_jti, user_agent, ip_address, device_fingerprint, expires_at)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
-            RETURNING *
+
+        const sql = `
+            INSERT INTO SESIONES_ACTIVAS
+            (usuario_id, session_uuid, token_jti, user_agent, ip_address, device_fingerprint, expires_at)
+            VALUES (:userId, :sessionUuid, :tokenJti, :ua, :ip, :finger, :expires)
+            RETURNING sesion_id INTO :outId
         `;
-        
-        const values = [
+
+        const binds = {
             userId,
-            sessionId,
+            sessionUuid,
             tokenJti,
-            deviceInfo.userAgent || null,
-            deviceInfo.ipAddress || null,
-            deviceInfo.fingerprint || null,
-            expiresAt
-        ];
-        
+            ua: deviceInfo.userAgent || null,
+            ip: deviceInfo.ipAddress || null,
+            finger: deviceInfo.fingerprint || null,
+            expires: expiresAt,
+            outId: { type: oracledb.NUMBER, dir: oracledb.BIND_OUT }
+        };
+
+        let conn;
         try {
-            const result = await pool.query(query, values);
-            return { success: true, session: result.rows[0] };
-        } catch (error) {
-            console.error('Error creando sesión:', error);
-            return { success: false, error: error.message };
+            conn = await getConnection();
+            const result = await conn.execute(sql, binds, { autoCommit: true });
+
+            return {
+                success: true,
+                session: {
+                    sesion_id: result.outBinds.outId[0],
+                    session_uuid: sessionUuid,
+                    token_jti: tokenJti
+                }
+            };
+        } catch (err) {
+            console.error("Error creando sesión:", err);
+            return { success: false, error: err.message };
+        } finally {
+            if (conn) {
+                try { await conn.close(); } catch (e) {}
+            }
         }
     }
-    
-    // Verificar si una sesión está activa
+
+    // Verificar sesión activa
     static async isSessionActive(tokenJti) {
-        const query = `
-            SELECT * FROM sesiones_activas 
-            WHERE token_jti = $1 
-            AND is_active = true 
-            AND expires_at > NOW()
+        const sql = `
+            SELECT * FROM SESIONES_ACTIVAS
+            WHERE token_jti = :token
+              AND is_active = 1
+              AND expires_at > SYSDATE
         `;
-        
+
+        let conn;
         try {
-            const result = await pool.query(query, [tokenJti]);
+            conn = await getConnection();
+            const result = await conn.execute(sql, { token: tokenJti });
             return result.rows.length > 0 ? result.rows[0] : null;
-        } catch (error) {
-            console.error('Error verificando sesión:', error);
+        } catch (err) {
+            console.error("Error verificando sesión:", err);
             return null;
+        } finally {
+            if (conn) {
+                try { await conn.close(); } catch (e) {}
+            }
         }
     }
-    
-    // Actualizar última actividad de una sesión
+
+    // Actualizar actividad
     static async updateLastActivity(tokenJti) {
-        const query = `
-            UPDATE sesiones_activas 
-            SET last_activity = NOW() 
-            WHERE token_jti = $1 AND is_active = true
+        const sql = `
+            UPDATE SESIONES_ACTIVAS
+            SET last_activity = SYSDATE
+            WHERE token_jti = :token AND is_active = 1
         `;
-        
+
+        let conn;
         try {
-            await pool.query(query, [tokenJti]);
+            conn = await getConnection();
+            await conn.execute(sql, { token: tokenJti }, { autoCommit: true });
             return true;
-        } catch (error) {
-            console.error('Error actualizando actividad:', error);
+        } catch (err) {
+            console.error("Error actualizando actividad:", err);
             return false;
+        } finally {
+            if (conn) {
+                try { await conn.close(); } catch (e) {}
+            }
         }
     }
-    
-    // Invalidar una sesión específica
+
+    // Invalidar una sesión
     static async invalidateSession(tokenJti) {
-        const query = `
-            UPDATE sesiones_activas 
-            SET is_active = false 
-            WHERE token_jti = $1
+        const sql = `
+            UPDATE SESIONES_ACTIVAS
+            SET is_active = 0
+            WHERE token_jti = :token
         `;
-        
+
+        let conn;
         try {
-            const result = await pool.query(query, [tokenJti]);
-            return result.rowCount > 0;
-        } catch (error) {
-            console.error('Error invalidando sesión:', error);
+            conn = await getConnection();
+            const result = await conn.execute(sql, { token: tokenJti }, { autoCommit: true });
+            return result.rowsAffected > 0;
+        } catch (err) {
+            console.error("Error invalidando sesión:", err);
             return false;
+        } finally {
+            if (conn) {
+                try { await conn.close(); } catch (e) {}
+            }
         }
     }
-    
+
     // Invalidar todas las sesiones de un usuario
     static async invalidateAllUserSessions(userId, exceptTokenJti = null) {
-        let query = `
-            UPDATE sesiones_activas 
-            SET is_active = false 
-            WHERE usuario_id = $1
-        `;
-        let values = [userId];
-        
+        let sql = `UPDATE SESIONES_ACTIVAS SET is_active = 0 WHERE usuario_id = :id`;
+        const binds = { id: userId };
+
         if (exceptTokenJti) {
-            query += ` AND token_jti != $2`;
-            values.push(exceptTokenJti);
+            sql += ` AND token_jti != :token`;
+            binds.token = exceptTokenJti;
         }
-        
+
+        let conn;
         try {
-            const result = await pool.query(query, values);
-            return result.rowCount;
-        } catch (error) {
-            console.error('Error invalidando sesiones del usuario:', error);
+            conn = await getConnection();
+            const result = await conn.execute(sql, binds, { autoCommit: true });
+            return result.rowsAffected;
+        } catch (err) {
+            console.error("Error invalidando sesiones:", err);
             return 0;
+        } finally {
+            if (conn) {
+                try { await conn.close(); } catch (e) {}
+            }
         }
     }
-    
-    // Obtener sesiones activas de un usuario
-    static async getUserActiveSessions(userId) {
-        const query = `
-            SELECT session_id, user_agent, ip_address, created_at, last_activity
-            FROM sesiones_activas 
-            WHERE usuario_id = $1 AND is_active = true AND expires_at > NOW()
-            ORDER BY last_activity DESC
-        `;
-        
-        try {
-            const result = await pool.query(query, [userId]);
-            return result.rows;
-        } catch (error) {
-            console.error('Error obteniendo sesiones del usuario:', error);
-            return [];
-        }
-    }
-    
-    // Limpiar sesiones expiradas
-    static async cleanExpiredSessions() {
-        const query = `
-            DELETE FROM sesiones_activas 
-            WHERE expires_at < NOW() OR is_active = false
-        `;
-        
-        try {
-            const result = await pool.query(query);
-            return result.rowCount;
-        } catch (error) {
-            console.error('Error limpiando sesiones expiradas:', error);
-            return 0;
-        }
-    }
-    
-    // Generar fingerprint básico del dispositivo
+
+    // Generar fingerprint
     static generateDeviceFingerprint(userAgent, ipAddress) {
         const data = `${userAgent || 'unknown'}_${ipAddress || 'unknown'}`;
         return crypto.createHash('sha256').update(data).digest('hex').substring(0, 32);
     }
-    
-    // Verificar si el dispositivo coincide
+
+    // Verificar fingerprint
     static verifyDeviceFingerprint(session, currentUserAgent, currentIpAddress) {
-        if (!session.device_fingerprint) return true; // Si no hay fingerprint guardado, permitir
-        
-        const currentFingerprint = this.generateDeviceFingerprint(currentUserAgent, currentIpAddress);
-        return session.device_fingerprint === currentFingerprint;
+        if (!session.DEVICE_FINGERPRINT) return true;
+
+        const current = this.generateDeviceFingerprint(currentUserAgent, currentIpAddress);
+        return session.DEVICE_FINGERPRINT === current;
     }
 }
 

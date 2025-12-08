@@ -5,6 +5,8 @@ const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const SessionManager = require('../../middleware/sessionManager');
 const { sendOTPEmail } = require('../../utils/sendEmail');
+const { getConnection, oracledb } = require('../../configuracion/oraclePool');
+
 
 // Función auxiliar para generar código OTP
 function generarCodigoOTP() {
@@ -393,26 +395,47 @@ exports.validacionProvUsers = async (req, res) => {
       message: 'Nombre de usuario y contraseña son requeridos' 
     });
   }
+
+  connection = await getConnection();
   
+  // const query = `
+  //   SELECT 
+  //     u.codigo AS id_usuario, 
+  //     u.nombre_usuario,
+  //     u.contrasenia,
+  //     r.nombre AS rol,
+  //     m.codigo AS codigo_medico,
+  //     m.nombre as nombre_medico,
+  //     m.apellido as apellido_medico
+  //   FROM usuario u
+  //   JOIN rol r ON u.codigo_rol = r.codigo
+  //   LEFT JOIN medico m ON u.codigo = m.codigo_usuario
+  //   WHERE u.nombre_usuario = $1
+  //     AND u.estado = true;
+  // `;
+
   const query = `
-    SELECT 
-      u.codigo AS id_usuario, 
-      u.nombre_usuario,
-      u.contrasenia,
-      r.nombre AS rol,
-      m.codigo AS codigo_medico,
-      m.nombre as nombre_medico,
-      m.apellido as apellido_medico
-    FROM usuario u
-    JOIN rol r ON u.codigo_rol = r.codigo
-    LEFT JOIN medico m ON u.codigo = m.codigo_usuario
-    WHERE u.nombre_usuario = $1
-      AND u.estado = true;
+  SELECT 
+        u.user_id          AS id_usuario,
+        u.user_username    AS nombre_usuario,
+        u.user_contrasenia AS contrasenia,
+        r.rol_nombre       AS rol
+      FROM USUARIO u
+      JOIN USUARIO_ROL ur ON u.user_id = ur.user_id
+      JOIN ROL r ON ur.rol_id = r.rol_id
+      WHERE u.user_username = :username
+        AND u.user_estado = 1
   `;
-  const values = [nombre_usuario];
+
+  // const values = [nombre_usuario];
 
   try {
-    const result = await pool.query(query, values);
+    // const result = await pool.query(query, values);
+    const result = await connection.execute(
+      query,
+      { username: nombre_usuario },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
 
     if (result.rows.length === 0) {
       return res.status(401).json({ 
@@ -422,25 +445,28 @@ exports.validacionProvUsers = async (req, res) => {
     }
 
     const usuario = result.rows[0];
-    const contraseñaValida = await bcrypt.compare(contrasenia, usuario.contrasenia);
 
+    
+    console.log("Hash recibido desde Oracle:", usuario.CONTRASENIA);
+    console.log("Contraseña enviada desde Insomnia:", contrasenia);
+    console.log("Resultado de bcrypt.compare:", await bcrypt.compare(contrasenia, usuario.CONTRASENIA));
+
+
+    const contraseñaValida = await bcrypt.compare(contrasenia, usuario.CONTRASENIA);
     if (!contraseñaValida) {
       return res.status(401).json({ 
         success: false,
         message: 'Contraseña Incorrecta' 
       });
     }
-
-    
+   
     const tokenJti = crypto.randomUUID();
-    
+
     const token = jwt.sign(
       { 
-        id: usuario.id_usuario, 
-        nombreUsuario: usuario.nombre_usuario, 
-        rol: usuario.rol,
-        codigoMedico: usuario.codigo_medico,
-        nombresMedico: usuario.nombre_medico ? 'Dr.' + usuario.nombre_medico + ' ' + usuario.apellido_medico : null,
+        id: usuario.ID_USUARIO, 
+        nombreUsuario: usuario.NOMBRE_USUARIO, 
+        rol: usuario.ROL,
         jti: tokenJti, 
         iat: Math.floor(Date.now() / 1000)
       },
@@ -453,7 +479,7 @@ exports.validacionProvUsers = async (req, res) => {
     const deviceFingerprint = SessionManager.generateDeviceFingerprint(userAgent, ipAddress);
     
     console.log('Fingerprint generado:', deviceFingerprint);
-    const sessionResult = await SessionManager.createSession(usuario.id_usuario, tokenJti, {
+    const sessionResult = await SessionManager.createSession(usuario.ID_USUARIO, tokenJti, {
       userAgent,
       ipAddress,
       fingerprint: deviceFingerprint
@@ -471,11 +497,9 @@ exports.validacionProvUsers = async (req, res) => {
       message: 'Login exitoso',
       token,
       usuario: {
-        id: usuario.id_usuario,
-        nombreUsuario: usuario.nombre_usuario,
-        rol: usuario.rol,
-        codigoMedico: usuario.codigo_medico,
-        nombresMedico: usuario.nombre_medico ? 'Dr.' + usuario.nombre_medico + ' ' + usuario.apellido_medico : null
+        id: usuario.ID_USUARIO,
+        nombreUsuario: usuario.NOMBRE_USUARIO,
+        rol: usuario.ROL,
       }
     });
     

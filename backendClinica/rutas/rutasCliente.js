@@ -4,6 +4,8 @@ const controladorPacientes = require('../controladores/Clientes/ctlClientes');
 const authenticateToken = require('../middleware/auth');
 
 
+// router.get('/listar/:estado', controladorPacientes.getClientesEstado);
+
 router.get('/listar/:estado', authenticateToken,
     controladorPacientes.getClientesEstado);
 
