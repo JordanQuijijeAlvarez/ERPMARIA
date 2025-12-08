@@ -433,13 +433,13 @@ select * from producto;
 --AGREGAR LA COLUMNA DE descripcion
 -- venta_estado = defecto '1'
 
-
 CREATE OR REPLACE PROCEDURE REGISTRAR_VENTA_COMPLETA (
     p_local_id        IN NUMBER,
     p_cliente_id      IN NUMBER,
     p_user_id         IN NUMBER,
     p_monto           IN NUMBER,
     p_iva             IN NUMBER,
+    p_subiva          IN NUMBER,
     p_descripcion     IN VARCHAR2,
     p_detalles_json   IN CLOB,
     p_respuesta       OUT CLOB
@@ -454,6 +454,7 @@ BEGIN
         venta_horafecha,
         venta_total,
         venta_iva,
+        venta_subiva,
         venta_descripcion
     ) VALUES (
         p_local_id,
@@ -462,6 +463,7 @@ BEGIN
         SYSDATE,
         p_monto,
         p_iva,
+        p_subiva,
         p_descripcion
     )
     RETURNING venta_id INTO v_venta_id;
