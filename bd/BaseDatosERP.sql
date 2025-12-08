@@ -162,10 +162,12 @@ CREATE TABLE VENTA (
     venta_id             NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     venta_horafecha      DATE NOT NULL,
     venta_iva            NUMBER NOT NULL,
+    venta_Subtiva        NUMBER NOT NULL,
     venta_total          NUMBER(10, 2) NOT NULL,
     venta_estado         CHAR(1) CHECK (venta_estado IN ('0','1')) NOT NULL,
     venta_estadoregistro CHAR(1) DEFAULT '1' CHECK (venta_estadoregistro IN ('0','1')) NOT NULL,
     venta_fechregistro   DATE DEFAULT SYSDATE,
+    venta_descripcion    VARCHAR2(150),
     user_id              NUMBER NOT NULL,
     local_id             NUMBER NOT NULL,
     client_id            NUMBER NOT NULL
