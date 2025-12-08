@@ -83,8 +83,21 @@
           <div class="flex items-center justify-center w-8 h-8 mr-3">
             <i class="fa fa-street-view colorIconosSliderStandar"></i>
           </div>
-          <p class="text-sm font-semibold">Productos</p>
+          <p class="text-sm font-semibold">PRODUCTOS</p>
         </a>
+          <!-- boton lista ventas -->
+        <a
+          *appMostrarSiRol="['administrador']"
+          routerLink="listaventas"
+          class="flex items-center p-3 bg-white rounded-md shadow-sm cursor-pointer hover:bg-gray-100 hover:shadow-md hover:scale-105 transition-all duration-200 mb-1"
+        >
+          <div class="flex items-center justify-center w-8 h-8 mr-3">
+            <i class="fa fa-street-view colorIconosSliderStandar"></i>
+          </div>
+          <p class="text-sm font-semibold">VENTAS</p>
+        </a>
+
+
 
 
 

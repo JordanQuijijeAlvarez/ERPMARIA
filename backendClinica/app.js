@@ -7,6 +7,7 @@ require('dotenv').config();
 const rutasCliente = require('./rutas/rutasCliente');
 const rutasProductos = require('./rutas/rutasProducto');
 const rutasCompra = require('./rutas/rutasCompra');
+const rutasVentas = require('./rutas/rutasVenta');
 const rutasCategoria = require('./rutas/rutasCategoria');
 const rutasSubCategoria = require('./rutas/rutasSubCategoria');
 const rutasLocal = require('./rutas/rutasLocal');
@@ -28,6 +29,8 @@ app.use('/clientes', rutasCliente);
 app.use('/productos', rutasProductos);
 app.use('/categorias', rutasCategoria);
 app.use('/compras', rutasCompra);
+app.use('/ventas', rutasVentas);
+
 app.use('/subcategoria', rutasSubCategoria);
 app.use('/local', rutasLocal);
 app.use('/proveedor', rutasProveedor);

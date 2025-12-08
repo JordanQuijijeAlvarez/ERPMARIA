@@ -428,3 +428,149 @@ END;
 /
 
 select * from producto;
+-----------------------------------------VENTAS--------------------
+
+--AGREGAR LA COLUMNA DE descripcion
+-- venta_estado = defecto '1'
+
+
+CREATE OR REPLACE PROCEDURE REGISTRAR_VENTA_COMPLETA (
+    p_local_id        IN NUMBER,
+    p_cliente_id      IN NUMBER,
+    p_user_id         IN NUMBER,
+    p_monto           IN NUMBER,
+    p_iva             IN NUMBER,
+    p_descripcion     IN VARCHAR2,
+    p_detalles_json   IN CLOB,
+    p_respuesta       OUT CLOB
+) AS
+    v_venta_id    NUMBER;
+BEGIN
+    /* 1. Insertar cabecera sin enviar el ID */
+    INSERT INTO VENTA (
+        local_id,
+        client_id,
+        user_id,
+        venta_horafecha,
+        venta_total,
+        venta_iva,
+        venta_descripcion
+    ) VALUES (
+        p_local_id,
+        p_cliente_id,
+        p_user_id,
+        SYSDATE,
+        p_monto,
+        p_iva,
+        p_descripcion
+    )
+    RETURNING venta_id INTO v_venta_id;
+
+    /* 2. Procesar detalles */
+    FOR r IN (
+        SELECT *
+        FROM JSON_TABLE(
+            p_detalles_json,
+            '$[*]' COLUMNS (
+                prod_id        NUMBER PATH '$.prod_id',
+                cantidad       NUMBER PATH '$.detv_cantidad',
+                subtotal       NUMBER PATH '$.detv_subtotal'
+            )
+        )
+    ) LOOP
+
+        -- Insertar detalle (ID autogenerado)
+        INSERT INTO DETALLE_VENTA (
+            venta_id,
+            prod_id,
+            detv_cantidad,
+            detv_subtotal,
+            detv_estado
+        ) VALUES (
+            v_venta_id,
+            r.prod_id,
+            r.cantidad,
+            r.subtotal,
+            1
+        );
+
+        -- Descontar stock
+        UPDATE PRODUCTO
+        SET prod_stock = prod_stock - r.cantidad
+        WHERE prod_id = r.prod_id;
+
+        -- Registrar movimiento
+        INSERT INTO MOVIMIENTO_STOCK (
+            movi_stock_tipomov,
+            movi_stock_cantidad,
+            prod_id,
+            user_id,
+            movi_stock_referenciadoc
+        ) VALUES (
+            'SALIDA_VENTA',
+            r.cantidad,
+            r.prod_id,
+            p_user_id,
+            'VENTA-' || v_venta_id
+        );
+
+    END LOOP;
+
+    /* 3. Construir JSON de salida */
+    p_respuesta := JSON_OBJECT(
+        'status' VALUE 'OK',
+        'venta_id' VALUE v_venta_id,
+        'message' VALUE 'Venta registrada correctamente'
+    );
+
+    COMMIT;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        p_respuesta := JSON_OBJECT(
+            'status' VALUE 'ERROR',
+            'message' VALUE SQLERRM
+        );
+END;
+/
+
+
+CREATE OR REPLACE VIEW VW_VENTAS AS
+SELECT
+    v.venta_id,
+    v.venta_horafecha,
+    (
+      SELECT SUM(d.detv_cantidad)
+      FROM DETALLE_VENTA d
+      WHERE d.venta_id = v.venta_id
+    ) AS total_items,
+    v.venta_total,
+    v.venta_iva,
+    l.local_nombre,
+    c.client_cedula,
+    c.client_nombres || ' ' ||c.client_apellidos as clientenombre,
+    u.user_nombres   || ' ' ||u.user_apellidos  as usuarionombre,
+    v.venta_descripcion,
+    v.venta_estadoregistro
+
+FROM VENTA v
+JOIN CLIENTE c ON v.client_id = c.client_id
+JOIN USUARIO u ON v.user_id = u.user_id
+JOIN LOCAL l ON v.local_id = l.local_id ;
+
+
+select * from vw_ventas;
+
+
+CREATE OR REPLACE VIEW VW_DETALLE_VENTA AS
+SELECT
+    d.detv_id,
+    d.venta_id,
+    d.prod_id,
+    p.prod_nombre,
+    p.prod_precioventa,
+    d.detv_cantidad,
+    d.detv_subtotal
+FROM DETALLE_VENTA d
+JOIN PRODUCTO p ON d.prod_id = p.prod_id;

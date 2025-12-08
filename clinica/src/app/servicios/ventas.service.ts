@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { InProducto, InProductoDetalle } from '../modelos/modeloProductos/InProducto';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
+import { InVentaCompleto } from '../modelos/modeloVentas/InVentas';
 
 @Injectable({
   providedIn: 'root'
 })
 
-export class productosService {
+export class ventaService {
 
  private urlServidor = 'http://localhost:3000';
 
@@ -15,6 +16,23 @@ export class productosService {
   constructor(private http: HttpClient) { }
 
   
+CrearVenta(venta: InVentaCompleto): Observable<any> {
+
+    return this.http.post(`${this.urlServidor}/ventas/Registrar`, venta);
+  }
+
+
+
+  getDetalleVentas(id: number): Observable<any> {
+
+    return this.http.get<any>(`${this.urlServidor}/ventas/detalle/${id}`);
+  }
+
+  getVentasEstado(estado: number): Observable<any> {
+
+    return this.http.get<any>(`${this.urlServidor}/ventas/${estado}`);
+  }
+
 
   LproductosEstado (estado: number): Observable<InProductoDetalle[]> {
 
@@ -39,10 +57,7 @@ export class productosService {
     return this.http.get<InProducto[]>(`${this.urlServidor}/productos/ListarSinUsuario`);
   }
 
-  CrearProducto(producto: InProducto): Observable<any> {
-
-    return this.http.post(`${this.urlServidor}/productos/Registrar`, producto);
-  }
+  
 
   EliminarProducto(id:number):Observable<any>{
     return this.http.delete(`${this.urlServidor}/productos/Eliminar/${id}`);

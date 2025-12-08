@@ -35,6 +35,31 @@ exports.getProductosEstado = async (req, res) => {
     }
 };
 
+exports.getProductosCodigoBarrasEstado = async (req, res) => {
+    const { codbarra,estado } = req.params;
+    let connection;
+
+    try {
+        connection = await getConnection();
+
+        const result = await connection.execute(
+            `SELECT * FROM PRODUCTO WHERE prod_estado = :estado AND prod_codbarra=:codbarra`,
+            { codbarra,estado },
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        // Formatear claves a minúscula
+        res.json(formatearSalida(result.rows));
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: error.message });
+
+    } finally {
+        if (connection) await connection.close();
+    }
+};
+
 
 
 exports.getProductos = async (req, res) => {
