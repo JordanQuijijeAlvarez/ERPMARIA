@@ -33,6 +33,7 @@ export class FrmventasComponent {
   stockActual: any;
   listaDetalles: any[] = [];
   iva: number = 15;
+  subiva: number = 0;
   subtotal: number = 0;
 
   total: number = 0;
@@ -183,8 +184,8 @@ export class FrmventasComponent {
 
   calcularTotales() {
     this.subtotal = this.listaDetalles.reduce((acc, item) => acc + (item.cantidad * item.precioUnitario), 0);
-    this.iva = this.subtotal * 0.15;
-    this.total = this.subtotal + this.iva;
+    this.subiva = this.subtotal * (this.iva/100);
+    this.total = this.subtotal + this.subiva;
   }
 
 
@@ -230,6 +231,7 @@ export class FrmventasComponent {
     const ObjVenta: InVentaCompleto = {
       venta_id: 0,
       venta_horafecha: new Date().toISOString(),
+      venta_subiva: this.subiva,
       venta_iva: this.iva,
       venta_total: this.total,
       local_id: 1,
@@ -300,7 +302,6 @@ export class FrmventasComponent {
     };
 
     if (this.eventoUpdate) {
-      //cita.codigo = this.codigoCita;
     } else {
       console.log(consulta);
       this.serviConsultas.CrearConsulta(consulta).subscribe({

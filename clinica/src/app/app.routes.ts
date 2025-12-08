@@ -29,8 +29,8 @@ import { ListaclientesComponent } from './components/pages/clientes/listacliente
 import { frmClientesComponent } from './components/pages/clientes/frmclientes/frmclientes.component';
 import { ListaproductosComponent } from './components/pages/productos/listaproductos/listaproductos.component';
 import { FrmproductoComponent } from './components/pages/productos/frmproductos/frmproductos.component';
-import { FrmventasComponent } from './components/pages/consultas copy/frmventas/frmventas.component';
-import { listaVentasComponent } from './components/pages/consultas copy/listaventas/listaventas.component';
+import { FrmventasComponent } from './components/pages/ventas/frmventas/frmventas.component';
+import { listaVentasComponent } from './components/pages/ventas/listaventas/listaventas.component';
 
 export const routes: Routes = [
   { path: '', redirectTo:'home/dashboard', pathMatch:'full' },

@@ -232,10 +232,7 @@ export class listaVentasComponent {
       this.updatePaginatedData();
     },
     error: (err) => {
-      this.ServicioAlertas.info(
-        'ERROR',
-        'NO SE PUEDE ACCEDER A LA INFORMACIÓN DE VENTAS'
-      );
+      
     },
   });
 }

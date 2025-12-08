@@ -74,6 +74,7 @@ exports.Registrarventa = async (req, res) => {
     cliente_id,
     user_id,
     venta_iva,
+    venta_subiva,
     venta_total,
     venta_descripcion,
     detalle_venta
@@ -96,6 +97,7 @@ exports.Registrarventa = async (req, res) => {
           :p_user_id,
           :p_monto,
           :p_iva,
+          :p_subiva,
           :p_descripcion,
           :p_detalles_json,
           :p_respuesta
@@ -108,6 +110,7 @@ exports.Registrarventa = async (req, res) => {
         p_user_id: user_id,
         p_monto: venta_total,
         p_iva: venta_iva,
+        p_subiva:venta_subiva,
         p_descripcion: venta_descripcion,
         p_detalles_json: detallesJson,
         p_respuesta: { type: oracledb.CLOB, dir: oracledb.BIND_OUT }
