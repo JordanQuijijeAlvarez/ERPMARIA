@@ -36,6 +36,9 @@ export class listaVentasComponent {
   Ventas: any[] = [];
 
   totalDetalle = 0;
+  iva=0;
+    subtiva=0;
+
 
 
 
@@ -202,9 +205,11 @@ export class listaVentasComponent {
     return pages;
   }
 
-  verDetalle(id: number, total:number) {
+  verDetalle(id: number, total:number,iva :number,subtiva:number) {
     this.ventaSeleccionadaId = id;
     this.totalDetalle=total
+    this.iva=iva;
+    this.subtiva=subtiva;
     this.mostrarDetalle = true;
 
     this.ServicioVentas.getDetalleVentas(id).subscribe(res => {

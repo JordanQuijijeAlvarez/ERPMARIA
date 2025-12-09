@@ -112,7 +112,7 @@
               <td class="px-3 py-3 whitespace-nowrap text-center">
                 <div class="flex justify-center gap-2">
                   <!-- Ver Detalle -->
-                  <button (click)="verDetalle(venta.venta_id,venta.venta_total)"
+                  <button (click)="verDetalle(venta.venta_id,venta.venta_total,venta.venta_iva,venta.venta_subiva)"
                     class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200" title="Ver detalle">
                     <i class="fas fa-eye text-xs"></i>
                   </button>
@@ -153,7 +153,12 @@
         </tr>
       </tbody>
     </table>
-
+<div class="mt-4 text-right font-bold text-lg">
+      iva: {{ iva | currency:'%' }}
+    </div>
+    <div class="mt-4 text-right font-bold text-lg">
+      Calculo: {{ subtiva | currency:'USD' }}
+    </div>
     <div class="mt-4 text-right font-bold text-lg">
       Total: {{ totalDetalle | currency:'USD' }}
     </div>
