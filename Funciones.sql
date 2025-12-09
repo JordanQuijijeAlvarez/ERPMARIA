@@ -549,6 +549,8 @@ SELECT
     ) AS total_items,
     v.venta_total,
     v.venta_iva,
+        v.venta_subiva,
+
     l.local_nombre,
     c.client_cedula,
     c.client_nombres || ' ' ||c.client_apellidos as clientenombre,
@@ -560,6 +562,7 @@ FROM VENTA v
 JOIN CLIENTE c ON v.client_id = c.client_id
 JOIN USUARIO u ON v.user_id = u.user_id
 JOIN LOCAL l ON v.local_id = l.local_id ;
+
 
 
 select * from vw_ventas;
