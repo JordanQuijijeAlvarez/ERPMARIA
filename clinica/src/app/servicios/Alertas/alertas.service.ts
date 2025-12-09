@@ -88,6 +88,20 @@ export class AlertService {
       }
     });
   }
+loading(title: string ): void {
+  Swal.fire({
+    title,
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
+}
+
+close(): void {
+  Swal.close();
+}
+
 
 
 

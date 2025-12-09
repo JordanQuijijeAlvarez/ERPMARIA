@@ -1,7 +1,5 @@
 export interface InCategoria {
-    subcat_id: number,
-	subcat_nombre: string,
-	subcat_descripcion: string,
-	subcat_categoria:number	
-    
+    cat_id?: number,
+	cat_nombre: string,
+	cat_descripcion: string    
 }

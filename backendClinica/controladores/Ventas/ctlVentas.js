@@ -107,7 +107,7 @@ exports.getEncabVentaEstado= async (req, res) => {
         );
 
         if (result.rows.length > 0) {
-            const encabeformateado = formatearSalida(result.rows)[0];
+            const encabeformateado = formatearSalida(result.rows);
             res.json(encabeformateado);
         } else {
             res.status(400).json({ error: "NO EXISTE LA FACTURA" });

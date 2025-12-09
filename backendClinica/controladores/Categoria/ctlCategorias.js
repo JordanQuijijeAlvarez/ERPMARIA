@@ -1,64 +1,84 @@
-const poolsec = require('../../configuracion/dbmini');
+const poolsec = require('../../configuracion/dbmini'); // Si ya no usas pg, esta linea quiza sobre, pero la dejo por si acaso
+const { getConnection, oracledb } = require('../../configuracion/oraclePool');
+
+// ==========================================================
+// FUNCIÓN DE AYUDA (HELPER)
+// Convierte las llaves de ORACLE (MAYUSCULAS) a minúsculas
+// ==========================================================
+function formatearSalida(rows) {
+    if (!rows || rows.length === 0) return [];
+    return rows.map(obj => {
+        const newObj = {};
+        Object.keys(obj).forEach(key => {
+            newObj[key.toLowerCase()] = obj[key];
+        });
+        return newObj;
+    });
+}
+
+
+
 
 exports.getCategoriasEstado = async (req, res) => {
-    const {estado} = req.params;
-    const query = 'SELECT * FROM listarcategoriasestado($1)';
-    const values = [estado];
-    try {
-        const result = await poolsec.query(query,values);
-        res.json(result.rows);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
+  
+         const { estado } = req.params;
+         let connection;
+     
+         try {
+             connection = await getConnection();
+             const result = await connection.execute(
+                 `SELECT cat_id,cat_nombre FROM CATEGORIA WHERE cat_estado = :estado`,
+                 [estado],
+                 { outFormat: oracledb.OUT_FORMAT_OBJECT }
+             );
+     
+             if (result.rows.length > 0) {
+                 const categoriaFormat = formatearSalida(result.rows);
+                 res.json(categoriaFormat);
+             } else {
+                 res.status(400).json({ error: "NO EXISTE CATEGORIAS" });
+             }
+     
+         } catch (error) {
+             console.log(error);
+             res.status(500).json({ error: "ERROR EN EL SERVIDOR" });
+         } finally {
+             if (connection) await connection.close();
+         }
+   };
+   
 
-exports.getCategorias = async (req, res) => {
-    const query = 'SELECT * FROM categoria;';
-    try {
-        const result = await poolsec.query(query);
-        res.json(result.rows);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
 
-exports.getCategoriaId = async (req, res) => {
-    const {id} = req.params;
-    // CORRECCIÓN: La columna es 'cat_id', no 'codigo'
-    const query ='SELECT * FROM categoria WHERE cat_id = $1';
-    const values = [id];
-    try {
-        const result = await poolsec.query(query,values);
-        
-        if (result.rowCount > 0){
-            res.json(result.rows[0]);
-        } else {
-            res.status(400).json({error:"NO EXISTE ESA CATEGORIA"});
-        }
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({error:"ERROR EN EL SERVIDOR"});
-    }
-};
 
 exports.Registrarcategoria = async (req, res) => {
-    const {nombre, descripcion} = req.body;
-    const query ='SELECT registrarcategoria($1, $2);';
-    const values = [nombre, descripcion];
-
-    console.log(values);
-    try {
-        const actor = await poolsec.connect();
-        await actor.query(query,values);
-        actor.release();
-        res.status(200).json({message:'categoria registrada'});
     
+    const { cat_nombre, cat_descripcion } = req.body;
+    let connection;
+
+    try {
+        connection = await getConnection();
+
+        // 1. CORREGIDO: Se agregó el nombre de la tabla 'CATEGORIA'
+        // 2. CORREGIDO: Se eliminó el 'commit;' del string
+        const query = `INSERT INTO CATEGORIA (cat_nombre, cat_descripcion) VALUES (:cat_nombre, :cat_descripcion)`;
+        
+        // 3. CORREGIDO: Se usa un Objeto {} en lugar de un Array [] para coincidir con los :nombres
+        const values = {
+            cat_nombre: cat_nombre,
+            cat_descripcion: cat_descripcion
+        };
+
+        await connection.execute(query, values, { autoCommit: true });
+        
+        res.status(200).json({ message: 'Categoria registrada exitosamente' });
+
     } catch (error) {
         console.log(error);
-        res.status(400).json({error:"No se pudo registrar la categoria"});
+        res.status(400).json({ error: "No se pudo registrar la categoria", details: error.message });
+    } finally {
+        if (connection) await connection.close();
     }
 };
-
 exports.Actualizarcategoria = async (req, res) => {
     // CORRECCIÓN: Necesitamos el ID para saber qué actualizar
     const {cat_id, nombre, descripcion} = req.body; 

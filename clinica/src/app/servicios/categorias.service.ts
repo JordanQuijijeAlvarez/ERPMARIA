@@ -2,11 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { InSubcategoria } from '../modelos/modeloSubcategoria/InSubcategoria';
+import { InCategoria } from '../modelos/modeloCategoria/InCategoria';
 
 @Injectable({
   providedIn: 'root'
 })
-export class SubcategoriasService {
+export class CategoriasService {
 
   private urlServidor = 'http://localhost:3000';
 
@@ -15,15 +16,14 @@ export class SubcategoriasService {
 
   
 
-  LSubcategoriasEstado (estado: number): Observable<InSubcategoria[]> {
-
-    return this.http.get<InSubcategoria[]>(`${this.urlServidor}/subcategorias/listar/${estado}`);
+  LCategoriasEstado (estado: number): Observable<InCategoria[]> {
+    return this.http.get<InCategoria[]>(`${this.urlServidor}/categorias/listar/${estado}`);
   }
 
   
-  CrearSubcategorias(Subcategorias: InSubcategoria): Observable<any> {
+  CrearCategoria(categorias: InCategoria): Observable<any> {
 
-    return this.http.post(`${this.urlServidor}/subcategorias/Registrar`, Subcategorias);
+    return this.http.post(`${this.urlServidor}/categorias/Registrar`, categorias);
   }
 
 

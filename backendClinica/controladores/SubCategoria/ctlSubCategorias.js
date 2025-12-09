@@ -42,6 +42,39 @@ exports.getSubcategoriasEstado = async (req, res) => {
 
 
 
+exports.RegistrarSubcategoria = async (req, res) => {
+    
+    const { cat_id, subcat_nombre, subcat_descripcion  } = req.body;
+    let connection;
+
+    try {
+        connection = await getConnection();
+
+        // 1. CORREGIDO: Se agregó el nombre de la tabla 'CATEGORIA'
+        // 2. CORREGIDO: Se eliminó el 'commit;' del string
+        const query = `INSERT INTO SUBCATEGORIA (cat_id,subcat_nombre, subcat_descripcion) VALUES (:cat_id, :subcat_nombre, :subcat_descripcion)`;
+        
+        // 3. CORREGIDO: Se usa un Objeto {} en lugar de un Array [] para coincidir con los :nombres
+        const values = {
+            cat_id:cat_id,
+            subcat_nombre: subcat_nombre,
+            subcat_descripcion: subcat_descripcion
+        };
+
+        await connection.execute(query, values, { autoCommit: true });
+        
+        res.status(200).json({ message: 'SubCategoria registrada exitosamente' });
+
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ error: "No se pudo registrar la Subcategoria", details: error.message });
+    } finally {
+        if (connection) await connection.close();
+    }
+};
+
+
+
 
 // Obtener todas (tabla cruda)
 exports.getSubCategorias = async (req, res) => {
@@ -75,24 +108,6 @@ exports.getSubcategoriaId = async (req, res) => {
     }
 };
 
-// Registrar
-exports.RegistrarSubcategoria = async (req, res) => {
-    const {cat_id, nombre, descripcion} = req.body;
-    const query ='SELECT registrarsubcategoria($1, $2, $3);';
-    const values = [cat_id, nombre, descripcion];
-
-    console.log(values);
-    try {
-        const actor = await poolsec.connect();
-        await actor.query(query,values);
-        actor.release();
-        res.status(200).json({message:'subcategoria registrada'});
-    
-    } catch (error) {
-        console.log(error);
-        res.status(400).json({error:"No se pudo registrar la subcategoria"});
-    }
-};
 
 // Actualizar
 exports.Actualizarsubcategoria = async (req, res) => {

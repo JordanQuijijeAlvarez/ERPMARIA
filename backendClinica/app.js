@@ -31,7 +31,7 @@ app.use('/categorias', rutasCategoria);
 app.use('/compras', rutasCompra);
 app.use('/ventas', rutasVentas);
 
-app.use('/subcategoria', rutasSubCategoria);
+app.use('/subcategorias', rutasSubCategoria);
 app.use('/local', rutasLocal);
 app.use('/proveedor', rutasProveedor);
 app.use('/usuarios', rutasUsuarios);
