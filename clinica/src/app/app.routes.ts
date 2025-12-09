@@ -110,7 +110,12 @@ export const routes: Routes = [
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
       },
-
+ {
+        path: 'actualizarVenta/:id',
+        component: FrmventasComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['ADMINISTRADOR'] },
+      },
       // Médicos
       {
         path: 'listamedicos',

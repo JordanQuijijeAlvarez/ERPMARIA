@@ -579,3 +579,173 @@ SELECT
     d.detv_subtotal
 FROM DETALLE_VENTA d
 JOIN PRODUCTO p ON d.prod_id = p.prod_id;
+
+
+CREATE OR REPLACE VIEW vw_venta_completa AS
+SELECT 
+    -- Datos de Cabecera (Venta)
+    v.venta_id,
+    v.venta_horafecha,
+    v.venta_subiva,
+    v.venta_iva,
+    v.venta_total,
+    v.venta_descripcion,
+    
+    -- Datos del Cliente
+    c.client_id AS cliente_id,
+    c.client_cedula AS cliente_cedula,
+    c.client_nombres AS cliente_nombres, -- O CONCAT(c.nombres, ' ', c.apellidos)
+    c.client_direccion AS cliente_direccion,
+    
+    -- Datos del Detalle
+    d.detv_id,
+    d.detv_cantidad,
+    d.detv_subtotal,
+    d.detv_estado,
+    
+    -- Datos del Producto
+    p.prod_id,
+    p.prod_nombre,
+    p.prod_codbarra,
+    p.prod_precioventa AS detv_precio_unitario -- O el precio histórico guardado en detalle
+
+FROM venta v
+JOIN cliente c ON v.client_id = c.client_id
+JOIN detalle_venta d ON v.venta_id = d.venta_id
+JOIN producto p ON d.prod_id = p.prod_id;
+
+
+
+CREATE OR REPLACE PROCEDURE ACTUALIZAR_VENTA_COMPLETA (
+    p_venta_id        IN NUMBER,  -- Nuevo parámetro obligatorio
+    p_local_id        IN NUMBER,
+    p_cliente_id      IN NUMBER,
+    p_user_id         IN NUMBER,
+    p_monto           IN NUMBER,
+    p_iva             IN NUMBER,
+    p_subiva          IN NUMBER,
+    p_descripcion     IN VARCHAR2,
+    p_detalles_json   IN CLOB,
+    p_respuesta       OUT CLOB
+) AS
+BEGIN
+    /* =======================================================
+       PASO 1: REVERTIR STOCK DE LA VENTA ANTERIOR
+       (Devolvemos los productos al estante antes de borrar)
+       ======================================================= */
+    FOR r_old IN (
+        SELECT prod_id, detv_cantidad 
+        FROM DETALLE_VENTA 
+        WHERE venta_id = p_venta_id
+    ) LOOP
+        -- 1.1 Devolver stock (SUMAR)
+        UPDATE PRODUCTO
+        SET prod_stock = prod_stock + r_old.detv_cantidad
+        WHERE prod_id = r_old.prod_id;
+
+        -- 1.2 Registrar movimiento de corrección (ENTRADA)
+        INSERT INTO MOVIMIENTO_STOCK (
+            movi_stock_tipomov,
+            movi_stock_cantidad,
+            prod_id,
+            user_id,
+            movi_stock_referenciadoc
+        ) VALUES (
+            'ENTRADA_CORRECCION', -- O 'REVERSO_VENTA'
+            r_old.detv_cantidad,
+            r_old.prod_id,
+            p_user_id,
+            'CORREC-VENTA-' || p_venta_id
+        );
+    END LOOP;
+
+    /* =======================================================
+       PASO 2: ELIMINAR DETALLES ANTIGUOS
+       ======================================================= */
+    DELETE FROM DETALLE_VENTA WHERE venta_id = p_venta_id;
+
+    /* =======================================================
+       PASO 3: ACTUALIZAR CABECERA DE VENTA
+       ======================================================= */
+    UPDATE VENTA SET
+        local_id = p_local_id,
+        client_id = p_cliente_id, -- Ojo: en tu tabla es client_id
+        user_id = p_user_id,
+        venta_total = p_monto,
+        venta_iva = p_iva,
+        venta_subiva = p_subiva,
+        venta_descripcion = p_descripcion,
+        venta_horafecha = SYSDATE -- Actualizamos la fecha de edición
+    WHERE venta_id = p_venta_id;
+
+    /* =======================================================
+       PASO 4: PROCESAR NUEVOS DETALLES (Igual que en Registrar)
+       ======================================================= */
+    FOR r IN (
+        SELECT *
+        FROM JSON_TABLE(
+            p_detalles_json,
+            '$[*]' COLUMNS (
+                prod_id        NUMBER PATH '$.prod_id',
+                cantidad       NUMBER PATH '$.detv_cantidad',
+                subtotal       NUMBER PATH '$.detv_subtotal'
+            )
+        )
+    ) LOOP
+
+        -- 4.1 Insertar nuevo detalle
+        INSERT INTO DETALLE_VENTA (
+            venta_id,
+            prod_id,
+            detv_cantidad,
+            detv_subtotal,
+            detv_estado
+        ) VALUES (
+            p_venta_id,
+            r.prod_id,
+            r.cantidad,
+            r.subtotal,
+            1
+        );
+
+        -- 4.2 Descontar nuevo stock (RESTAR)
+        UPDATE PRODUCTO
+        SET prod_stock = prod_stock - r.cantidad
+        WHERE prod_id = r.prod_id;
+
+        -- 4.3 Registrar nuevo movimiento (SALIDA)
+        INSERT INTO MOVIMIENTO_STOCK (
+            movi_stock_tipomov,
+            movi_stock_cantidad,
+            prod_id,
+            user_id,
+            movi_stock_referenciadoc
+        ) VALUES (
+            'SALIDA_VENTA',
+            r.cantidad,
+            r.prod_id,
+            p_user_id,
+            'VENTA-' || p_venta_id
+        );
+
+    END LOOP;
+
+    /* =======================================================
+       PASO 5: RESPUESTA EXITOSA
+       ======================================================= */
+    p_respuesta := JSON_OBJECT(
+        'status' VALUE 'OK',
+        'venta_id' VALUE p_venta_id,
+        'message' VALUE 'Venta actualizada y stock ajustado correctamente'
+    );
+
+    COMMIT;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        p_respuesta := JSON_OBJECT(
+            'status' VALUE 'ERROR',
+            'message' VALUE SQLERRM
+        );
+END;

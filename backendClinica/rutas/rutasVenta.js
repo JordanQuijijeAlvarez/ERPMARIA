@@ -10,6 +10,11 @@ router.get('/detalle/:id', authenticateToken,
     ctlVentas.getDetalleVenta)
 router.get('/:estado', authenticateToken,
     ctlVentas.getEncabVentaEstado)
+router.get('/obtener/:id', authenticateToken,
+    ctlVentas.ObtenerVentaPorId);
+
+router.put('/Actualizar/:id', authenticateToken,
+    ctlVentas.ActualizarVenta);
 
 /*
 router.get('/listar/:estado', authenticateToken,

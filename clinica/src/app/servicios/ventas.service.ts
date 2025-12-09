@@ -9,6 +9,7 @@ import { InVentaCompleto } from '../modelos/modeloVentas/InVentas';
 })
 
 export class ventaService {
+  
 
  private urlServidor = 'http://localhost:3000';
 
@@ -32,6 +33,16 @@ CrearVenta(venta: InVentaCompleto): Observable<any> {
 
     return this.http.get<any>(`${this.urlServidor}/ventas/${estado}`);
   }
+
+  ObtenerVentaPorId(idVenta: number): Observable<any> {
+    return this.http.get<any>(`${this.urlServidor}/ventas/obtener/${idVenta}`);
+
+  }
+
+    ActualizarVenta(idVenta: number,venta: InVentaCompleto): Observable<any> {
+    return this.http.put(`${this.urlServidor}/ventas/Actualizar/${idVenta}`,venta);
+
+  } 
 
 
   LproductosEstado (estado: number): Observable<InProductoDetalle[]> {

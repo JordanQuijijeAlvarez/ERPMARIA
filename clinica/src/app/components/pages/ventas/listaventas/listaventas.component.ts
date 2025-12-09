@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {  RouterModule } from '@angular/router';
+import {  Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AlertService } from '../../../../servicios/Alertas/alertas.service';
@@ -51,6 +51,8 @@ export class listaVentasComponent {
   };
 
   constructor(
+    private router: Router,
+
     private ServicioAlertas: AlertService,
     private ServicioVentas: ventaService,
 
@@ -241,4 +243,8 @@ export class listaVentasComponent {
     },
   });
 }
+
+ActualizarVenta(id: any): void {
+    this.router.navigate(['home/actualizarVenta', id]);
+  }
 }

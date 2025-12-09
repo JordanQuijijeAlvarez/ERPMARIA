@@ -35,28 +35,17 @@ export class FrmventasComponent {
   iva: number = 15;
   subiva: number = 0;
   subtotal: number = 0;
-
   total: number = 0;
-
-
-
-
-
   formVentas: FormGroup;
-
-  citaPaciente: InCitaPacienteLista | undefined;
-  codigoCita!: number;
-  cedulaPaciente: string = '';
-  nombrePaciente!: string;
-  edadPaciente!: number;
   eventoUpdate = false;
-
-
   cliente: number = 0;
   producto: InProducto | undefined;
+  codigoventa: number = 0;
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
+
 
     private ServicioVentas: ventaService,
 
@@ -80,6 +69,20 @@ export class FrmventasComponent {
   }
 
   ngOnInit(): void {
+
+    this.route.paramMap.subscribe((parametros) => {
+    const id = parametros.get('id');
+    if (id) {
+      this.eventoUpdate = true;
+      this.codigoventa = parseInt(id);
+      
+      // LLAMAMOS AL MÉTODO DE CARGA (Asegúrate de tener este método en tu servicio)
+      this.cargarVentaParaEditar(this.codigoventa); 
+      
+    } else {
+      this.eventoUpdate = false;
+    }
+  });
 
   }
 
@@ -184,72 +187,48 @@ export class FrmventasComponent {
 
   calcularTotales() {
     this.subtotal = this.listaDetalles.reduce((acc, item) => acc + (item.cantidad * item.precioUnitario), 0);
-    this.subiva = this.subtotal * (this.iva/100);
+    this.subiva = this.subtotal * (this.iva / 100);
     this.total = this.subtotal + this.subiva;
   }
 
 
-  guardarVenta() {
-    if (this.formVentas.invalid || this.listaDetalles.length === 0) {
-      this.alertaServ.info('Formulario Incompleto', 'Revise los datos del cliente y agregue productos.');
-      return;
-    }
-
-
-
-    console.log('Enviando venta...', this.crearObjetoVenta());
-
-    this.ServicioVentas.CrearVenta(this.crearObjetoVenta()).subscribe({
-      next: (res) => {
-        this.alertaServ.success('venta registrado con éxito.', res.message);
-        this.router.navigate(['home/']);
-      },
-      error: (err) => {
-        console.log('Error al crear venta:', err);
-        this.alertaServ.error(
-          'ERROR AL REGISTRAR',
-          'Hubo un problema al registrar la venta: revise que la información sea correcta'
-        );
-      },
-    });
-
-
-  }
+  
 
 
   crearObjetoVenta(): InVentaCompleto {
+  const detalles: InDetalleVenta[] = this.listaDetalles.map(item => ({
+    detv_id: 0, // Generalmente se manda 0 y el backend decide si borra e inserta de nuevo o actualiza
+    venta_id: this.eventoUpdate ? this.codigoventa : 0, // <--- AQUÍ EL CAMBIO IMPORTANTE
+    prod_id: item.id_producto,
+    detv_cantidad: item.cantidad,
+    detv_subtotal: item.subtotal,
+    detv_estado: 1
+  }));
 
-    const detalles: InDetalleVenta[] = this.listaDetalles.map(item => ({
-      detv_id: 0,
-      venta_id: 0,
-      prod_id: item.id_producto,
-      detv_cantidad: item.cantidad,
-      detv_subtotal: item.subtotal,
-      detv_estado: 1
-    }));
+  const ObjVenta: InVentaCompleto = {
+    venta_id: this.eventoUpdate ? this.codigoventa : 0, // <--- ID REAL SI ES UPDATE
+    venta_horafecha: new Date().toISOString(),
+    venta_subiva: this.subiva,
+    venta_iva: this.iva,
+    venta_total: this.total,
+    local_id: 1,
+    cliente_id: this.cliente,
+    user_id: 1,
+    venta_descripcion: '', // Puedes agregar un campo para esto si quieres
+    detalle_venta: detalles
+  };
 
-    const ObjVenta: InVentaCompleto = {
-      venta_id: 0,
-      venta_horafecha: new Date().toISOString(),
-      venta_subiva: this.subiva,
-      venta_iva: this.iva,
-      venta_total: this.total,
-      local_id: 1,
-      cliente_id: this.cliente,
-      user_id: 1,
-      venta_descripcion: '',
-      detalle_venta: detalles
-    };
-
-    return ObjVenta;
-  }
-
+  return ObjVenta;
+}
 
   cancelarVenta() {
     this.listaDetalles = [];
     this.formVentas.reset();
     this.calcularTotales();
     this.stockActual = 0;
+          this.router.navigate(['home/listaventas']); // Regresar si falla
+
+
   }
 
 
@@ -270,9 +249,80 @@ export class FrmventasComponent {
 
 
 
+cargarVentaParaEditar(idVenta: number) {
+  //this.alertaServ.loading('Cargando información de la venta...'); // Opcional si tienes loading
 
+  this.ServicioVentas.ObtenerVentaPorId(idVenta).subscribe({
+    next: (res: any) => {
+      // 1. SETEAR DATOS DE CABECERA (CLIENTE)
+      // Ajusta 'res.cliente...' según como te devuelva los datos tu backend
+      this.cliente = res.cliente_id;
+      
+      this.getCedulaCliente.setValue(res.cliente_cedula || res.cedula); 
+      this.getNombreCliente.setValue(res.cliente_nombres || res.nombres);
+      this.getDatosAddCliente.setValue(res.cliente_direccion || res.direccion);
 
+      // 2. SETEAR DETALLES (Transformar de BD a Frontend)
+      // Tu tabla espera: id_producto, codigo, nombreProducto, precioUnitario, cantidad, subtotal
+      if (res.detalle_venta) {
+        this.listaDetalles = res.detalle_venta.map((item: any) => {
+          return {
+            id_producto: item.prod_id,
+            // Si el backend no trae el código de barras en el detalle, puedes dejarlo vacío o pedirlo
+            codigo: item.prod_codbarra || 'N/A', 
+            nombreProducto: item.prod_nombre, 
+            precioUnitario: parseFloat(item.detv_precio_unitario || item.prod_precio), // Asegúrate de tener el precio unitario
+            cantidad: item.detv_cantidad,
+            subtotal: parseFloat(item.detv_subtotal)
+          };
+        });
+      }
 
+      // 3. RECALCULAR TOTALES VISUALES
+      this.calcularTotales();
+   //   this.alertaServ.close(); // Cerrar loading
+    },
+    error: (err:any) => {
+      console.error(err);
+      this.alertaServ.error('Error', 'No se pudo cargar la información de la venta');
+      this.router.navigate(['home/listaventas']); // Regresar si falla
+    }
+  });
+}
+
+guardarVenta() {
+  if (this.formVentas.invalid || this.listaDetalles.length === 0) {
+    this.alertaServ.info('Formulario Incompleto', 'Revise los datos y agregue productos.');
+    return;
+  }
+
+  const ventaObjeto = this.crearObjetoVenta();
+
+  if (this.eventoUpdate) {
+    // --- LÓGICA DE ACTUALIZACIÓN (PUT) ---
+    this.ServicioVentas.ActualizarVenta(this.codigoventa, ventaObjeto).subscribe({
+      next: (res) => {
+        this.alertaServ.success('Actualizado', 'La venta se ha modificado correctamente');
+        this.router.navigate(['home/listaventas']); // O donde listes las ventas
+      },
+      error: (err) => {
+        this.alertaServ.error('Error', 'No se pudo actualizar la venta');
+      }
+    });
+
+  } else {
+    // --- LÓGICA DE CREACIÓN (POST) ---
+    this.ServicioVentas.CrearVenta(ventaObjeto).subscribe({
+      next: (res) => {
+        this.alertaServ.success('Éxito', 'Venta registrada correctamente');
+        this.router.navigate(['home/listaventas']);
+      },
+      error: (err) => {
+        this.alertaServ.error('Error', 'No se pudo registrar la venta');
+      }
+    });
+  }
+}
 
 
 
@@ -288,7 +338,7 @@ export class FrmventasComponent {
     }
 
     const consulta: InConsultas = {
-      codigo_cita: this.codigoCita,
+      codigo_cita: this.codigoventa,
       peso: this.formVentas.value.txtPesoPaciente,
       temperatura: this.formVentas.value.txtTemperaturaPaciente,
       presion: this.formVentas.value.txtPresionPaciente,
@@ -321,11 +371,11 @@ export class FrmventasComponent {
   }
 
   cargarDatosPaciente(): void {
-    this.formVentas.patchValue({
-      txtNombresPaciente: this.nombrePaciente,
-      txtEdadPaciente: this.edadPaciente,
-      txtCedulaPaciente: this.cedulaPaciente,
-    });
+    // this.formVentas.patchValue({
+    //   txtNombresPaciente: this.nombrePaciente,
+    //   txtEdadPaciente: this.edadPaciente,
+    //   txtCedulaPaciente: this.cedulaPaciente,
+    // });
   }
   marcarCamposComoTocados(): void {
     Object.keys(this.formVentas.controls).forEach((campo) => {
