@@ -37,17 +37,30 @@ export class ComponenteloginComponent implements OnInit {
     contrasenia: this.formLogin.value.password
   };
 
-  this.authservicio.loginConOTP(usuarioLogin).subscribe({
-    next: res => {
-      const codigoUsuario = res.usuario_codigo;
+  // this.authservicio.loginConOTP(usuarioLogin).subscribe({
+  //   next: res => {
+  //     const codigoUsuario = res.usuario_codigo;
       
-      // Aquí puedes navegar a la ruta del nuevo componente o mostrar un modal
-      this.router.navigate(['/verificacion-otp'], { queryParams: { codigo_usuario: codigoUsuario } });
+  //     // Aquí puedes navegar a la ruta del nuevo componente o mostrar un modal
+  //     this.router.navigate(['/verificacion-otp'], { queryParams: { codigo_usuario: codigoUsuario } });
+
+  //   }, error: err => {
+  //     alert('Hubo un problema con la autenticación: ' + err.error.mensaje);
+  //   }
+  // });
+
+  this.authservicio.login(usuarioLogin).subscribe({
+    next: res => {      
+      
+      this.router.navigate(['home/dashboard'])
 
     }, error: err => {
       alert('Hubo un problema con la autenticación: ' + err.error.mensaje);
     }
   });
+
+
+
 }
 
 

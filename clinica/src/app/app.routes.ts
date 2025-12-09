@@ -33,25 +33,25 @@ import { FrmventasComponent } from './components/pages/ventas/frmventas/frmventa
 import { listaVentasComponent } from './components/pages/ventas/listaventas/listaventas.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo:'home/dashboard', pathMatch:'full' },
 
 
-  // { path: '', redirectTo: 'login', pathMatch: 'full' },
-  // { path: 'login', component: ComponenteloginComponent },
-  // { path: 'verificacion-otp', component: VerificacionOtpComponent },
 
-  // {
-  //   path: 'login/recuperacion/:username',
-  //   component: RecuperarContraseniaComponent,
-  // },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: 'login', component: ComponenteloginComponent },
+ // { path: 'verificacion-otp', component: VerificacionOtpComponent },
 
-  // en este apartado va el path para la pagina 404
-  //
+  {
+    path: 'login/recuperacion/:username',
+    component: RecuperarContraseniaComponent,
+  },
+
+  //en este apartado va el path para la pagina 404
+  
 
   {
     path: 'home',
     component: PanelprincipalComponent,
-    //canActivate: [AuthService], // Protege todas las rutas dentro de 'home'
+    canActivate: [AuthService], // Protege todas las rutas dentro de 'home'
     children: [
       { path: 'dashboard', component: DashboardComponent },
 
@@ -61,19 +61,19 @@ export const routes: Routes = [
         path: 'listarclientes',
         component: ListaclientesComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADMINISTRADOR'] },
       },
       {
         path: 'crearCliente',
         component: frmClientesComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADMINISTRADOR'] },
       },
       {
         path: 'actualizarCliente/:id',
         component: frmClientesComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADMINISTRADOR'] },
       },
 
       // Productos (Ejemplo: solo rol "admin" puede crear/actualizar)
@@ -81,19 +81,19 @@ export const routes: Routes = [
         path: 'listarproductos',
         component: ListaproductosComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADMINISTRADOR'] },
       },
       {
         path: 'creaproductos',
         component: FrmproductoComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADMINISTRADOR'] },
       },
       {
         path: 'actualizarProducto/:id',
         component: FrmproductoComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADMINISTRADOR'] },
       },
 
 
@@ -102,13 +102,13 @@ export const routes: Routes = [
         path: 'crearVenta',
         component: FrmventasComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADMINISTRADOR'] },
       },
        {
         path: 'listaventas',
         component: listaVentasComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADMINISTRADOR'] },
       },
 
       // Médicos
@@ -116,19 +116,19 @@ export const routes: Routes = [
         path: 'listamedicos',
         component: ListamedicosComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADMINISTRADOR'] },
       },
       {
         path: 'crearMedico',
         component: FrmmedicosComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADMINISTRADOR'] },
       },
       {
         path: 'actualizarMedico/:id',
         component: FrmmedicosComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADMINISTRADOR'] },
       },
 
       // Citas (Ejemplo: solo rol "recepcionista" puede agendar citas)
@@ -136,7 +136,7 @@ export const routes: Routes = [
         path: 'frmcitas',
         component: FrmcitasComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador', 'recepcionista'] },
+        data: { roles: ['ADMINISTRADOR', 'recepcionista'] },
       },
 
       // Consultas
@@ -144,13 +144,13 @@ export const routes: Routes = [
         path: 'listaconsultas',
         component: listaConsultasComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador', 'medico'] },
+        data: { roles: ['ADMINISTRADOR', 'medico'] },
       },
       {
         path: 'realizarConsulta',
         component: FrmconsultasComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador', 'medico'] },
+        data: { roles: ['ADMINISTRADOR', 'medico'] },
       },
 
       // Consultorios
@@ -158,19 +158,19 @@ export const routes: Routes = [
         path: 'listaconsultorios',
         component: ListaconsultoriosComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADMINISTRADOR'] },
       },
       {
         path: 'crearConsultorios',
         component: FrmconsultoriosComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADMINISTRADOR'] },
       },
       {
         path: 'actualizarConsultorios/:id',
         component: FrmconsultoriosComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADMINISTRADOR'] },
       },
 
       // Especialidades
@@ -178,19 +178,19 @@ export const routes: Routes = [
         path: 'listaespecialidades',
         component: listaEspecialidadesComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADMINISTRADOR'] },
       },
       {
         path: 'crearEspecialidades',
         component: FrmespecialidadsComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADMINISTRADOR'] },
       },
       {
         path: 'actualizarEspecialidades/:id',
         component: FrmespecialidadsComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADMINISTRADOR'] },
       },
 
       // Horarios
@@ -198,19 +198,19 @@ export const routes: Routes = [
         path: 'listahorarios',
         component: listaHorariosComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADMINISTRADOR'] },
       },
       {
         path: 'crearHorarios',
         component: FrmhorariosComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADMINISTRADOR'] },
       },
       {
         path: 'actualizarHorarios/:id',
         component: FrmhorariosComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADMINISTRADOR'] },
       },
 
       //Usuarios
@@ -218,19 +218,19 @@ export const routes: Routes = [
         path: 'listausuarios',
         component: ListausuariosComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADMINISTRADOR'] },
       },
       {
         path: 'crearUsuarios',
         component: FrmusuariosComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADMINISTRADOR'] },
       },
       {
         path: 'actualizarUsuarios/:id',
         component: FrmusuariosComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador'] },
+        data: { roles: ['ADMINISTRADOR'] },
       },
 
       // Historial Clínico (Ejemplo: solo rol "medico" puede ver el historial)
@@ -238,19 +238,19 @@ export const routes: Routes = [
         path: 'listahistorial',
         component: listaHistorialComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador', 'medico', 'recepcionista'] },
+        data: { roles: ['ADMINISTRADOR', 'medico', 'recepcionista'] },
       },
       {
         path: 'historial/imprimir/:codigo',
         component: reporteHistorialComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['administrador', 'medico', 'recepcionista'] },
+        data: { roles: ['ADMINISTRADOR', 'medico', 'recepcionista'] },
       },
 
       { path: '404', component: pagina404Component }//colocar al final en la parte de arriba 
 
     ],
-  },
+  }
 
-  { path: '**', component: pagina404Component },
+  //{ path: '**', component: pagina404Component },
 ];

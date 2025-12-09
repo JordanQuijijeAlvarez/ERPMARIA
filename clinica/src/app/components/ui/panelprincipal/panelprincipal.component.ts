@@ -25,29 +25,9 @@ export class PanelprincipalComponent {
 
   
 }
-usuario:InLogin={
-    nombre_usuario:'admin',
-    contrasenia:'admin123'
-  };
+
 ngOnInit(): void {
- this.authService.login(this.usuario).subscribe({
-    next: res => {
-      const token = res?.token;
-    
-      if (token && typeof token === 'string') {
-        try {
-          this.authService.guardarToken(token);
-        } catch {
-          console.log( 'Hubo un problema al guardar el token.');
-        }
-      } else {
-        console.log( 'Token no recibido o inválido.');
-      }
-    },
-    error: err => {
-      console.log( err.error?.mensaje || 'Código incorrecto');
-    }
-  });
+ 
 }
 
 }

@@ -397,23 +397,6 @@ exports.validacionProvUsers = async (req, res) => {
   }
 
   connection = await getConnection();
-  
-  // const query = `
-  //   SELECT 
-  //     u.codigo AS id_usuario, 
-  //     u.nombre_usuario,
-  //     u.contrasenia,
-  //     r.nombre AS rol,
-  //     m.codigo AS codigo_medico,
-  //     m.nombre as nombre_medico,
-  //     m.apellido as apellido_medico
-  //   FROM usuario u
-  //   JOIN rol r ON u.codigo_rol = r.codigo
-  //   LEFT JOIN medico m ON u.codigo = m.codigo_usuario
-  //   WHERE u.nombre_usuario = $1
-  //     AND u.estado = true;
-  // `;
-
   const query = `
   SELECT 
         u.user_id          AS id_usuario,
@@ -427,7 +410,6 @@ exports.validacionProvUsers = async (req, res) => {
         AND u.user_estado = 1
   `;
 
-  // const values = [nombre_usuario];
 
   try {
     // const result = await pool.query(query, values);
