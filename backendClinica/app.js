@@ -38,12 +38,12 @@ app.use('/usuarios', rutasUsuarios);
 app.use('/roles', rutasRoles);
 
 
-//Ruta provisional 
+// Ruta provisional 
 app.post('/loginprov', login.validacionProvUsers);
 
 
 
-// Rutas de autenticación
+//Rutas de autenticación
 app.post('/login', login.validacionUsers);
 app.post('/logout', authenticateToken, login.logout);
 app.get('/sesiones-activas', authenticateToken, login.getSesionesActivas);
