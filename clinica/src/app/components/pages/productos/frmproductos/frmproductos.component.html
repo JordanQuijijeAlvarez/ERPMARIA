@@ -36,10 +36,10 @@
                   Código de Barras *
                 </label>
                 <input formControlName="txtCodigobarras" type="text" id="codigobarras" autocomplete="address-level2"
-                  placeholder="Ingresa el codigo (13 dígitos)" maxlength="10"
+                  placeholder="Ingresa el codigo (13 dígitos)" maxlength="13"
                   class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm" />
                 <app-validators [control]="frmProducto.get('txtCodigobarras')!" [showCounter]="true"
-                  [expectedLength]="10">
+                  [expectedLength]="13">
                 </app-validators>
               </div>
 

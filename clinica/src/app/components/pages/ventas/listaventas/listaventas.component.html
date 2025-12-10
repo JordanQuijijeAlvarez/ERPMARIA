@@ -68,75 +68,96 @@
         </a>
       </div>
 
-      <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th class="px-3 py-4 text-left text-xs font-semibold text-gray-600 uppercase w-28">
-                N° Factura
-              </th>
-              <th class="px-3 py-4 text-left text-xs font-semibold text-gray-600 uppercase w-48">
-                ventas
-              </th>
-              <th class="px-3 py-4 text-left text-xs font-semibold text-gray-600 uppercase w-40">
-                Fecha
-              </th>
-              <th class="px-3 py-4 text-right text-xs font-semibold text-gray-600 uppercase w-32">
-                Total
-              </th>
-              <th class="px-3 py-4 text-center text-xs font-semibold text-gray-600 uppercase w-24">
-                Acciones
-              </th>
-            </tr>
-          </thead>
+      <div class="mb-4 border-b border-gray-200">
+        <ul class="flex flex-wrap -mb-px text-sm font-medium text-center">
+          <li class="mr-2">
+            <button (click)="cambiarTab(1)"
+              [class]="estadoActual === 1 
+              ? 'inline-block p-4 text-blue-600 border-b-2 border-blue-600 rounded-t-lg active' 
+              : 'inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300'">
+              <i class="fas fa-check-circle mr-2"></i> Activas
+            </button>
+          </li>
+          <li class="mr-2">
+            <button (click)="cambiarTab(0)"
+              [class]="estadoActual === 0 
+              ? 'inline-block p-4 text-red-600 border-b-2 border-red-600 rounded-t-lg active' 
+              : 'inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300'">
+              <i class="fas fa-ban mr-2"></i> Anuladas
+            </button>
+          </li>
+        </ul>
+      </div>
 
-          <tbody class="bg-white divide-y divide-gray-200">
-            <!-- No results message -->
-            <tr *ngFor="let venta of paginatedVentas" class="hover:bg-gray-50 transition-colors duration-200">
-              <td class="px-3 py-3 whitespace-nowrap font-medium">
-                #{{ venta.venta_id }}
-              </td>
+      <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+          <a routerLink="../crearVenta" *ngIf="estadoActual === 1">
+          </a>
+        </div>
 
-              <td class="px-3 py-3 whitespace-nowrap">
-                {{ venta.clientenombre }}
-              </td>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr *ngIf="paginatedVentas.length === 0">
+                <td colspan="5" class="px-6 py-10 text-center text-gray-500">
+                  <div class="flex flex-col items-center justify-center">
+                    <i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i>
+                    <p class="text-lg font-medium">No se encontraron ventas</p>
+                    <p class="text-sm">
+                      {{ estadoActual === 1 ? 'No hay ventas registradas aún.' : 'No hay ventas anuladas.' }}
+                    </p>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngFor="let venta of paginatedVentas" class="hover:bg-gray-50 transition-colors duration-200">
 
-              <td class="px-3 py-3 whitespace-nowrap">
-                {{ venta.venta_horafecha | date:'dd/MM/yyyy HH:mm' }}
-              </td>
+                <td class="px-3 py-3 whitespace-nowrap font-medium">
+                  #{{ venta.venta_id }}
+                </td>
 
-              <td class="px-3 py-3 whitespace-nowrap text-right font-semibold">
-                {{ venta.venta_total | currency:'USD' }}
-              </td>
+                <td class="px-3 py-3 whitespace-nowrap">
+                  {{ venta.clientenombre }}
+                </td>
 
-              <td class="px-3 py-3 whitespace-nowrap text-center">
-                <div class="flex justify-center gap-2">
-                  <!-- Ver Detalle -->
-                  <button (click)="verDetalle(venta.venta_id,venta.venta_total,venta.venta_iva,venta.venta_subiva)"
-                    class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200" title="Ver detalle">
-                    <i class="fas fa-eye text-xs"></i>
-                  </button>
-                
-                  <!-- Editar -->
-                  <button (click)="ActualizarVenta(venta.venta_id)"
-                    class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200" title="Editar">
-                    <i class="fas fa-edit text-xs"></i>
-                  </button>
+                <td class="px-3 py-3 whitespace-nowrap">
+                  {{ venta.venta_horafecha | date:'dd/MM/yyyy HH:mm' }}
+                </td>
 
-                   <!-- Anular -->
-                  <button (click)="verDetalle(venta.venta_id,venta.venta_total,venta.venta_iva,venta.venta_subiva)"
-                    class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200" title="Anular">
-                    <i class="fas fa-trash text-xs"></i>
-                  </button>
-                </div>
-              </td>
-            
-            </tr>
+                <td class="px-3 py-3 whitespace-nowrap text-right font-semibold">
+                  {{ venta.venta_total | currency:'USD' }}
+                </td>
 
-          </tbody>
-        </table>
+                <td class="px-3 py-3 whitespace-nowrap text-center">
+                  <div class="flex justify-center gap-2">
 
-        <!-- Modal Detalle de Venta -->
+                    <button (click)="verDetalle(venta.venta_id, venta.venta_total, venta.venta_iva, venta.venta_subiva)"
+                      class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200" title="Ver detalle">
+                      <i class="fas fa-eye text-xs"></i>
+                    </button>
+
+                    <ng-container *ngIf="estadoActual === 1">
+                      <button (click)="ActualizarVenta(venta.venta_id)"
+                        class="w-8 h-8 bg-yellow-100 text-yellow-600 rounded-lg hover:bg-yellow-200" title="Editar">
+                        <i class="fas fa-edit text-xs"></i>
+                      </button>
+
+                      <button (click)="anularVenta(venta.venta_id)"
+                        class="w-8 h-8 bg-red-100 text-red-600 rounded-lg hover:bg-red-200" title="Anular">
+                        <i class="fas fa-trash text-xs"></i>
+                      </button>
+                    </ng-container>
+
+                    <span *ngIf="estadoActual === 0"
+                      class="px-2 py-1 text-xs font-semibold text-red-700 bg-red-100 rounded-full">
+                      Anulada
+                    </span>
+
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+                  <!-- Modal Detalle de Venta -->
 <div *ngIf="mostrarDetalle" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
   <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl p-6">
     <div class="flex justify-between items-center mb-4">
@@ -180,60 +201,61 @@
 
       </div>
 
-      <!-- Pagination Section -->
-      <div class="px-6 py-4 bg-gray-50 border-t border-gray-200" *ngIf="totalItems > 0">
-        <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
-          <!-- Results info y selector de items por página -->
-          <div class="flex flex-col sm:flex-row items-center gap-4">
-            <div class="text-sm text-gray-600">
-              Mostrando <span class="font-medium">{{ getItemRange().start }}-{{ getItemRange().end }}</span> de <span
-                class="font-medium">{{ totalItems }}</span> Registros
-            </div>
+          <!-- Pagination Section -->
+          <div class="px-6 py-4 bg-gray-50 border-t border-gray-200" *ngIf="totalItems > 0">
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
+              <!-- Results info y selector de items por página -->
+              <div class="flex flex-col sm:flex-row items-center gap-4">
+                <div class="text-sm text-gray-600">
+                  Mostrando <span class="font-medium">{{ getItemRange().start }}-{{ getItemRange().end }}</span> de
+                  <span class="font-medium">{{ totalItems }}</span> Registros
+                </div>
 
-            <!-- Selector de items por página -->
-            <div class="flex items-center gap-2 text-sm text-gray-600">
-              <label for="itemsPerPage" class="text-gray-600">Mostrar:</label>
-              <select id="itemsPerPage" (change)="changeItemsPerPage(+$any($event.target).value)" [value]="itemsPerPage"
-                class="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 cursor-pointer">
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
-              <span>por página</span>
-            </div>
-          </div>
+                <!-- Selector de items por página -->
+                <div class="flex items-center gap-2 text-sm text-gray-600">
+                  <label for="itemsPerPage" class="text-gray-600">Mostrar:</label>
+                  <select id="itemsPerPage" (change)="changeItemsPerPage(+$any($event.target).value)"
+                    [value]="itemsPerPage"
+                    class="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 cursor-pointer">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                  <span>por página</span>
+                </div>
+              </div>
 
-          <!-- Pagination controls -->
-          <div class="flex items-center gap-2">
-            <button type="button" (click)="previousPage()" [disabled]="currentPage === 1"
-              class="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
-              <i class="fas fa-chevron-left mr-1"></i>
-              Anterior
-            </button>
+              <!-- Pagination controls -->
+              <div class="flex items-center gap-2">
+                <button type="button" (click)="previousPage()" [disabled]="currentPage === 1"
+                  class="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+                  <i class="fas fa-chevron-left mr-1"></i>
+                  Anterior
+                </button>
 
-            <div class="flex items-center gap-1">
-              <button *ngFor="let page of getPageNumbers()" type="button" (click)="goToPage(page)"
-                [class]="page === currentPage 
+                <div class="flex items-center gap-1">
+                  <button *ngFor="let page of getPageNumbers()" type="button" (click)="goToPage(page)"
+                    [class]="page === currentPage 
                   ? 'w-8 h-8 text-sm font-medium text-white bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 cursor-pointer'
                   : 'w-8 h-8 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 cursor-pointer'">
-                {{ page }}
-              </button>
+                    {{ page }}
+                  </button>
 
-              <!-- Ellipsis for large page counts -->
-              <span *ngIf="totalPages > 5 && currentPage < totalPages - 2" class="px-2 text-gray-500">...</span>
+                  <!-- Ellipsis for large page counts -->
+                  <span *ngIf="totalPages > 5 && currentPage < totalPages - 2" class="px-2 text-gray-500">...</span>
+                </div>
+
+                <button type="button" (click)="nextPage()" [disabled]="currentPage === totalPages"
+                  class="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+                  Siguiente
+                  <i class="fas fa-chevron-right ml-1"></i>
+                </button>
+              </div>
             </div>
-
-            <button type="button" (click)="nextPage()" [disabled]="currentPage === totalPages"
-              class="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
-              Siguiente
-              <i class="fas fa-chevron-right ml-1"></i>
-            </button>
           </div>
         </div>
       </div>
-    </div>
-  </div>
 
-  
+      

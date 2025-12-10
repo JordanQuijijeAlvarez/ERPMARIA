@@ -44,6 +44,12 @@ CrearVenta(venta: InVentaCompleto): Observable<any> {
 
   } 
 
+  
+  AnularVenta(id:number):Observable<any>{
+    return this.http.delete(`${this.urlServidor}/ventas/Anular/${id}`);
+
+  }
+
 
   LproductosEstado (estado: number): Observable<InProductoDetalle[]> {
 
@@ -70,10 +76,6 @@ CrearVenta(venta: InVentaCompleto): Observable<any> {
 
   
 
-  EliminarProducto(id:number):Observable<any>{
-    return this.http.delete(`${this.urlServidor}/productos/Eliminar/${id}`);
-
-  }
   Actualizarproducto(producto: InProducto): Observable<any> {
 
     return this.http.put(`${this.urlServidor}/productos/Actualizar`, producto);

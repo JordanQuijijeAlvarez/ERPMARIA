@@ -27,6 +27,11 @@
       Debe contener exactamente 10 dígitos 
       <span *ngIf="showCounter" class="font-semibold">({{ getCurrentLength() }}/10)</span>
     </span>
+
+    <span *ngIf="control.errors?.['treceDigits']">
+      Debe contener exactamente 13 dígitos 
+      <span *ngIf="showCounter" class="font-semibold">({{ getCurrentLength() }}/10)</span>
+    </span>
     <span *ngIf="control.errors?.['exactLength']">
       Debe contener exactamente {{ control.errors?.['exactLength']?.requiredLength }} dígitos
       <span *ngIf="showCounter" class="font-semibold">({{ getCurrentLength() }}/{{ control.errors?.['exactLength']?.requiredLength }})</span>

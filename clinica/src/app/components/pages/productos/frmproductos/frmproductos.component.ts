@@ -48,7 +48,7 @@ export class FrmproductoComponent {
     private route: ActivatedRoute
   ) {
     this.frmProducto = this.formBuilder.group({
-      txtCodigobarras: ['', [Validators.required, ValidatorsComponent.numericTenDigits]],
+      txtCodigobarras: ['', [Validators.required, ValidatorsComponent.numericTreceDigits]],
       txtNombres: ['', Validators.required],
       txtDescripcion: ['', Validators.required],
       txtpreciocompra: ['', Validators.required],

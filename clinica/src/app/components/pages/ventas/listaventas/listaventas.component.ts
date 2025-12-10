@@ -40,6 +40,7 @@ export class listaVentasComponent {
     subtiva=0;
 
 
+    estadoActual: number = 1;
 
 
 
@@ -61,7 +62,7 @@ export class listaVentasComponent {
   ngOnInit(): void {
 
 
-    this.listarventasActivas(1);
+    this.listarventasActivas(this.estadoActual);
     /* if (this.authServi.obtenerRol() == 'administrador') {
  
      }else if (this.authServi.obtenerRol() == 'medico'){
@@ -75,6 +76,58 @@ export class listaVentasComponent {
 
 
   }
+
+  cambiarTab(estado: number) {
+    this.estadoActual = estado;
+    this.currentPage = 1; // Reiniciamos paginación
+    this.searchTerm = ''; // Opcional: Limpiar búsqueda al cambiar tab
+    this.isSearching = false;
+    
+    // Llamamos al servicio con el nuevo estado
+    this.listarventasActivas(estado);
+  }
+
+  // 3. MÉTODO PARA ANULAR (Stub)
+  anularVenta(id: number) {
+
+    this.ServicioAlertas.confirm(
+      'CONFIRMAR ACCIÓN',
+      '¿Está seguro que desea eliminar el registro n° ' + id,
+      'Si, eliminar',
+      'Cancelar'
+    ).then((result) => {
+      if (result.isConfirmed) {
+        this.ServicioVentas.AnularVenta(id).subscribe({
+          next: (res) => {
+            this.Ventas = this.Ventas.filter(
+              (venta) => venta.venta_id !== id
+            );
+
+            // Actualizar la búsqueda si está activa
+            if (this.isSearching) {
+              this.onSearch(this.searchTerm);
+            } else {
+              this.filteredVentas = [...this.Ventas];
+              this.totalItems = this.filteredVentas.length;
+              this.calculatePagination();
+              this.updatePaginatedData();
+            }
+
+            this.ServicioAlertas.eliminacionCorrecta();
+          },
+          error: (err) => {
+            this.ServicioAlertas.error(
+              'ERROR',
+              'Se genero un error en el proceso de eliminación'
+            );
+            console.log('ERROR  ' + err.error.error);
+          },
+        });
+      }
+    });
+  }
+  
+
   calculatePagination(): void {
     this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
     if (this.currentPage > this.totalPages) {
@@ -227,11 +280,17 @@ export class listaVentasComponent {
 
 
 
-  listarventasActivas(estado: number): void {
+listarventasActivas(estado: number): void {
+  // Opcional: Mostrar loading
+  // this.ServicioAlertas.loading('Cargando...'); 
+
   this.ServicioVentas.getVentasEstado(estado).subscribe({
     next: (res: any) => {
+      // this.ServicioAlertas.close();
       console.log('Ventas recibidas:', res);
-      this.Ventas = Array.isArray(res) ? res : [res];
+      
+      // Si llega null o undefined, lo convertimos en array vacío
+      this.Ventas = Array.isArray(res) ? res : (res ? [res] : []);
 
       this.filteredVentas = [...this.Ventas];
       this.totalItems = this.filteredVentas.length;
@@ -239,7 +298,17 @@ export class listaVentasComponent {
       this.updatePaginatedData();
     },
     error: (err) => {
-      
+      // this.ServicioAlertas.close();
+      console.log('No se encontraron registros o hubo error:', err);
+
+      // --- AQUÍ ESTABA EL PROBLEMA ---
+      // Si el backend dice "No hay registros" (Error 400/404),
+      // DEBEMOS LIMPIAR LAS VARIABLES VISUALES MANUALMENTE
+      this.Ventas = [];
+      this.filteredVentas = [];
+      this.paginatedVentas = [];
+      this.totalItems = 0;
+      this.currentPage = 1;
     },
   });
 }

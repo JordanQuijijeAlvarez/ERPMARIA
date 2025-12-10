@@ -35,6 +35,24 @@ export class ValidatorsComponent {
     return null;
   }
 
+  static numericTreceDigits(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+    
+    const value = control.value.toString();
+    
+    // Verificar si contiene solo números
+    if (!/^\d+$/.test(value)) {
+      return { 'onlyNumbers': true };
+    }
+    
+    // Verificar si tiene exactamente 10 dígitos
+    if (value.length !== 13) {
+      return { 'treceDigits': true };
+    }
+    
+    return null;
+  }
+
   /**
    * Validador personalizado para campos numéricos con longitud específica
    * @param length - Longitud requerida

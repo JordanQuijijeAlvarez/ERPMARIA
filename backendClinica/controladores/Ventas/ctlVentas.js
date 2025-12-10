@@ -324,3 +324,24 @@ exports.ActualizarVenta = async (req, res) => {
     }
   }
 };
+
+
+exports.AnularVenta = async (req, res) => {
+    const { id } = req.params;
+    let connection;
+
+    try {
+        connection = await getConnection();
+        const query = `BEGIN anularventa(:1); END;`;
+        
+        await connection.execute(query, [id], { autoCommit: true });
+        
+        res.status(200).json({ message: "El registro se anulo correctamente" });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "ERROR EN EL SERVIDOR", detalle: error.message });
+    } finally {
+        if (connection) await connection.close();
+    }
+};

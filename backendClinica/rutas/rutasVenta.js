@@ -15,7 +15,8 @@ router.get('/obtener/:id', authenticateToken,
 
 router.put('/Actualizar/:id', authenticateToken,
     ctlVentas.ActualizarVenta);
-
+router.delete('/Anular/:id', authenticateToken,
+   ctlVentas.AnularVenta);
 /*
 router.get('/listar/:estado', authenticateToken,
     ctlCompras.get);
@@ -26,8 +27,7 @@ router.get('/listar', authenticateToken,
 router.get('/:id', authenticateToken,
     ctlCompras.getcompraId);
 
-router.delete('/Eliminar/:id', authenticateToken,
-   ctlCompras.eliminarcompra);
+
 
 router.post('/Registrar', authenticateToken,
     ctlCompras.Registrarcompra);

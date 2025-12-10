@@ -749,3 +749,17 @@ EXCEPTION
             'message' VALUE SQLERRM
         );
 END;
+create or replace PROCEDURE anularventa(v_id IN NUMBER) 
+AS
+BEGIN
+    UPDATE VENTA 
+    SET VENTA_ESTADOREGISTRO = '0' 
+    WHERE VENTA_ID = v_id;
+
+    COMMIT;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
+END;
