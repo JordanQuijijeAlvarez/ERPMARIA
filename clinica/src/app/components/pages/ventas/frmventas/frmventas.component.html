@@ -1,7 +1,8 @@
-<form  [formGroup]="formVentas"  (ngSubmit)="guardarVenta()">
+<form [formGroup]="formVentas" (ngSubmit)="guardarVenta()">
   <div class="min-h-screen p-6">
-    <div class="max-w-5xl mx-auto"> <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden mb-6">
-        
+    <div class="max-w-5xl mx-auto">
+      <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden mb-6">
+
         <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 m-4 mb-0">
           <h2 class="text-3xl font-bold text-center text-gray-800 mb-2">
             NUEVA VENTA
@@ -20,22 +21,16 @@
 
         <div class="p-6 border-b border-gray-200">
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
+
             <div class="lg:col-span-3">
               <label class="block text-sm font-semibold text-gray-700 mb-2">
                 <i class="fas fa-id-card text-gray-500 mr-1"></i> Cédula / RUC *
               </label>
               <div class="flex gap-2">
-                <input
-                  formControlName="txtCedulaCliente"
-                  placeholder="Buscar cédula..."
-                  type="text"
-                  (keyup.enter)="buscarCliente()"
-                  class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white"
-                />
-                <button 
-                  type="button"
-                  (click)="buscarCliente()"
+                <input formControlName="txtCedulaCliente" placeholder="Buscar cédula..." type="text"
+                  (keydown.enter)="$event.preventDefault(); buscarCliente()"
+                  class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white" />
+                <button type="button" (click)="buscarCliente()"
                   class="px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
                   <i class="fas fa-search"></i>
                 </button>
@@ -46,24 +41,16 @@
               <label class="block text-sm font-semibold text-gray-700 mb-2">
                 <i class="fas fa-user text-gray-500 mr-1"></i> Nombres del Cliente
               </label>
-              <input
-                readonly
-                formControlName="txtNombreCliente"
-                placeholder="Nombre del cliente..."
-                class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-600 cursor-not-allowed"
-              />
+              <input readonly formControlName="txtNombreCliente" placeholder="Nombre del cliente..."
+                class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-600 cursor-not-allowed" />
             </div>
 
             <div class="lg:col-span-4">
               <label class="block text-sm font-semibold text-gray-700 mb-2">
                 <i class="fas fa-map-marker-alt text-gray-500 mr-1"></i> Dirección / Teléfono
               </label>
-              <input
-                readonly
-                formControlName="txtDatosAdicionales"
-                placeholder="Información de contacto..."
-                class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-600 cursor-not-allowed"
-              />
+              <input readonly formControlName="txtDatosAdicionales" placeholder="Información de contacto..."
+                class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-600 cursor-not-allowed" />
             </div>
           </div>
         </div>
@@ -77,26 +64,22 @@
 
         <div class="p-6 bg-gray-50/50">
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
-            
+
             <div class="lg:col-span-8">
               <label class="block text-sm font-semibold text-gray-700 mb-2">
                 Buscar Producto
               </label>
               <div class="relative">
                 <i class="fas fa-search absolute left-4 top-4 text-gray-400"></i>
-                <input 
-                    type="text" 
-                    formControlName="txtCodBarra"
-                    (keyup.enter)="agregarProducto()"
-
-                    placeholder="Escriba código o nombre del producto..."
-                    class="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 shadow-sm"
-                >
-                </div>
+                <input type="text" formControlName="txtCodBarra"
+                  (keydown.enter)="$event.preventDefault(); agregarProducto()"
+                  placeholder="Escriba código o nombre del producto..."
+                  class="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 shadow-sm">
+              </div>
             </div>
 
             <div class="lg:col-span-2">
-               <label class="block text-sm font-semibold text-gray-700 mb-2 text-center">
+              <label class="block text-sm font-semibold text-gray-700 mb-2 text-center">
                 Stock
               </label>
               <div class="px-4 py-3 bg-gray-200 border border-gray-300 rounded-lg text-center font-bold text-gray-700">
@@ -105,11 +88,8 @@
             </div>
 
             <div class="lg:col-span-2">
-              <button
-                type="button"
-                (click)="agregarProducto()"
-                class="w-full px-4 py-3 bg-gray-800 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 transition-all duration-200 flex justify-center items-center gap-2"
-              >
+              <button type="button" (click)="agregarProducto()"
+                class="w-full px-4 py-3 bg-gray-800 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 transition-all duration-200 flex justify-center items-center gap-2">
                 <i class="fas fa-plus"></i> Agregar
               </button>
             </div>
@@ -129,7 +109,7 @@
             </thead>
             <tbody class="divide-y divide-gray-100">
               <tr *ngFor="let item of listaDetalles; let i = index" class="hover:bg-gray-50 transition-colors">
-                
+
                 <td class="px-6 py-4 text-gray-800 font-medium">
                   {{ item.nombreProducto }}
                   <div class="text-xs text-gray-400">{{ item.codigo }}</div>
@@ -141,22 +121,14 @@
 
                 <td class="px-6 py-4">
                   <div class="flex justify-center items-center">
-                    <button 
-                      type="button"
-                      (click)="disminuirCantidad(i)"
+                    <button type="button" (click)="disminuirCantidad(i)"
                       class="w-8 h-8 rounded-l-lg bg-gray-200 hover:bg-gray-300 text-gray-600 flex items-center justify-center border border-gray-300 transition-colors">
                       <i class="fas fa-minus text-xs"></i>
                     </button>
-                    <input 
-                      type="number"
-                      [(ngModel)]="item.cantidad" 
-                      [ngModelOptions]="{standalone: true}" 
+                    <input type="number" [(ngModel)]="item.cantidad" [ngModelOptions]="{standalone: true}"
                       (change)="calcularTotales()"
-                      class="w-16 h-8 text-center border-y border-gray-300 focus:outline-none text-gray-800 font-semibold bg-white"
-                    >
-                    <button 
-                      type="button"
-                      (click)="aumentarCantidad(i)"
+                      class="w-16 h-8 text-center border-y border-gray-300 focus:outline-none text-gray-800 font-semibold bg-white">
+                    <button type="button" (click)="aumentarCantidad(i)"
                       class="w-8 h-8 rounded-r-lg bg-gray-200 hover:bg-gray-300 text-gray-600 flex items-center justify-center border border-gray-300 transition-colors">
                       <i class="fas fa-plus text-xs"></i>
                     </button>
@@ -168,15 +140,13 @@
                 </td>
 
                 <td class="px-6 py-4 text-center">
-                  <button 
-                    type="button"
-                    (click)="eliminarProducto(i)"
+                  <button type="button" (click)="eliminarProducto(i)"
                     class="text-red-400 hover:text-red-600 transition-colors p-2 rounded-full hover:bg-red-50">
                     <i class="fas fa-trash-alt"></i>
                   </button>
                 </td>
               </tr>
-              
+
               <tr *ngIf="listaDetalles.length === 0">
                 <td colspan="5" class="px-6 py-12 text-center text-gray-400">
                   <i class="fas fa-shopping-cart text-4xl mb-3 block opacity-20"></i>
@@ -210,20 +180,14 @@
       </div>
 
       <div class="flex items-center justify-end gap-4 mt-6 mb-12">
-        <button
-          type="button"
-          (click)="cancelarVenta()"
-          class="px-6 py-3 bg-white text-gray-800 font-semibold rounded-lg shadow-md border border-gray-300 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-200 transform hover:scale-105"
-        >
+        <button type="button" (click)="cancelarVenta()"
+          class="px-6 py-3 bg-white text-gray-800 font-semibold rounded-lg shadow-md border border-gray-300 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-200 transform hover:scale-105">
           <i class="fas fa-times mr-2"></i>
           Cancelar
         </button>
-        
-        <button
-          type="submit"
-          [class.opacity-50]="listaDetalles.length === 0"
-          class="px-8 py-3 bg-white text-gray-800 font-semibold rounded-lg shadow-md border border-gray-300 hover:bg-gray-50 hover:text-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200 transform hover:scale-105"
-        >
+
+        <button type="submit" [class.opacity-50]="listaDetalles.length === 0"
+          class="px-8 py-3 bg-white text-gray-800 font-semibold rounded-lg shadow-md border border-gray-300 hover:bg-gray-50 hover:text-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200 transform hover:scale-105">
           <i class="fas fa-save mr-2"></i>
           Generar Venta
         </button>

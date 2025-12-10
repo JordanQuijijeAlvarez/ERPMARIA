@@ -105,55 +105,57 @@ export class FrmventasComponent {
 
 
 
-  agregarProducto() {
+ agregarProducto() {
+  if (!this.getCodBarras.value) return;
 
-    this.ServicioProductos.BuscarprodCodBarras(this.getCodBarras.value, 1)
-      .subscribe({
-        next: (res: any) => {
+  this.ServicioProductos.BuscarprodCodBarras(this.getCodBarras.value, 1)
+    .subscribe({
+      next: (res: any) => {
 
-          this.producto = res[0];
-          this.stockActual = res[0].prod_stock;
-
-          // VALIDACIONES
-          if (!this.producto) {
-            this.alertaServ.info('Atención', 'Primero debe buscar un producto válido');
-            return;
-          }
-
-          if (this.stockActual <= 0) {
-            this.alertaServ.error('Sin Stock', 'Este producto no tiene existencias disponibles');
-            return;
-          }
-
-          const indiceExistente = this.listaDetalles
-            .findIndex(item => item.id_producto === this.producto?.prod_id);
-
-          if (indiceExistente !== -1) {
-            this.aumentarCantidad(indiceExistente);
-          } else {
-            const nuevoDetalle = {
-              id_producto: this.producto.prod_id,
-              codigo: this.producto.prod_codbarra,
-              nombreProducto: this.producto.prod_nombre,
-              precioUnitario: this.producto.prod_precioventa,
-              cantidad: 1,
-              subtotal: this.producto.prod_precioventa
-            };
-
-            this.listaDetalles.push(nuevoDetalle);
-            this.calcularTotales();
-          }
-
-          // LIMPIAR
-          this.getCodBarras.setValue('');
-          this.producto = undefined;
-          this.stockActual = 0;
-        },
-        error: () => {
-          this.alertaServ.error('Error', 'No se pudo buscar el producto');
+        if (!res || res.length === 0) {
+          this.alertaServ.info('Producto no encontrado', 'No existe un producto con ese código de barras.');
+          this.getCodBarras.setValue(''); 
+          return;
         }
-      });
-  }
+
+        this.producto = res[0];
+        this.stockActual = res[0].prod_stock;
+
+        if (this.stockActual <= 0) {
+          this.alertaServ.error('Sin Stock', 'Este producto no tiene existencias disponibles');
+          return;
+        }
+
+        const indiceExistente = this.listaDetalles
+          .findIndex(item => item.id_producto === this.producto?.prod_id);
+
+        if (indiceExistente !== -1) {
+          this.aumentarCantidad(indiceExistente);
+        } else {
+          const nuevoDetalle = {
+            id_producto: this.producto!.prod_id ,
+            codigo: this.producto!.prod_codbarra,
+            nombreProducto: this.producto!.prod_nombre,
+            precioUnitario: this.producto!.prod_precioventa,
+            cantidad: 1,
+            subtotal: this.producto!.prod_precioventa
+          };
+
+          this.listaDetalles.push(nuevoDetalle);
+          this.calcularTotales();
+        }
+
+        // 5. Limpieza final
+        this.getCodBarras.setValue('');
+        this.producto = undefined;
+        this.stockActual = 0;
+      },
+      error: (err) => {
+        console.error(err);
+        this.alertaServ.error('Error', 'Hubo un problema al consultar el servidor');
+      }
+    });
+}
 
 
   aumentarCantidad(index: number) {
