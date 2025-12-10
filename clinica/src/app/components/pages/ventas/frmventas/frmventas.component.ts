@@ -8,9 +8,6 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { InCitaPacienteLista } from '../../../../modelos/modeloCitas/InCitaPacienteLista';
-import { InConsultas } from '../../../../modelos/modeloConsultas/InConsultas';
-import { consultasService } from '../../../../servicios/consultas.service';
 import { AlertService } from '../../../../servicios/Alertas/alertas.service';
 import { CommonModule } from '@angular/common';
 import { ValidatorsComponent } from '../../../shared/validators/validators.component';
@@ -51,7 +48,6 @@ export class FrmventasComponent {
 
 
     private formBuilder: FormBuilder,
-    private serviConsultas: consultasService,
     private ServicioCliente: clienteService,
     private ServicioProductos: productosService,
 
@@ -329,56 +325,6 @@ guardarVenta() {
 
 
 
-  guardarConsulta(): void {
-    if (this.formVentas.invalid) {
-      this.alertaServ.info(
-        '',
-        'Por favor, complete todos los campos obligatorios *'
-      );
-      this.marcarCamposComoTocados();
-      return;
-    }
-
-    const consulta: InConsultas = {
-      codigo_cita: this.codigoventa,
-      peso: this.formVentas.value.txtPesoPaciente,
-      temperatura: this.formVentas.value.txtTemperaturaPaciente,
-      presion: this.formVentas.value.txtPresionPaciente,
-      diagnostico: this.formVentas.value.txtDiagnostico,
-      tratamiento: this.formVentas.value.txtTratamiento,
-      observaciones: this.formVentas.value.txtObservaciones,
-      estatura: this.formVentas.value.txtEstaturaPaciente,
-      codigo: 0,
-      usuario: 1,
-      estado: false,
-    };
-
-    if (this.eventoUpdate) {
-    } else {
-      console.log(consulta);
-      this.serviConsultas.CrearConsulta(consulta).subscribe({
-        next: (res) => {
-          this.alertaServ.success('Consulta registrada con éxito.', '');
-          this.router.navigate(['home/listaconsultas']);
-        },
-        error: (err) => {
-          console.log('Error al registrar consulta:', err);
-          this.alertaServ.error(
-            'ERROR AL REGISTRAR',
-            'Hubo un problema al registrar la consulta: revise que la información sea correcta'
-          );
-        },
-      });
-    }
-  }
-
-  cargarDatosPaciente(): void {
-    // this.formVentas.patchValue({
-    //   txtNombresPaciente: this.nombrePaciente,
-    //   txtEdadPaciente: this.edadPaciente,
-    //   txtCedulaPaciente: this.cedulaPaciente,
-    // });
-  }
   marcarCamposComoTocados(): void {
     Object.keys(this.formVentas.controls).forEach((campo) => {
       const control = this.formVentas.get(campo);

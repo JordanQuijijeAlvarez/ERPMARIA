@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../../servicios/authservicio.service';
-import { MedicosService } from '../../../servicios/medicos.service';
 import { DirectivasModule } from '../../../directivas/directivas.module';
 import { RouterLink } from '@angular/router';
 
@@ -12,7 +11,7 @@ import { RouterLink } from '@angular/router';
 })
 export class DashboardComponent implements OnInit {
 
-  constructor(private authService: AuthService,private medicoServi:MedicosService) { }
+  constructor(private authService: AuthService) { }
 
   nombreUserAccedido: string = '';
   

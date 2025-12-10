@@ -6,9 +6,7 @@ import { UsuariosService } from '../../../../servicios/usuarios.service';
 import { AlertService } from '../../../../servicios/Alertas/alertas.service';
 import { CommonModule } from '@angular/common';
 import { InUsuario } from '../../../../modelos/modeloUsuarios/InUsuarios';
-import { MedicosService } from '../../../../servicios/medicos.service';
 import { RolesService } from '../../../../servicios/roles.service';
-import { InMedico } from '../../../../modelos/modelMedicos/InMedico';
 import { InRoles } from '../../../../modelos/modeloRoles/InRoles';
 import { ValidatorsComponent } from '../../../shared/validators/validators.component';
 import Swal from 'sweetalert2';
@@ -20,6 +18,9 @@ import Swal from 'sweetalert2';
     styleUrl: './frmusuarios.component.css'
 })
 export class FrmusuariosComponent {
+guardarUsuario() {
+throw new Error('Method not implemented.');
+}
 
     frmUsuario: FormGroup;
     eventoUpdate: boolean = false;
@@ -28,18 +29,17 @@ export class FrmusuariosComponent {
     estado: boolean = true;
     isMedicoSelected = false;
 
-    listaMedicoSinUsuario: InMedico[] = [];
     listaRoles: InRoles[] = [];
 
   
     @ViewChild('datepickerElement') datepickerElement!: ElementRef;
+listaMedicoSinUsuario: any;
   
     constructor(
       private formBuilder: FormBuilder,
       private http: HttpClient,
       private router: Router,
       private usuarioServ: UsuariosService,
-      private medicoServ: MedicosService,
       private rolServ: RolesService,
       private route: ActivatedRoute,
       private alertaServ: AlertService
@@ -54,7 +54,7 @@ export class FrmusuariosComponent {
     }
     ngOnInit(): void {
       this.listarRoles();
-      this.listarMedicos();
+      //this.listarMedicos();
 
       this.route.paramMap.subscribe((parametros) => {
         const id = parametros.get('id');
@@ -71,18 +71,18 @@ export class FrmusuariosComponent {
       });
     }
 
-    listarMedicos(): void {
-      this.medicoServ.LMedicoSinUsuario().subscribe({
-        next: (res) => {
-          this.listaMedicoSinUsuario = res;
+    // listarMedicos(): void {
+    //   this.medicoServ.LMedicoSinUsuario().subscribe({
+    //     next: (res) => {
+    //       this.listaMedicoSinUsuario = res;
   
-          console.log(res);
-        },
-        error: (err) => {
-          alert('NO EXISTEN REGISTROS');
-        },
-      });
-    }
+    //       console.log(res);
+    //     },
+    //     error: (err) => {
+    //       alert('NO EXISTEN REGISTROS');
+    //     },
+    //   });
+    // }
 
     listarRoles(): void {
       this.rolServ.LRoles().subscribe({
@@ -153,110 +153,110 @@ export class FrmusuariosComponent {
       });
     }
   
-guardarUsuario(): void {
-  this.marcarCamposComoTocados();
+// guardarUsuario(): void {
+//   this.marcarCamposComoTocados();
 
-  if (this.frmUsuario.invalid) {
-    const camposConError: string[] = [];
+//   if (this.frmUsuario.invalid) {
+//     const camposConError: string[] = [];
 
-    if (this.frmUsuario.get('txtNombreUsuario')?.invalid) {
-      camposConError.push('Nombre de Usuario');
-    }
+//     if (this.frmUsuario.get('txtNombreUsuario')?.invalid) {
+//       camposConError.push('Nombre de Usuario');
+//     }
 
-    if (this.frmUsuario.get('txtCorreoUsuario')?.invalid) {
-      camposConError.push('Correo de Usuario');
-    }
+//     if (this.frmUsuario.get('txtCorreoUsuario')?.invalid) {
+//       camposConError.push('Correo de Usuario');
+//     }
 
-    if (this.frmUsuario.get('txtContrasenia')?.invalid) {
-      camposConError.push('Contraseña');
-    }
+//     if (this.frmUsuario.get('txtContrasenia')?.invalid) {
+//       camposConError.push('Contraseña');
+//     }
 
-    if (this.frmUsuario.get('cbxRoles')?.invalid) {
-      camposConError.push('Rol del Sistema');
-    }
+//     if (this.frmUsuario.get('cbxRoles')?.invalid) {
+//       camposConError.push('Rol del Sistema');
+//     }
 
-    if (this.isMedicoSelected && this.frmUsuario.get('cbxMedicos')?.invalid) {
-      camposConError.push('Médico Asignado');
-    }
+//     if (this.isMedicoSelected && this.frmUsuario.get('cbxMedicos')?.invalid) {
+//       camposConError.push('Médico Asignado');
+//     }
 
-    Swal.fire({
-      title: 'Campos Requeridos',
-      text: `Ingrese correctamente los siguientes campos: ${camposConError.join(', ')}`,
-      icon: 'warning',
-      confirmButtonColor: '#3085d6',
-      confirmButtonText: 'Entendido'
-    });
+//     Swal.fire({
+//       title: 'Campos Requeridos',
+//       text: `Ingrese correctamente los siguientes campos: ${camposConError.join(', ')}`,
+//       icon: 'warning',
+//       confirmButtonColor: '#3085d6',
+//       confirmButtonText: 'Entendido'
+//     });
 
-    return;
-  }
+//     return;
+//   }
 
-  const usuario: InUsuario = {
-    nombre_usuario: this.frmUsuario.value.txtNombreUsuario,
-    contrasenia: this.frmUsuario.value.txtContrasenia,
-    codigo_rol: this.frmUsuario.value.cbxRoles,
-    email: this.frmUsuario.value.txtCorreoUsuario,
-    codigo: this.eventoUpdate ? String(this.codigo) : '',
-  };
+//   const usuario: InUsuario = {
+//     nombre_usuario: this.frmUsuario.value.txtNombreUsuario,
+//     contrasenia: this.frmUsuario.value.txtContrasenia,
+//     codigo_rol: this.frmUsuario.value.cbxRoles,
+//     email: this.frmUsuario.value.txtCorreoUsuario,
+//     codigo: this.eventoUpdate ? String(this.codigo) : '',
+//   };
 
-  const codigoMedico = this.frmUsuario.value.cbxMedicos;
+//   const codigoMedico = this.frmUsuario.value.cbxMedicos;
 
-  if (this.eventoUpdate) {
-    this.usuarioServ.ActualizarUsuario(usuario).subscribe({
-      next: () => {
-        Swal.fire({
-          title: 'Usuario actualizado',
-          text: 'Los datos del usuario fueron actualizados con éxito.',
-          icon: 'success',
-          confirmButtonText: 'Aceptar',
-        }).then(() => {
-          this.router.navigate(['home/listausuarios']);
-        });
-      },
-      error: (err) => {
-        console.error('Error al actualizar usuario:', err);
-        Swal.fire('Error', 'Hubo un problema al actualizar el usuario.', 'error');
-      }
-    });
-  } else {
-    this.usuarioServ.CrearUsuario(usuario).subscribe({
-      next: (res: any) => {
-        const nuevoIdUsuario = res.codigo_usuario;
+//   if (this.eventoUpdate) {
+//     this.usuarioServ.ActualizarUsuario(usuario).subscribe({
+//       next: () => {
+//         Swal.fire({
+//           title: 'Usuario actualizado',
+//           text: 'Los datos del usuario fueron actualizados con éxito.',
+//           icon: 'success',
+//           confirmButtonText: 'Aceptar',
+//         }).then(() => {
+//           this.router.navigate(['home/listausuarios']);
+//         });
+//       },
+//       error: (err) => {
+//         console.error('Error al actualizar usuario:', err);
+//         Swal.fire('Error', 'Hubo un problema al actualizar el usuario.', 'error');
+//       }
+//     });
+//   } else {
+//     this.usuarioServ.CrearUsuario(usuario).subscribe({
+//       next: (res: any) => {
+//         const nuevoIdUsuario = res.codigo_usuario;
 
-        if (this.isMedicoSelected && codigoMedico) {
-          this.medicoServ.AsignarUsuario(codigoMedico, nuevoIdUsuario).subscribe({
-            next: () => {
-              Swal.fire({
-                title: 'Usuario registrado',
-                text: 'El usuario fue registrado y asignado al médico con éxito.',
-                icon: 'success',
-                confirmButtonText: 'Aceptar',
-              }).then(() => {
-                this.router.navigate(['home/listausuarios']);
-              });
-            },
-            error: (err) => {
-              console.error('Error al asignar usuario al médico:', err);
-              Swal.fire('Error', 'Hubo un problema al asignar el usuario al médico.', 'error');
-            }
-          });
-        } else {
-          Swal.fire({
-            title: 'Usuario registrado',
-            text: 'El usuario fue registrado con éxito.',
-            icon: 'success',
-            confirmButtonText: 'Aceptar',
-          }).then(() => {
-            this.router.navigate(['home/listausuarios']);
-          });
-        }
-      },
-      error: (err) => {
-        console.error('Error al crear usuario:', err);
-        Swal.fire('Error', 'Hubo un problema al registrar el usuario.', 'error');
-      }
-    });
-  }
-}
+//         if (this.isMedicoSelected && codigoMedico) {
+//           this.medicoServ.AsignarUsuario(codigoMedico, nuevoIdUsuario).subscribe({
+//             next: () => {
+//               Swal.fire({
+//                 title: 'Usuario registrado',
+//                 text: 'El usuario fue registrado y asignado al médico con éxito.',
+//                 icon: 'success',
+//                 confirmButtonText: 'Aceptar',
+//               }).then(() => {
+//                 this.router.navigate(['home/listausuarios']);
+//               });
+//             },
+//             error: (err) => {
+//               console.error('Error al asignar usuario al médico:', err);
+//               Swal.fire('Error', 'Hubo un problema al asignar el usuario al médico.', 'error');
+//             }
+//           });
+//         } else {
+//           Swal.fire({
+//             title: 'Usuario registrado',
+//             text: 'El usuario fue registrado con éxito.',
+//             icon: 'success',
+//             confirmButtonText: 'Aceptar',
+//           }).then(() => {
+//             this.router.navigate(['home/listausuarios']);
+//           });
+//         }
+//       },
+//       error: (err) => {
+//         console.error('Error al crear usuario:', err);
+//         Swal.fire('Error', 'Hubo un problema al registrar el usuario.', 'error');
+//       }
+//     });
+//   }
+// }
 
     marcarCamposComoTocados(): void {
       Object.keys(this.frmUsuario.controls).forEach((campo) => {
