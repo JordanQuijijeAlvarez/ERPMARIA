@@ -133,10 +133,10 @@ export class FrmproductoComponent {
         prod_codbarra: this.frmProducto.value.txtCodigobarras,
         prod_nombre: this.frmProducto.value.txtNombres,
         prod_descripcion: this.frmProducto.value.txtDescripcion,
-        prod_precioventa: this.frmProducto.value.txtstock,
-        prod_preciocompra: this.frmProducto.value.txtprecioventa,
+        prod_precioventa: this.frmProducto.value.txtprecioventa,
+        prod_preciocompra: this.frmProducto.value.txtpreciocompra,
         prod_stockmin: parseFloat(this.frmProducto.value.txtstockminimo),
-        prod_stock: parseFloat(this.frmProducto.value.txtpreciocompra),
+        prod_stock: parseFloat(this.frmProducto.value.txtstock),
         subcat_id: this.frmProducto.value.cbxSubcategoria,
         prod_id: 0
       };
