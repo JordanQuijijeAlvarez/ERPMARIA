@@ -1,10 +1,4 @@
 ---------------------------------------CLIENTES----------------------------------------
-
-
-CREATE SEQUENCE seq_general
-    START WITH 1
-    INCREMENT BY 1
-    NOCACHE;
     
 CREATE OR REPLACE TRIGGER trg_auditoria_cliente
 AFTER INSERT OR UPDATE OR DELETE ON CLIENTE
@@ -191,17 +185,6 @@ BEGIN
     RETURN v_cursor;
 END;
 /
-
-
------------------------------- PRODUCTOS ----------------------------------------------------------------
-
-select * from producto;
-ALTER TABLE PRODUCTO 
-ADD (
-    prod_codbarra           VARCHAR2(13),
-    prod_preciocompra  NUMBER(10,2)
-);
-
 
 CREATE OR REPLACE VIEW vw_producto_detalle AS
 SELECT 
@@ -427,7 +410,6 @@ EXCEPTION
 END;
 /
 
-select * from producto;
 -----------------------------------------VENTAS--------------------
 
 --AGREGAR LA COLUMNA DE descripcion
@@ -537,6 +519,8 @@ EXCEPTION
 END;
 /
 
+-------ADFADSFADSF
+
 
 CREATE OR REPLACE VIEW VW_VENTAS AS
 SELECT
@@ -562,10 +546,6 @@ FROM VENTA v
 JOIN CLIENTE c ON v.client_id = c.client_id
 JOIN USUARIO u ON v.user_id = u.user_id
 JOIN LOCAL l ON v.local_id = l.local_id ;
-
-
-
-select * from vw_ventas;
 
 
 CREATE OR REPLACE VIEW VW_DETALLE_VENTA AS
@@ -613,7 +593,6 @@ FROM venta v
 JOIN cliente c ON v.client_id = c.client_id
 JOIN detalle_venta d ON v.venta_id = d.venta_id
 JOIN producto p ON d.prod_id = p.prod_id;
-
 
 
 CREATE OR REPLACE PROCEDURE ACTUALIZAR_VENTA_COMPLETA (
@@ -749,17 +728,4 @@ EXCEPTION
             'message' VALUE SQLERRM
         );
 END;
-create or replace PROCEDURE anularventa(v_id IN NUMBER) 
-AS
-BEGIN
-    UPDATE VENTA 
-    SET VENTA_ESTADOREGISTRO = '0' 
-    WHERE VENTA_ID = v_id;
-
-    COMMIT;
-
-EXCEPTION
-    WHEN OTHERS THEN
-        ROLLBACK;
-        RAISE;
-END;
+ 
