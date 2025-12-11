@@ -84,7 +84,7 @@ exports.getCategoriaId = async (req, res) => {
            while ((row = await resultSet.getRow())) {
                rows.push(row);
            }
-   
+   //
            await resultSet.close();
    
            // Enviamos formateado a minúsculas
