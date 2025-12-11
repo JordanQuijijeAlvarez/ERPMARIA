@@ -21,6 +21,8 @@ import { ListaproductosComponent } from './components/pages/productos/listaprodu
 import { FrmproductoComponent } from './components/pages/productos/frmproductos/frmproductos.component';
 import { FrmventasComponent } from './components/pages/ventas/frmventas/frmventas.component';
 import { listaVentasComponent } from './components/pages/ventas/listaventas/listaventas.component';
+import { ListaproveedoresComponent } from './components/pages/proveedores/listaproveedores/listaproveedores.component';
+import { frmProveedoresComponent } from './components/pages/proveedores/frmproveedores/frmproveedores.component';
 
 export const routes: Routes = [
 
@@ -106,6 +108,27 @@ export const routes: Routes = [
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
       },
+
+            // PROVEEDOR
+      {
+        path: 'crearProveedor',
+        component: frmProveedoresComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['ADMINISTRADOR'] },
+      },
+       {
+        path: 'listaproveedor',
+        component: ListaproveedoresComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['ADMINISTRADOR'] },
+      },
+ {
+        path: 'actualizarProveedor/:id',
+        component: frmProveedoresComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['ADMINISTRADOR'] },
+      },
+     
      
 
       // Especialidades
