@@ -1,224 +1,171 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import {
   FormBuilder,
-  FormControlName,
   FormGroup,
   ReactiveFormsModule,
   Validators,
-  AbstractControl,
-  ValidationErrors,
-  ValidatorFn,
 } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { horariosService } from '../../../../servicios/horarios.service';
-import { InHorarios } from '../../../../modelos/modeloHorarios/InHorarios';
-import { AlertService } from '../../../../servicios/Alertas/alertas.service';
 import { CommonModule } from '@angular/common';
-import { ValidatorsComponent } from '../../../shared/validators/validators.component';
 import Swal from 'sweetalert2';
 
+// Importaciones propias (Ajusta las rutas si es necesario)
+import { AlertService } from '../../../../servicios/Alertas/alertas.service';
+import { ValidatorsComponent } from '../../../shared/validators/validators.component';
+import { CategoriasService } from '../../../../servicios/categorias.service';
 
 @Component({
-    selector: 'app-frmcategorias',
-    imports: [ReactiveFormsModule, RouterModule, CommonModule, ValidatorsComponent],
-    templateUrl: './frmcategorias.component.html',
-    styleUrl: './frmcategorias.component.css'
+  selector: 'app-frmcategorias',
+  standalone: true, // Asumo standalone por tu código anterior
+  imports: [ReactiveFormsModule, RouterModule, CommonModule, ValidatorsComponent],
+  templateUrl: './frmcategorias.component.html', // Asegúrate que el nombre coincida
+  styleUrl: './frmcategorias.component.css' // Asegúrate que el nombre coincida
 })
-export class FrmCategoriasComponent {
-  frmHorarios: FormGroup;
+export class FrmCategoriasComponent implements OnInit {
+  
+  frmCategoria: FormGroup;
   eventoUpdate: boolean = false;
-  codigo: number | null = null;
-  estado:boolean  = true;
-
-  @ViewChild('datepickerElement') datepickerElement!: ElementRef;
+  idEditar: number = 0; // El ID de categoría es numérico
 
   constructor(
     private formBuilder: FormBuilder,
     private http: HttpClient,
     private router: Router,
-    private horearioServ: horariosService,
+    private categoriaServ: CategoriasService, // Inyectamos servicio de categorías
     private alertaServ: AlertService,
-    
     private route: ActivatedRoute
   ) {
-    this.frmHorarios = this.formBuilder.group({
-      txtHoraInicio: ['', Validators.required],
-      txtHoraFin: ['', Validators.required],
-    }, { validators: this.timeRangeValidator });
+    this.frmCategoria = this.formBuilder.group({
+      txtNombre: ['', Validators.required],
+      txtDescripcion: [''] // La descripción puede ser opcional
+    });
   }
 
-  // Validador personalizado para verificar que hora inicio < hora fin
-  timeRangeValidator: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
-    const horaInicio = group.get('txtHoraInicio')?.value;
-    const horaFin = group.get('txtHoraFin')?.value;
-
-    if (!horaInicio || !horaFin) {
-      return null; // Si algún campo está vacío, no validamos
-    }
-
-    // Convertir las horas a minutos para comparar
-    const minutosInicio = this.convertirHoraAMinutos(horaInicio);
-    const minutosFin = this.convertirHoraAMinutos(horaFin);
-
-    if (minutosInicio >= minutosFin) {
-      return { timeRangeInvalid: true };
-    }
-
-    return null;
-  }
-
-  // Función auxiliar para convertir hora (HH:MM) a minutos
-  private convertirHoraAMinutos(hora: string): number {
-    const [horas, minutos] = hora.split(':').map(Number);
-    return horas * 60 + minutos;
-  }
   ngOnInit(): void {
     this.route.paramMap.subscribe((parametros) => {
       const id = parametros.get('id');
 
       if (id) {
         this.eventoUpdate = true;
-        this.codigo = parseInt(id);
-
-        this.cargarHorarios(this.codigo);
+        this.idEditar = parseInt(id);
+        this.cargarCategoria(this.idEditar);
       } else {
         this.eventoUpdate = false;
       }
     });
   }
 
-  cargarHorarios(id: number): void {
-    this.horearioServ.LhorariosId(id).subscribe({
-      next: (horario) => {
-        
-        this.estado= Boolean(horario.estado);
-        this.frmHorarios.patchValue({
-         
-          txtHoraInicio: horario.hora_inicio,
-          txtHoraFin: horario.hora_fin
-        
+  cargarCategoria(id: number): void {
+    // Asegúrate de tener el método 'ObtenerCategoria' o 'LcategoriaId' en tu servicio
+    this.categoriaServ.LSubcategoriasId(id).subscribe({
+      next: (categoria: any) => {
+        this.frmCategoria.patchValue({
+          txtNombre: categoria.cat_nombre,
+          txtDescripcion: categoria.cat_descripcion
         });
       },
       error: (err) => {
-        console.log('Error al cargar horario:', err);
-       },
+        console.log('Error al cargar categoría:', err);
+        this.alertaServ.error(
+          'Error de Carga',
+          'No se pudo obtener la información de la categoría'
+        );
+        this.router.navigate(['home/listacategorias']);
+      },
     });
   }
   
-
-  guardarhorario(): void {
-    // Primero marcar todos los campos como tocados para mostrar errores
+  guardarCategoria(): void {
+    // 1. Marcar campos como tocados para mostrar errores visuales
     this.marcarCamposComoTocados();
 
-    // Verificar si hay errores de validación específicos
-    if (this.frmHorarios.errors?.['timeRangeInvalid']) {
-      Swal.fire({
-        title: 'Error de Validación',
-        text: 'Ingrese correctamente los valores. La hora de inicio debe ser anterior a la hora de fin.',
-        icon: 'error',
-        confirmButtonColor: '#3085d6',
-        confirmButtonText: 'Entendido'
-      });
-      return;
-    }
-
-    // Verificar si el formulario tiene otros errores (campos obligatorios)
-    if (this.frmHorarios.invalid) {
-      // Verificar qué campos específicos tienen errores
+    // 2. Verificar validez del formulario
+    if (this.frmCategoria.invalid) {
       const camposConError = [];
       
-      if (this.frmHorarios.get('txtHoraInicio')?.invalid) {
-        camposConError.push('Hora de Inicio');
+      if (this.frmCategoria.get('txtNombre')?.invalid) {
+        camposConError.push('Nombre de la Categoría');
       }
-      if (this.frmHorarios.get('txtHoraFin')?.invalid) {
-        camposConError.push('Hora de Fin');
-      }
+      // Si pusiste validators en descripcion, agrégalo aquí
 
       if (camposConError.length > 0) {
         Swal.fire({
           title: 'Campos Requeridos',
-          text: 'Ingrese correctamente los valores. Complete los siguientes campos: ' + camposConError.join(', '),
+          text: 'Por favor complete: ' + camposConError.join(', '),
           icon: 'warning',
           confirmButtonColor: '#3085d6',
           confirmButtonText: 'Entendido'
         });
-      } else {
-        this.alertaServ.info(
-          '',
-          'Por favor, complete todos los campos obligatorios *'
-        );
       }
       return;
     }
 
-    const horario: InHorarios = {
-     
-      hora_inicio: this.frmHorarios.value.txtHoraInicio,   
-      hora_fin: this.frmHorarios.value.txtHoraFin,
-      codigo: '' ,
-      estado : '' ,
-      usuario:''+1  
+    // 3. Construir el objeto para enviar al backend
+    // Usamos las llaves que espera tu interfaz InCategoria (usualmente Mayúsculas o snake_case según definas)
+    // Aquí asumo que tu interfaz usa CAT_... para coincidir con la BD, 
+    // pero tu controlador espera cat_nombre (minúscula) en el body.
+    // Angular HttpClient enviará este objeto como JSON.
+    const categoria: any = {
+      cat_id: this.eventoUpdate ? this.idEditar : 0,
+      cat_nombre: this.frmCategoria.value.txtNombre,
+      cat_descripcion: this.frmCategoria.value.txtDescripcion
     };
 
-
     if (this.eventoUpdate) {
-      horario.codigo = '' + this.codigo;
-      horario.estado =''+ this.estado;
-
-      this.horearioServ.ActualizarHorario(horario).subscribe({
+      this.categoriaServ.ActualizarCategoria(categoria).subscribe({
         next: (res) => {
-          console.log('horario actualizada:', res);
-          this.alertaServ.success('Horario actualizado con éxito.', '');
-          this.router.navigate(['home/listahorarios']);
+          this.alertaServ.success('Categoría actualizada con éxito.', '');
+          this.router.navigate(['home/listacategorias']);
         },
         error: (err) => {
-          console.log('Error al actualizar horario:', err.error.msg);
+          console.log('Error al actualizar:', err);
           this.alertaServ.error(
             'ERROR AL ACTUALIZAR',
-            'Hubo un problema al actualizar el horario: revise que la información sea correcta'
-          );        },
+            'Hubo un problema al actualizar la categoría.'
+          );
+        },
       });
     } else {
-      this.horearioServ.CrearHorario(horario).subscribe({
+      this.categoriaServ.CrearCategoria(categoria).subscribe({
         next: (res) => {
-          this.alertaServ.success('Horario registrado con éxito.', '');
-          this.router.navigate(['home/listahorarios']);
+          this.alertaServ.success('Categoría registrada con éxito.', '');
+          this.router.navigate(['home/listacategorias']);
         },
         error: (err) => {
-          console.log('Error al crear horario:', err);
+          console.log('Error al crear:', err);
           this.alertaServ.error(
             'ERROR AL REGISTRAR',
-            'Hubo un problema al registrar el Horario: revise que la información sea correcta'
-          );        },
+            'Hubo un problema al registrar la categoría.'
+          );
+        },
       });
     }
   }
 
-
   marcarCamposComoTocados(): void {
-    Object.keys(this.frmHorarios.controls).forEach((campo) => {
-      const control = this.frmHorarios.get(campo);
+    Object.keys(this.frmCategoria.controls).forEach((campo) => {
+      const control = this.frmCategoria.get(campo);
       if (control) {
         control.markAsTouched();
       }
     });
   }
 
-    salirSinGuardar(): void {
-        Swal.fire({
-          title: '¿Está seguro que desea salir?',
-          text: 'Los cambios no guardados se perderán.',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Sí, salir',
-          cancelButtonText: 'Cancelar',
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.router.navigate(['/home/listahorarios']);
-          }
-        });
+  salirSinGuardar(): void {
+    Swal.fire({
+      title: '¿Está seguro que desea salir?',
+      text: 'Los cambios no guardados se perderán.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, salir',
+      cancelButtonText: 'Cancelar',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.router.navigate(['/home/listacategoria']);
       }
+    });
+  }
 }

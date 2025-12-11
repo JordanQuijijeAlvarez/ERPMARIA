@@ -7,6 +7,8 @@ const authenticateToken = require('../middleware/auth');
 router.get('/listar/:estado', authenticateToken,
     controladorCategoria.getCategoriasEstado);
 
+router.get('/:id', authenticateToken,
+    controladorCategoria.getCategoriaId);
   
 router.delete('/Eliminar/:id', authenticateToken,
    controladorCategoria.eliminarCategoria);

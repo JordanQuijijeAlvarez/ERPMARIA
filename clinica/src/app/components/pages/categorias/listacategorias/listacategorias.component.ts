@@ -1,25 +1,26 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, RouterModule } from '@angular/router';
-import Swal from 'sweetalert2';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { InHorarios } from '../../../../modelos/modeloHorarios/InHorarios';
-import { horariosService } from '../../../../servicios/horarios.service';
-import { AlertService } from '../../../../servicios/Alertas/alertas.service';
 
+// Importa tu modelo y servicio de categorías (asegúrate de crearlos o ajustar la ruta)
+import { AlertService } from '../../../../servicios/Alertas/alertas.service';
+import { InCategoria } from '../../../../modelos/modeloCategoria/InCategoria';
+import { CategoriasService } from '../../../../servicios/categorias.service';
 
 @Component({
     selector: 'app-listacategorias',
+    standalone: true, // Agregado standalone si usas Angular moderno
     imports: [CommonModule, RouterModule, FormsModule],
-    templateUrl: './listacategorias.component.html',
+    templateUrl: './listacategorias.component.html', // Asegúrate que el nombre coincida
     styleUrl: './listacategorias.component.css'
 })
-export class listaCategoriasComponent {
+export class ListaCategoriasComponent implements OnInit {
 
-  listaHorarios: InHorarios[] = [];
-  filteredHorarios: InHorarios[] = [];
-  paginatedHorarios: InHorarios[] = [];
+  listaCategorias: InCategoria[] = [];
+  filteredCategorias: InCategoria[] = [];
+  paginatedCategorias: InCategoria[] = [];
   
   // Propiedades de búsqueda
   searchTerm: string = '';
@@ -31,79 +32,68 @@ export class listaCategoriasComponent {
   totalPages: number = 1;
   totalItems: number = 0;
 
-
   constructor(
     private http: HttpClient,
-    private router : Router,
-    private ServicioHorarios: horariosService,
+    private router: Router,
+    private ServicioCategorias: CategoriasService, // Servicio inyectado
     private ServicioAlertas: AlertService
-    
-  ){
-  }
+  ) {}
 
   ngOnInit(): void {
-     
-    this.listarhorarioesEstado(true);
+    this.listarCategoriasEstado(1);
   }
 
-
-  listarhorarioesEstado(estado: any): void {  
-    this.ServicioHorarios.LhorariosEstado(estado).subscribe(
-      {
-          next: res => {
-            this.listaHorarios = res;
-            this.filteredHorarios = [...res]; // Inicializar lista filtrada
-            this.totalItems = this.filteredHorarios.length;
-            this.calculatePagination();
-            this.updatePaginatedData();
-          }, error: err => {
-            this.ServicioAlertas.infoEventoConfir('SESIÓN EXPIRADA', 'Inicie nuevamente sesión', () => {
-              this.router.navigate(['/login']);
-            });
-          }
+  listarCategoriasEstado(estado: number): void {  
+    this.ServicioCategorias.LCategoriasEstado(estado).subscribe({
+      next: (res) => {
+        this.listaCategorias = res;
+        this.filteredCategorias = [...res]; // Inicializar lista filtrada
+        this.totalItems = this.filteredCategorias.length;
+        this.calculatePagination();
+        this.updatePaginatedData();
+      },
+      error: (err) => {
+        console.error('Error al listar categorías', err);
       }
-    );
-  };
-
-
+    });
+  }
     
-  eliminarHorarios(id: any, nombre : string): void {
-
+  eliminarCategoria(id: number, nombre: string): void {
     this.ServicioAlertas.confirm(
       'CONFIRMAR ACCIÓN',
-      '¿Está seguro que desea eliminar el registro de ' + nombre,
+      '¿Está seguro que desea eliminar la categoría "' + nombre + '"?',
       'Si, eliminar',
       'Cancelar'
     ).then((result) => {
       if (result.isConfirmed) {
-
-        this.ServicioHorarios.EliminarHorario(id).subscribe(
-          {
-            next: res => {
-              this.listaHorarios = this.listaHorarios.filter(horario => parseInt(horario.codigo) !== id);
-              
-              // Actualizar listas filtradas y paginación
-              this.filteredHorarios = this.filteredHorarios.filter(horario => parseInt(horario.codigo) !== id);
-              this.totalItems = this.filteredHorarios.length;
-              this.calculatePagination();
-              this.updatePaginatedData();
-
-              this.ServicioAlertas.eliminacionCorrecta();
-            },
-            error: err =>{
-             
-              this.ServicioAlertas.error('ERROR','Se genero un error en el proceso de eliminación');
-              console.log('ERROR  '+ err.error.error);
+        this.ServicioCategorias.EliminarCategoria(id).subscribe({
+          next: (res) => {
+            // Eliminar del array local usando CAT_ID
+            this.listaCategorias = this.listaCategorias.filter(cat => cat.cat_id !== id);
+            
+            // Actualizar listas filtradas y paginación
+            if (this.isSearching) {
+                this.onSearch(this.searchTerm); // Re-filtrar si hay búsqueda activa
+            } else {
+                this.filteredCategorias = [...this.listaCategorias];
+                this.totalItems = this.filteredCategorias.length;
+                this.calculatePagination();
+                this.updatePaginatedData();
             }
-  
-          });
-   
+
+            this.ServicioAlertas.eliminacionCorrecta();
+          },
+          error: (err) => {
+            this.ServicioAlertas.error('ERROR', 'Se generó un error en el proceso de eliminación');
+            console.log('ERROR ' + err);
+          }
+        });
       }
     });
   }
   
-  Actualizarhorario(id: any): void {
-    this.router.navigate(['home/actualizarHorarios', id]);
+  ActualizarCategoria(id: number): void {
+    this.router.navigate(['home/actualizarCategoria', id]);
   }
 
   /**
@@ -111,6 +101,9 @@ export class listaCategoriasComponent {
    */
   calculatePagination(): void {
     this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+    // Evitar que totalPages sea 0 si no hay items
+    if (this.totalPages === 0) this.totalPages = 1;
+    
     if (this.currentPage > this.totalPages) {
       this.currentPage = 1;
     }
@@ -122,7 +115,7 @@ export class listaCategoriasComponent {
   updatePaginatedData(): void {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
-    this.paginatedHorarios = this.filteredHorarios.slice(startIndex, endIndex);
+    this.paginatedCategorias = this.filteredCategorias.slice(startIndex, endIndex);
   }
 
   /**
@@ -167,29 +160,31 @@ export class listaCategoriasComponent {
    * Obtiene el rango de items mostrados
    */
   getItemRange(): { start: number, end: number } {
+    if (this.totalItems === 0) return { start: 0, end: 0 };
     const start = (this.currentPage - 1) * this.itemsPerPage + 1;
     const end = Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
     return { start, end };
   }
 
   /**
-   * Realiza la búsqueda de horarios
+   * Realiza la búsqueda de categorías
+   * Filtra por NOMBRE y DESCRIPCION
    */
   onSearch(searchValue: string): void {
     this.searchTerm = searchValue.toLowerCase().trim();
     this.isSearching = this.searchTerm.length > 0;
     
     if (this.isSearching) {
-      this.filteredHorarios = this.listaHorarios.filter(horario => 
-        horario.hora_inicio.toLowerCase().includes(this.searchTerm) ||
-        horario.hora_fin.toLowerCase().includes(this.searchTerm)
+      this.filteredCategorias = this.listaCategorias.filter(cat => 
+        cat.cat_nombre.toLowerCase().includes(this.searchTerm) ||
+        (cat.cat_descripcion && cat.cat_descripcion.toLowerCase().includes(this.searchTerm))
       );
     } else {
-      this.filteredHorarios = [...this.listaHorarios];
+      this.filteredCategorias = [...this.listaCategorias];
     }
     
     // Actualizar paginación después de filtrar
-    this.totalItems = this.filteredHorarios.length;
+    this.totalItems = this.filteredCategorias.length;
     this.currentPage = 1; // Reset a la primera página
     this.calculatePagination();
     this.updatePaginatedData();
@@ -201,8 +196,8 @@ export class listaCategoriasComponent {
   clearSearch(): void {
     this.searchTerm = '';
     this.isSearching = false;
-    this.filteredHorarios = [...this.listaHorarios];
-    this.totalItems = this.filteredHorarios.length;
+    this.filteredCategorias = [...this.listaCategorias];
+    this.totalItems = this.filteredCategorias.length;
     this.currentPage = 1;
     this.calculatePagination();
     this.updatePaginatedData();
@@ -235,7 +230,6 @@ export class listaCategoriasComponent {
       let start = Math.max(1, this.currentPage - halfRange);
       let end = Math.min(this.totalPages, this.currentPage + halfRange);
       
-      // Ajustar si estamos cerca del inicio o final
       if (this.currentPage <= halfRange) {
         end = maxPagesToShow;
       } else if (this.currentPage > this.totalPages - halfRange) {
@@ -248,29 +242,5 @@ export class listaCategoriasComponent {
     }
     
     return pages;
-  }
-
-  /**
-   * Formatea una hora al formato HH:MM
-   */
-  formatTime(timeString: string): string {
-    if (!timeString) return '';
-    
-    try {
-      // Si es un string de tiempo simple, retornarlo tal como está
-      if (timeString.match(/^\d{2}:\d{2}$/)) {
-        return timeString;
-      }
-      
-      // Si es un datetime, extraer solo la parte de la hora
-      if (timeString.includes('T')) {
-        const time = timeString.split('T')[1];
-        return time.substring(0, 5); // HH:MM
-      }
-      
-      return timeString;
-    } catch (error) {
-      return timeString;
-    }
   }
 }

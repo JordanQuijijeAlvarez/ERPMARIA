@@ -305,6 +305,7 @@ export class FrmproductoComponent {
               // Llamada AJAX rápida para crear la CATEGORÍA
               // NOTA: Ajusta el objeto según tu backend
               const objCat: InCategoria = {
+                cat_id:0,
                 cat_nombre: nombreCat,
                 cat_descripcion: 'Creada desde Productos'
               };
