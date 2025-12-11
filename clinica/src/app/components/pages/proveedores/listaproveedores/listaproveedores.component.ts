@@ -1,23 +1,33 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
+// IMPORTANTE: Asegúrate de importar tu servicio de proveedores y el modelo correcto
 import { AlertService } from '../../../../servicios/Alertas/alertas.service';
 import { DirectivasModule } from '../../../../directivas/directivas.module';
-import { clienteService } from '../../../../servicios/clientes.service';
-import { InClientes } from '../../../../modelos/modelClientes/InClientes';
+// import { ProveedorService } from '../../../../servicios/proveedores.service'; // <--- CAMBIAR ESTO POR TU SERVICIO REAL
+// import { InProveedor } from '../../../../modelos/modelProveedores/InProveedor'; // <--- CAMBIAR ESTO POR TU MODELO REAL
+
+// Mock del servicio para evitar errores de compilación en este ejemplo.
+// Debes usar tu servicio real 'ProveedorService'
+
+import { ProveedorService } from '../../../../servicios/proveedores.service';
+import { InProveedor } from '../../../../modelos/modelProveedor/InProveedor';
 
 @Component({
-    selector: 'app-listaproveedores',
-    imports: [CommonModule, RouterModule, DirectivasModule, FormsModule],
-    templateUrl: './listaproveedores.component.html',
-    styleUrl: './listaproveedores.component.css'
+  selector: 'app-listaproveedores',
+  standalone: true, // Asumo que es standalone por los imports directos
+  imports: [CommonModule, RouterModule, DirectivasModule, FormsModule],
+  templateUrl: './listaproveedores.component.html',
+  styleUrl: './listaproveedores.component.css'
 })
-export class ListaproveedoresComponent {
-  listaclientes: InClientes[] = [];
-  filteredClientes: InClientes[] = []; 
-  paginatedClientes: InClientes[] = [];
+export class ListaproveedoresComponent implements OnInit {
+
+  listaProveedores: InProveedor[] = [];
+  filteredProveedores: InProveedor[] = []; 
+  paginatedProveedores: InProveedor[] = [];
 
   currentPage: number = 1;
   itemsPerPage: number = 5;
@@ -31,33 +41,30 @@ export class ListaproveedoresComponent {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private ServicioCliente: clienteService,
-
+     private ServicioProveedor: ProveedorService, // <--- DESCOMENTAR Y USAR TU SERVICIO
     private ServicioAlertas: AlertService
   ) {}
 
   ngOnInit(): void {
-    this.listarClientesEstado('1');//1= activo 0=inactivo
+    this.listarProveedores();
   }
 
-  listarClientesEstado(estado: any): void {
-    this.ServicioCliente.LclienteEstado(estado).subscribe({
+  listarProveedores(): void {
+    // NOTA: Ajusta el nombre del método según tu servicio (ej. ListarProveedores, GetProveedores)
+    // Si tu backend filtra por estado, mantén el argumento, si no, quítalo.
+    
+    // Simulación de llamada (Reemplaza con this.ServicioProveedor.Listar()...)
+     this.ServicioProveedor.LproveedorEstado(1).subscribe({
       next: (res) => {
-        this.listaclientes = res;
-        this.filteredClientes = [...res]; 
-        this.totalItems = this.filteredClientes.length;
+        this.listaProveedores = res;
+        this.filteredProveedores = [...res]; 
+        this.totalItems = this.filteredProveedores.length;
         this.calculatePagination();
         this.updatePaginatedData();
       },
       error: (err) => {
-        // this.ServicioAlertas.infoEventoConfir(
-        //   'SESIÓN EXPIRADA',
-        //   'Inicie nuevamente sesión',
-        //   () => {
-        //     this.router.navigate(['/login']);
-        //   }
-        // );
-      },
+         console.error('Error al listar', err);
+      }
     });
   }
 
@@ -66,6 +73,7 @@ export class ListaproveedoresComponent {
    */
   calculatePagination(): void {
     this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+    if (this.totalPages === 0) this.totalPages = 1; // Prevenir página 0
     if (this.currentPage > this.totalPages) {
       this.currentPage = 1;
     }
@@ -77,7 +85,7 @@ export class ListaproveedoresComponent {
   updatePaginatedData(): void {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
-    this.paginatedClientes = this.filteredClientes.slice(startIndex, endIndex);
+    this.paginatedProveedores = this.filteredProveedores.slice(startIndex, endIndex);
   }
 
   /**
@@ -114,32 +122,32 @@ export class ListaproveedoresComponent {
    * Obtiene el rango de items mostrados
    */
   getItemRange(): { start: number, end: number } {
+    if (this.totalItems === 0) return { start: 0, end: 0 };
     const start = (this.currentPage - 1) * this.itemsPerPage + 1;
     const end = Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
     return { start, end };
   }
 
   /**
-   * Realiza la búsqueda de clientes
+   * Realiza la búsqueda de proveedores
+   * Filtra por: RUC, NOMBRE, TELEFONO
    */
   onSearch(searchValue: string): void {
     this.searchTerm = searchValue.toLowerCase().trim();
     this.isSearching = this.searchTerm.length > 0;
     
     if (this.isSearching) {
-      this.filteredClientes = this.listaclientes.filter(cliente => 
-        cliente.client_cedula.toLowerCase().includes(this.searchTerm) ||
-        cliente.client_nombres.toLowerCase().includes(this.searchTerm) ||
-        cliente.client_apellidos.toLowerCase().includes(this.searchTerm) ||
-        `${cliente.client_nombres} ${cliente.client_apellidos}`.toLowerCase().includes(this.searchTerm) ||
-        cliente.client_correo.toLowerCase().includes(this.searchTerm)
+      this.filteredProveedores = this.listaProveedores.filter(proveedor => 
+        proveedor.prove_ruc.toLowerCase().includes(this.searchTerm) ||
+        proveedor.prove_nombre.toLowerCase().includes(this.searchTerm) ||
+        (proveedor.prove_telefono && proveedor.prove_telefono.toLowerCase().includes(this.searchTerm))
       );
     } else {
-      this.filteredClientes = [...this.listaclientes];
+      this.filteredProveedores = [...this.listaProveedores];
     }
     
     // Actualizar paginación después de filtrar
-    this.totalItems = this.filteredClientes.length;
+    this.totalItems = this.filteredProveedores.length;
     this.currentPage = 1; // Reset a la primera página
     this.calculatePagination();
     this.updatePaginatedData();
@@ -151,8 +159,8 @@ export class ListaproveedoresComponent {
   clearSearch(): void {
     this.searchTerm = '';
     this.isSearching = false;
-    this.filteredClientes = [...this.listaclientes];
-    this.totalItems = this.filteredClientes.length;
+    this.filteredProveedores = [...this.listaProveedores];
+    this.totalItems = this.filteredProveedores.length;
     this.currentPage = 1;
     this.calculatePagination();
     this.updatePaginatedData();
@@ -167,22 +175,20 @@ export class ListaproveedoresComponent {
     this.calculatePagination();
     this.updatePaginatedData();
   }
+
   getPageNumbers(): number[] {
     const pages: number[] = [];
     const maxPagesToShow = 5;
     
     if (this.totalPages <= maxPagesToShow) {
-      // Mostrar todas las páginas si son pocas
       for (let i = 1; i <= this.totalPages; i++) {
         pages.push(i);
       }
     } else {
-      // Lógica para mostrar páginas con puntos suspensivos
       const halfRange = Math.floor(maxPagesToShow / 2);
       let start = Math.max(1, this.currentPage - halfRange);
       let end = Math.min(this.totalPages, this.currentPage + halfRange);
       
-      // Ajustar si estamos cerca del inicio o final
       if (this.currentPage <= halfRange) {
         end = maxPagesToShow;
       } else if (this.currentPage > this.totalPages - halfRange) {
@@ -197,26 +203,32 @@ export class ListaproveedoresComponent {
     return pages;
   }
 
-  eliminarcliente(id: any, nombre: string): void {
+  /**
+   * Eliminar Proveedor
+   * Se usa PROVE_RUC como identificador según tu estructura
+   */
+  eliminarProveedor(id: any, nombre: string): void {
     this.ServicioAlertas.confirm(
       'CONFIRMAR ACCIÓN',
-      '¿Está seguro que desea eliminar el registro de ' + nombre,
+      '¿Está seguro que desea eliminar el registro de ' + nombre + '?',
       'Si, eliminar',
       'Cancelar'
     ).then((result) => {
       if (result.isConfirmed) {
-        this.ServicioCliente.Eliminarcliente(id).subscribe({
+        
+        // REEMPLAZAR CON TU SERVICIO REAL:
+         this.ServicioProveedor.EliminarProveedor(id).subscribe({
           next: (res) => {
-            this.listaclientes = this.listaclientes.filter(
-              (cliente) => cliente.client_id !== id
+            this.listaProveedores = this.listaProveedores.filter(
+              (proveedor) => proveedor.prove_id !== id
             );
 
             // Actualizar la búsqueda si está activa
             if (this.isSearching) {
               this.onSearch(this.searchTerm);
             } else {
-              this.filteredClientes = [...this.listaclientes];
-              this.totalItems = this.filteredClientes.length;
+              this.filteredProveedores = [...this.listaProveedores];
+              this.totalItems = this.filteredProveedores.length;
               this.calculatePagination();
               this.updatePaginatedData();
             }
@@ -233,33 +245,25 @@ export class ListaproveedoresComponent {
         });
       }
     });
+        
   }
 
   /**
-   * Formatea una fecha al formato DD-MM-YYYY
+   * Helper para refrescar vistas
    */
-  formatDate(dateString: string): string {
-    if (!dateString) return '';
-    
-    try {
-      const date = new Date(dateString);
-      
-      // Verificar si la fecha es válida
-      if (isNaN(date.getTime())) {
-        return dateString; // Retornar el string original si no es una fecha válida
-      }
-      
-      const day = date.getDate().toString().padStart(2, '0');
-      const month = (date.getMonth() + 1).toString().padStart(2, '0');
-      const year = date.getFullYear();
-      
-      return `${day}-${month}-${year}`;
-    } catch (error) {
-      return dateString; // En caso de error, retornar el string original
+  private refrescarDespuesDeAccion(): void {
+    if (this.isSearching) {
+      this.onSearch(this.searchTerm);
+    } else {
+      this.filteredProveedores = [...this.listaProveedores];
+      this.totalItems = this.filteredProveedores.length;
+      this.calculatePagination();
+      this.updatePaginatedData();
     }
   }
 
-  Actualizarcliente(id: any): void {
-    this.router.navigate(['home/actualizarCliente', id]);
+  ActualizarProveedor(ruc:any,id: any): void {
+    // Redirige a la ruta de edición de proveedores
+    this.router.navigate(['home/actualizarProveedor', id]);
   }
 }

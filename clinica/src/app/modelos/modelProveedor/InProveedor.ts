@@ -1,14 +1,9 @@
-export interface InClientes {
-
-    client_id:number,	
-	client_cedula: string,
-	client_nombres: string,
-	client_apellidos:string,
-	client_direccion:string,
-	client_correo:string
-    //estado: string,
-    //usuario:string,
-    //fecha_registro:string;
-
-
+export interface InProveedor {
+	prove_id?:Number;
+    prove_ruc: string;        // ID Principal
+    prove_nombre: string;
+    prove_telefono: string;
+    prove_correo:string;
+    prove_direccion: string;
+    prove_descripcion?: string; // Opcional
 }

@@ -33,7 +33,7 @@ app.use('/ventas', rutasVentas);
 
 app.use('/subcategorias', rutasSubCategoria);
 app.use('/local', rutasLocal);
-app.use('/proveedor', rutasProveedor);
+app.use('/proveedores', rutasProveedor);
 app.use('/usuarios', rutasUsuarios);
 app.use('/roles', rutasRoles);
 

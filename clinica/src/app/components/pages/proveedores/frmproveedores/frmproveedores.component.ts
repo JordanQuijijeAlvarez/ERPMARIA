@@ -1,152 +1,162 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import {
   AbstractControl,
   AsyncValidatorFn,
-  ControlEvent,
   FormBuilder,
-  FormControlName,
   FormGroup,
   ReactiveFormsModule,
   ValidationErrors,
-  ValidatorFn,
   Validators,
 } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { InClientes } from '../../../../modelos/modelClientes/InClientes';
 import { CommonModule } from '@angular/common';
-import { AlertService } from '../../../../servicios/Alertas/alertas.service';
 import Swal from 'sweetalert2';
-import { ValidatorsComponent } from '../../../shared/validators/validators.component';
 import { Observable, of, timer } from 'rxjs';
-import { map, catchError, switchMap, debounceTime } from 'rxjs/operators';
-import { clienteService } from '../../../../servicios/clientes.service';
+import { map, catchError, switchMap } from 'rxjs/operators';
+
+// Asegúrate de que las rutas de importación sean correctas
+import { AlertService } from '../../../../servicios/Alertas/alertas.service';
+import { ValidatorsComponent } from '../../../shared/validators/validators.component';
+import { ProveedorService } from '../../../../servicios/proveedores.service';
+import { InProveedor } from '../../../../modelos/modelProveedor/InProveedor';
 
 @Component({
   selector: 'app-frmproveedores',
+  standalone: true,
   imports: [ReactiveFormsModule, RouterModule, CommonModule, ValidatorsComponent],
-  templateUrl: './frmproveedores.component.html',
+  templateUrl: './frmproveedores.component.html', // Asegúrate que coincida con tu archivo html
   styleUrl: './frmproveedores.component.css',
 })
-export class frmProveedoresComponent {
-  frmCliente: FormGroup;
+export class frmProveedoresComponent implements OnInit {
+  frmProveedor: FormGroup;
   eventoUpdate: boolean = false;
-  codigo: number  = 0;
-
-  @ViewChild('datepickerElement') datepickerElement!: ElementRef;
+  idEditar: string = ''; // El ID ahora es el RUC (string)
+  rucEditar: string = ''; // El ID ahora es el RUC (string)
 
   constructor(
     private formBuilder: FormBuilder,
     private http: HttpClient,
     private router: Router,
-    private clienteServ: clienteService,
+    private proveedorServ: ProveedorService,
     private alertaServ: AlertService,
     private route: ActivatedRoute
   ) {
-    this.frmCliente = this.formBuilder.group({
-      txtCedula: [
-        '', 
-        [Validators.required, ValidatorsComponent.numericTenDigits],
-        [this.cedulaExistsValidator()]
+    this.frmProveedor = this.formBuilder.group({
+      txtRuc: [
+        '',
+        [
+          Validators.required, 
+          Validators.minLength(13), 
+          Validators.maxLength(13), 
+          Validators.pattern('^[0-9]*$') // Solo números
+        ],
+        [this.rucExistsValidator()]
       ],
-      txtNombres: ['', Validators.required],
-      txtApellidos: ['', Validators.required],
-      txtCorreo: ['', [Validators.required, Validators.email]],
-      txtDireccion: ['', Validators.required]
-      });
+      txtNombre: ['', Validators.required], // Razón Social / Nombre
+      txtTelefono: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
+      txtCorreo: ['', [Validators.email]], // Puede ser opcional, agrega Validators.required si es obligatorio
+      txtDireccion: ['', Validators.required],
+      txtDescripcion: [''] // Campo opcional
+    });
   }
 
-  // Validador asíncrono para verificar si la cédula ya existe
-  cedulaExistsValidator(): AsyncValidatorFn {
-    return (control: AbstractControl): Observable<ValidationErrors | null> => {
-      const cedula = control.value;
-      
-      // Si no hay valor, no validamos (esto lo maneja el validador required)
-      if (!cedula || cedula.length < 10) {
-        return of(null);
-      }
+rucExistsValidator(): AsyncValidatorFn {
+  return (control: AbstractControl): Observable<ValidationErrors | null> => {
+    const ruc = control.value;
 
-      // Si estamos en modo actualización y la cédula es la misma del cliente actual, permitirla
-      if (this.eventoUpdate && this.codigo) {
-        return this.clienteServ.LclienteId(this.codigo).pipe(
-          switchMap(clienteActual => {
-            if (clienteActual.client_cedula === cedula) {
-              return of(null); // La cédula actual del cliente es válida
-            }
-            // Si es diferente, verificar si existe en otros clientes
-            return this.verificarCedulaExistente(cedula);
-          }),
-          catchError(() => of(null))
-        );
-      }
+    // Si estamos editando y el ruc NO se puede cambiar
+    if (this.eventoUpdate && ruc === this.rucEditar) {
+      return of(null);
+    }
 
-      // En modo creación, verificar directamente
-      return this.verificarCedulaExistente(cedula);
-    };
-  }
+    return this.verificarRucExistente(ruc);
+  };
+}
 
-  // Método auxiliar para verificar si la cédula existe
-  private verificarCedulaExistente(cedula: string): Observable<ValidationErrors | null> {
-    return timer(500).pipe( // Debounce de 500ms para evitar muchas peticiones
-      switchMap(() => 
-        this.clienteServ.LclienteCedulaEstado(cedula, '1').pipe(
-          map(cliente => {
-            // Si encuentra un cliente con esa cédula, retorna error
-            return cliente ? { cedulaExists: { message: 'Esta cédula ya está registrada' } } : null;
-          }),
-          catchError(error => {
-            // Si el error es 404 (no encontrado), está bien
-            if (error.status === 404) {
-              return of(null);
-            }
-            // Para otros errores, no validamos
-            return of(null);
-          })
-        )
+
+  // Método auxiliar para verificar si el RUC existe
+  private verificarRucExistente(ruc: string): Observable<ValidationErrors | null> {
+  return timer(400).pipe(
+    switchMap(() =>
+      this.proveedorServ.LproveedorRucEstado(ruc, '1').pipe(
+        map(res => {
+          // Verifica correctamente arrays o objetos
+          const existe = Array.isArray(res)
+            ? res.length > 0
+            : !!res;
+
+          return existe ? { rucExists: true } : null;
+        }),
+        catchError(() => of(null))
       )
-    );
-  }
+    )
+  );
+}
+
   ngOnInit(): void {
     this.route.paramMap.subscribe((parametros) => {
-      const id = parametros.get('id');
-      if (id) {
+      const id = parametros.get('id'); // El parámetro en la URL debe ser el RUC
+      const ruc = parametros.get('ruc') ; // El parámetro en la URL debe ser el RUC
+      if (id && ruc) {
         this.eventoUpdate = true;
-        this.codigo = parseInt(id);
-        this.cargarcliente(this.codigo);
+        this.idEditar = id;
+        this.rucEditar = ruc;
+        this.cargarProveedor(this.idEditar);
+        // Deshabilitar el campo RUC en edición si es clave primaria y no se debe cambiar
+        this.frmProveedor.get('txtRuc')?.disable(); 
       } else {
         this.eventoUpdate = false;
       }
     });
   }
 
-  cargarcliente(id: number): void {
-    this.clienteServ.LclienteId(id).subscribe({
-      next: (cliente) => {
-        this.frmCliente.patchValue({
-          txtCedula: cliente.client_cedula,
-          txtNombres: cliente.client_nombres,
-          txtApellidos: cliente.client_apellidos,
-          txtCorreo: cliente.client_correo,
-          txtDireccion: cliente.client_direccion
-
+  cargarProveedor(id: string): void {
+    this.proveedorServ.ObtenerProveedor(id).subscribe({
+      next: (proveedor) => {
+        // Mapeamos los datos de la BD al formulario
+        this.frmProveedor.patchValue({
+          txtRuc: proveedor.prove_ruc,
+          txtNombre: proveedor.prove_nombre,
+          txtTelefono: proveedor.prove_telefono,
+          txtDireccion: proveedor.prove_direccion,
+          txtCorreo: proveedor.prove_correo || '', // Si agregaste este campo al modelo
+          txtDescripcion: proveedor.prove_descripcion || ''
         });
       },
       error: (err) => {
-        console.log('Error al cargar cliente:', err);
+        console.log('Error al cargar proveedor:', err);
         this.alertaServ.error(
-          'No se pudo cargar la información del cliente',
-          'Comuniquese con su administrador de TI'
+          'No se pudo cargar la información del proveedor',
+          'Comuníquese con su administrador de TI'
         );
+        this.router.navigate(['home/listarproveedores']);
       },
     });
   }
 
-  guardarcliente(): void {
-    // Primero marcar todos los campos como tocados para mostrar errores
-    this.marcarCamposComoTocados();
+  guardarProveedor(): void {
+   this.marcarCamposComoTocados();
 
-    // Verificar si hay validaciones pendientes
-    if (this.frmCliente.pending) {
+  this.frmProveedor.updateValueAndValidity({ onlySelf: false, emitEvent: true });
+
+  if (this.frmProveedor.pending) {
+    setTimeout(() => this.guardarProveedor(), 200);
+    return;
+  }
+
+  if (this.frmProveedor.invalid) {
+    if (this.frmProveedor.get('txtRuc')?.errors?.['rucExists']) {
+      Swal.fire({
+        title: 'RUC Duplicado',
+        text: 'El RUC ingresado ya está registrado.',
+        icon: 'error'
+      });
+      return;
+    }
+  }
+
+    if (this.frmProveedor.pending) {
       Swal.fire({
         title: 'Validación en Proceso',
         text: 'Por favor, espere mientras se verifica la información...',
@@ -157,47 +167,31 @@ export class frmProveedoresComponent {
       return;
     }
 
-    // Verificar si el formulario tiene errores
-    if (this.frmCliente.invalid) {
-      // Verificar qué campos específicos tienen errores
+    if (this.frmProveedor.invalid) {
       const camposConError = [];
       
-      if (this.frmCliente.get('txtCedula')?.invalid) {
-        if (this.frmCliente.get('txtCedula')?.errors?.['cedulaExists']) {
+      if (this.frmProveedor.get('txtRuc')?.invalid) {
+        if (this.frmProveedor.get('txtRuc')?.errors?.['rucExists']) {
           Swal.fire({
-            title: 'Cédula Duplicada',
-            text: 'La cédula ingresada ya está registrada en el sistema. Por favor, verifique el número de cédula.',
+            title: 'RUC Duplicado',
+            text: 'El RUC ingresado ya está registrado en el sistema.',
             icon: 'error',
             confirmButtonColor: '#3085d6',
             confirmButtonText: 'Entendido'
           });
           return;
         }
-        camposConError.push('Cédula');
+        camposConError.push('RUC (13 dígitos)');
       }
-      if (this.frmCliente.get('txtNombres')?.invalid) {
-        camposConError.push('Nombres');
-      }
-      if (this.frmCliente.get('txtApellidos')?.invalid) {
-        camposConError.push('Apellidos');
-      }
-      if (this.frmCliente.get('txtFechNac')?.invalid) {
-        camposConError.push('Fecha de Nacimiento');
-      }
-      if (this.frmCliente.get('txtNumTelefono')?.invalid) {
-        camposConError.push('Número de Teléfono');
-      }
-      if (this.frmCliente.get('txtCorreo')?.invalid) {
-        camposConError.push('Correo Electrónico');
-      }
-      if (this.frmCliente.get('txtDireccion')?.invalid) {
-        camposConError.push('Dirección');
-      }
+      if (this.frmProveedor.get('txtNombre')?.invalid) camposConError.push('Razón Social / Nombre');
+      if (this.frmProveedor.get('txtTelefono')?.invalid) camposConError.push('Teléfono');
+      if (this.frmProveedor.get('txtDireccion')?.invalid) camposConError.push('Dirección');
+      if (this.frmProveedor.get('txtCorreo')?.invalid) camposConError.push('Correo Electrónico');
 
       if (camposConError.length > 0) {
         Swal.fire({
           title: 'Campos Requeridos',
-          text: 'Ingrese correctamente los valores. Complete los siguientes campos: ' + camposConError.join(', '),
+          text: 'Por favor verifique los siguientes campos: ' + camposConError.join(', '),
           icon: 'warning',
           confirmButtonColor: '#3085d6',
           confirmButtonText: 'Entendido'
@@ -206,41 +200,45 @@ export class frmProveedoresComponent {
       return;
     }
 
-    const cliente: InClientes = {
-      client_cedula: this.frmCliente.value.txtCedula,
-      client_nombres: this.frmCliente.value.txtNombres,
-      client_apellidos: this.frmCliente.value.txtApellidos,
-      client_correo: this.frmCliente.value.txtCorreo,
-      client_direccion: this.frmCliente.value.txtDireccion,
-      client_id: 0
+    // Construir el objeto a enviar (Si el campo RUC está deshabilitado, usar getRawValue)
+    const formValues = this.frmProveedor.getRawValue();
+
+    const proveedor: InProveedor = {
+      prove_ruc: formValues.txtRuc,
+      prove_nombre: formValues.txtNombre,
+      prove_telefono: formValues.txtTelefono,
+      prove_direccion: formValues.txtDireccion,
+      prove_correo: formValues.txtCorreo, // Asegúrate que esté en tu interfaz InProveedor
+      prove_descripcion: formValues.txtDescripcion
     };
 
     if (this.eventoUpdate) {
-      cliente.client_id=this.codigo;
-      this.clienteServ.Actualizarcliente(cliente).subscribe({
+      // En update, usualmente el ID (RUC) no cambia, se envía para buscar y actualizar
+      proveedor.prove_id = parseInt( this.idEditar);
+      this.proveedorServ.ActualizarProveedor(proveedor).subscribe({
         next: (res) => {
-          this.alertaServ.success('cliente actualizado con éxito.', '');
-          this.router.navigate(['home/listarclientes']);
+          this.alertaServ.success('Proveedor actualizado con éxito.', '');
+          this.router.navigate(['home/dashboard']);
         },
         error: (err) => {
-          console.log('Error al actualizar cliente:', err.error.msg);
+          console.log('Error al actualizar:', err);
           this.alertaServ.error(
             'ERROR AL ACTUALIZAR',
-            'Hubo un problema al actualizar el cliente: revise que la información sea correcta'
+            'Hubo un problema al actualizar el proveedor.'
           );
         },
       });
     } else {
-      this.clienteServ.Crearcliente(cliente).subscribe({
+      this.proveedorServ.CrearProveedor(proveedor).subscribe({
         next: (res) => {
-          this.alertaServ.success('cliente registrado con éxito.', '');
-          this.router.navigate(['home/listarclientes']);
+          this.alertaServ.success('Proveedor registrado con éxito.', '');
+          this.router.navigate(['home/listarproveedores']);
         },
         error: (err) => {
-          console.log('Error al crear cliente:', err);
+          console.log('Error al crear:', err);
           this.alertaServ.error(
             'ERROR AL REGISTRAR',
-            'Hubo un problema al registrar el cliente: revise que la información sea correcta'
+            'Hubo un problema al registrar el proveedor.'
           );
         },
       });
@@ -248,8 +246,8 @@ export class frmProveedoresComponent {
   }
 
   marcarCamposComoTocados(): void {
-    Object.keys(this.frmCliente.controls).forEach((campo) => {
-      const control = this.frmCliente.get(campo);
+    Object.keys(this.frmProveedor.controls).forEach((campo) => {
+      const control = this.frmProveedor.get(campo);
       if (control) {
         control.markAsTouched();
       }
@@ -268,9 +266,8 @@ export class frmProveedoresComponent {
       cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        this.router.navigate(['/home/listaclientes']);
+        this.router.navigate(['/home/listarproveedores']);
       }
     });
   }
-
 }
