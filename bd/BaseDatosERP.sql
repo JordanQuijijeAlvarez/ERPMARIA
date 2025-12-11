@@ -294,3 +294,6 @@ ALTER TABLE SESIONES_ACTIVAS ADD CONSTRAINT fk_sesiones_user
 FOREIGN KEY (usuario_id) REFERENCES USUARIO(user_id);
 
 COMMIT;
+
+
+--se agrego el campo compra_descripcion y compra_subiva 

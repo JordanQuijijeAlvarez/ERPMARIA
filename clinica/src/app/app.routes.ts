@@ -25,6 +25,8 @@ import { ListaproveedoresComponent } from './components/pages/proveedores/listap
 import { frmProveedoresComponent } from './components/pages/proveedores/frmproveedores/frmproveedores.component';
 import { FrmCategoriasComponent } from './components/pages/categorias/frmcategorias/frmcategorias.component';
 import { ListaCategoriasComponent } from './components/pages/categorias/listacategorias/listacategorias.component';
+import { ListaComprasComponent } from './components/pages/ventas copy/listacompras/listacompras.component';
+import { FrmComprasComponent } from './components/pages/ventas copy/frmcompras/frmcompras.component';
 
 export const routes: Routes = [
 
@@ -110,6 +112,27 @@ export const routes: Routes = [
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
       },
+      
+      // COMPRAS
+      {
+        path: 'crearCompra',
+        component: FrmComprasComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['ADMINISTRADOR'] },
+      },
+       {
+        path: 'listacompras',
+        component: ListaComprasComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['ADMINISTRADOR'] },
+      },
+ {
+        path: 'actualizarCompra/:id',
+        component: FrmComprasComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['ADMINISTRADOR'] },
+      },
+
 
             // PROVEEDOR
       {
