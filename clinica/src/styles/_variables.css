@@ -4,63 +4,66 @@
 
 :root {
   /* ===== COLORES PRIMARIOS ===== */
-  --color-primary: #e50914;
+  /* --color-primary: #e50914;
   --color-primary-hover: #b00710;
   --color-primary-light: #ffebee;
-  --color-primary-dark: #8b0000;
-  
+  --color-primary-dark: #8b0000; */
 
+  --color-primary: #ff9800;
+  --color-primary-hover: #f57c00;
+  --color-primary-light: #fff3e0;
+  --color-primary-dark: #e65100;
 
   /* ===== COLORES SECUNDARIOS ===== */
   --color-secondary: #333;
   --color-secondary-hover: #555;
   --color-secondary-light: #666;
-  
+
   /* ===== COLORES DE TEXTO ===== */
   --color-text-primary: #333;
   --color-text-secondary: #666;
   --color-text-light: #999;
   --color-text-white: #fff;
-  
+
   /* ===== COLORES DE FONDO ===== */
   --color-bg-main: #f9f9f9;
   --color-bg-card: #fff;
   --color-bg-hover: #f5f5f5;
   --color-bg-input: #fff;
   --color-bg-dark: #1a1a1a;
-  
+
   /* ===== COLORES DE BORDES ===== */
   --color-border: #e0e0e0;
   --color-border-light: #f0f0f0;
   --color-border-dark: #ccc;
-  
+
   /* ===== COLORES DE ESTADO ===== */
   /* Success */
   --color-success: #4caf50;
   --color-success-hover: #388e3c;
   --color-success-light: #e8f5e9;
-  
+
   /* Warning */
   --color-warning: #ff9800;
   --color-warning-hover: #e65100;
   --color-warning-light: #fff3e0;
-  
+
   /* Danger */
   --color-danger: #f44336;
   --color-danger-hover: #c62828;
   --color-danger-light: #ffebee;
-  
+
   /* Info */
   --color-info: #2196f3;
   --color-info-hover: #1976d2;
   --color-info-light: #e3f2fd;
-  
+
   /* ===== SOMBRAS ===== */
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
   --shadow-xl: 0 8px 32px rgba(0, 0, 0, 0.16);
-  
+
   /* ===== ESPACIADOS ===== */
   --spacing-xs: 8px;
   --spacing-sm: 12px;
@@ -68,21 +71,23 @@
   --spacing-lg: 24px;
   --spacing-xl: 32px;
   --spacing-2xl: 48px;
-  
+
   /* ===== BORDER RADIUS ===== */
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
   --radius-full: 9999px;
-  
+
   /* ===== TRANSICIONES ===== */
   --transition-fast: 0.15s ease;
   --transition-normal: 0.2s ease;
   --transition-slow: 0.3s ease;
-  
+
   /* ===== FUENTES ===== */
-  --font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  --font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
