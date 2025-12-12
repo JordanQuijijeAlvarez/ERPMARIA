@@ -1,10 +1,6 @@
-<div (click)="toggleMenu(1)">
-  <app-sidebar> </app-sidebar>
-  <div>
-    <main>
-      <div>
-        <app-panelcontenido></app-panelcontenido>
-      </div>
-    </main>
-  </div>
+<div class="panel-principal">
+  <app-sidebar class="panel-principal__sidebar"></app-sidebar>
+  <main class="panel-principal__contenido">
+    <app-panelcontenido></app-panelcontenido>
+  </main>
 </div>
