@@ -1,132 +1,124 @@
 <form [formGroup]="frmCliente" (ngSubmit)="guardarcliente()">
-  <div>
-    <div>
-      <!-- Form Content -->
-      <div>
-        <div>
-          <h2>
-            {{ eventoUpdate ? 'ACTUALIZAR CLIENTE' : 'REGISTRO DE CLIENTE' }}
-          </h2>
-          <p>
-            {{ eventoUpdate ? 'Modifique la información del CLIENTE según sea necesario' : 'Complete la información personal del nuevo CLIENTE' }}
-          </p>
-        </div>
-        <!-- Section Header -->
+  <div style="padding: 24px;">
+    <!-- Form Content -->
+    <div class="card">
+      <div class="card__header">
+        <h2 class="card__title">
+          {{ eventoUpdate ? 'ACTUALIZAR CLIENTE' : 'REGISTRO DE CLIENTE' }}
+        </h2>
+        <p class="card__subtitle">
+          {{ eventoUpdate ? 'Modifique la información del CLIENTE según sea necesario' : 'Complete la información personal del nuevo CLIENTE' }}
+        </p>
+      </div>
 
-        <div>
-          <h3>
-            <i class="fas fa-user-edit"></i>
-            Información Personal
-          </h3>
-        </div>
+      <!-- Section Header -->
+      <div style="margin-top: 24px; margin-bottom: 16px;">
+        <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--color-text-primary); display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-user-edit"></i>
+          Información Personal
+        </h3>
+      </div>
 
-        <!-- Form Fields -->
-        <div>
-          <div>
-            <!-- Cédula -->
-            <div>
-              <label>
-                <i class="fas fa-id-card"></i>
-                Cédula *
-              </label>
-              <input
-                formControlName="txtCedula"
-                placeholder="Ingrese número de cédula"
-                maxlength="10"
-                type="text"
-                
-              />
-              <app-validators 
-                [control]="frmCliente.get('txtCedula')!"
-                [showCounter]="true"
-                [expectedLength]="10">
-              </app-validators>
-            </div>
+      <!-- Form Fields -->
+      <div class="card__body">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+          <!-- Cédula -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-id-card"></i>
+              Cédula *
+            </label>
+            <input
+              formControlName="txtCedula"
+              placeholder="Ingrese número de cédula"
+              maxlength="10"
+              type="text"
+              class="form-input"
+            />
+            <app-validators 
+              [control]="frmCliente.get('txtCedula')!"
+              [showCounter]="true"
+              [expectedLength]="10">
+            </app-validators>
+          </div>
 
-            <!-- Nombres -->
-            <div>
-              <label>
-                <i class="fas fa-user"></i>
-                Nombres *
-              </label>
-              <input
-                placeholder="Ingrese los nombres"
-                formControlName="txtNombres"
-                type="text"
-                
-              />
-              <app-validators [control]="frmCliente.get('txtNombres')!"></app-validators>
-            </div>
+          <!-- Nombres -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-user"></i>
+              Nombres *
+            </label>
+            <input
+              placeholder="Ingrese los nombres"
+              formControlName="txtNombres"
+              type="text"
+              class="form-input"
+            />
+            <app-validators [control]="frmCliente.get('txtNombres')!"></app-validators>
+          </div>
 
-            <!-- Apellidos -->
-            <div>
-              <label>
-                <i class="fas fa-user-tag"></i>
-                Apellidos *
-              </label>
-              <input
-                placeholder="Ingrese los apellidos"
-                formControlName="txtApellidos"
-                type="text"
-                
-              />
-              <app-validators [control]="frmCliente.get('txtApellidos')!"></app-validators>
-            </div>
+          <!-- Apellidos -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-user-tag"></i>
+              Apellidos *
+            </label>
+            <input
+              placeholder="Ingrese los apellidos"
+              formControlName="txtApellidos"
+              type="text"
+              class="form-input"
+            />
+            <app-validators [control]="frmCliente.get('txtApellidos')!"></app-validators>
+          </div>
 
-            
+          <!-- Email -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-envelope"></i>
+              Correo Electrónico
+            </label>
+            <input
+              formControlName="txtCorreo"
+              placeholder="ejemplo@correo.com"
+              type="email"
+              class="form-input"
+            />
+            <app-validators [control]="frmCliente.get('txtCorreo')!"></app-validators>
+          </div>
 
-            <!-- Email -->
-            <div>
-              <label>
-                <i class="fas fa-envelope"></i>
-                Correo Electrónico
-              </label>
-              <input
-                formControlName="txtCorreo"
-                placeholder="ejemplo@correo.com"
-                type="email"
-                
-              />
-              <app-validators [control]="frmCliente.get('txtCorreo')!"></app-validators>
-            </div>
-
-            <!-- Dirección -->
-            <div>
-              <label>
-                <i class="fas fa-map-marker-alt"></i>
-                Dirección de Domicilio *
-              </label>
-              <textarea
-                formControlName="txtDireccion"
-                placeholder="Ingrese la dirección completa del CLIENTE"
-                rows="3"
-                
-              ></textarea>
-              <app-validators [control]="frmCliente.get('txtDireccion')!"></app-validators>
-            </div>
-
-          
+          <!-- Dirección -->
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label class="form-label">
+              <i class="fas fa-map-marker-alt"></i>
+              Dirección de Domicilio *
+            </label>
+            <textarea
+              formControlName="txtDireccion"
+              placeholder="Ingrese la dirección completa del CLIENTE"
+              rows="3"
+              class="form-textarea"
+            ></textarea>
+            <app-validators [control]="frmCliente.get('txtDireccion')!"></app-validators>
           </div>
         </div>
       </div>
 
       <!-- Action Buttons -->
-      <div>
-        <a>
-            <button
-            type="button"
-            (click)="salirSinGuardar()"
-            
-          >
-            <i class="fas fa-times mr-2"></i>
-            Cancelar
-          </button>
-        </a>
+      <div class="card__footer" style="display: flex; justify-content: flex-end; gap: 12px;">
+        <button
+          type="button"
+          (click)="salirSinGuardar()"
+          class="btn btn--outline"
+        >
+          <i class="fas fa-times"></i>
+          Cancelar
+        </button>
         <button
           type="submit"
-          
+          class="btn btn--primary"
         >
-          <i class="fas fa-save mr-2"></i>
+          <i class="fas fa-save"></i>
           {{ eventoUpdate ? 'Actualizar cliente' : 'Guardar cliente' }}
         </button>
       </div>
