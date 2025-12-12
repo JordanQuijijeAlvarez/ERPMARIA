@@ -5,7 +5,11 @@
 /* BEM: sidebar principal usando variables de tema */
 .sidebar {
 	width: 240px;
-	background: linear-gradient(var(--color-primary-dark), var(--color-primary));
+	background: 
+		url('/assets/images/dodles.png') repeat,
+		linear-gradient(var(--color-primary-dark), var(--color-primary));
+	background-size: 200px auto, cover;
+	background-blend-mode: soft-light;
 	color: var(--color-text-white);
 	min-height: 100vh;
 	display: flex;
@@ -66,7 +70,9 @@
 	gap: var(--spacing-md);
 	padding: var(--spacing-sm) var(--spacing-lg);
 	margin: 0 var(--spacing-md);
-	color: var(--color-text-white);
+	color: var(--color-text-primary);
+	background: rgba(255, 255, 255, 0.892);
+	opacity: var(--sidebar-link-opacity, 1);
 	text-decoration: none;
 	border-radius: var(--radius-xl);
 	font-size: 1rem;

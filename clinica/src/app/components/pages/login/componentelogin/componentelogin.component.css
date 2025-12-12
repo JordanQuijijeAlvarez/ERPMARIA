@@ -5,7 +5,11 @@
 /* Fondo general */
 .login {
 	min-height: 100vh;
-	background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary-hover) 60%, var(--color-primary) 100%);
+	background: 
+		url('/assets/images/dodles.png') repeat,
+		linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary-hover) 60%, var(--color-primary) 100%);
+	background-size: 300px auto, cover;
+	background-blend-mode: soft-light;
 	display: flex;
 	align-items: center;
 	justify-content: center;
