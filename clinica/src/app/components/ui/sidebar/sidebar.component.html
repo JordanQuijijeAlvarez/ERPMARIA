@@ -18,21 +18,21 @@
       </p>
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a routerLink="listarclientes" class="sidebar__nav-link">
+        <a routerLink="listarclientes" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
           <i class="fa fa-street-view sidebar__icon"></i>
           <span>Clientes</span>
         </a>
       </li>
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a routerLink="listarproductos" class="sidebar__nav-link">
+        <a routerLink="listarproductos" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
           <i class="fa fa-box sidebar__icon"></i>
           <span>Productos</span>
         </a>
       </li>
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a routerLink="listaventas" class="sidebar__nav-link">
+        <a routerLink="listaventas" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
           <i class="fa fa-shopping-cart sidebar__icon"></i>
           <span>Ventas</span>
         </a>
@@ -44,14 +44,14 @@
       </p>
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['medico']">
-        <a routerLink="dashboard" class="sidebar__nav-link">
+        <a routerLink="dashboard" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
           <i class="fas fa-chart-pie sidebar__icon"></i>
           <span>Dashboard</span>
         </a>
       </li>
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR', 'recepcionista']">
-        <a routerLink="frmcitas" class="sidebar__nav-link">
+        <a routerLink="frmcitas" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
           <i class="fas fa-stethoscope sidebar__icon"></i>
           <span>Citas</span>
         </a>
@@ -63,14 +63,14 @@
       </p>
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR', 'recepcionista']">
-        <a routerLink="listapacientes" class="sidebar__nav-link">
+        <a routerLink="listapacientes" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
           <i class="fa fa-user sidebar__icon"></i>
           <span>Pacientes</span>
         </a>
       </li>
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR', 'medico', 'recepcionista']">
-        <a routerLink="listahistorial" class="sidebar__nav-link">
+        <a routerLink="listahistorial" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
           <i class="fa fa-history sidebar__icon"></i>
           <span>Historial</span>
         </a>
@@ -82,28 +82,28 @@
       </p>
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a routerLink="listamedicos" class="sidebar__nav-link">
+        <a routerLink="listamedicos" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
           <i class="fa fa-user-md sidebar__icon"></i>
           <span>Médicos</span>
         </a>
       </li>
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a routerLink="listaespecialidades" class="sidebar__nav-link">
+        <a routerLink="listaespecialidades" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
           <i class="fa fa-book sidebar__icon"></i>
           <span>Especialidades</span>
         </a>
       </li>
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR', 'medico']">
-        <a routerLink="listaconsultas" class="sidebar__nav-link">
+        <a routerLink="listaconsultas" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
           <i class="fa fa-thermometer-empty sidebar__icon"></i>
           <span>Consultas</span>
         </a>
       </li>
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a routerLink="listahorarios" class="sidebar__nav-link">
+        <a routerLink="listahorarios" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
           <i class="fa fa-calendar sidebar__icon"></i>
           <span>Horarios</span>
         </a>
@@ -115,14 +115,14 @@
       </p>
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a routerLink="listaconsultorios" class="sidebar__nav-link">
+        <a routerLink="listaconsultorios" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
           <i class="fa fa-bed sidebar__icon"></i>
           <span>Consultorios</span>
         </a>
       </li>
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a routerLink="listausuarios" class="sidebar__nav-link">
+        <a routerLink="listausuarios" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
           <i class="fa fa-users sidebar__icon"></i>
           <span>Usuarios</span>
         </a>
@@ -132,7 +132,7 @@
 
   <button class="sidebar__logout" (click)="cerrarSesion()">
     <i class="fas fa-power-off sidebar__logout-icon"></i>
-    <span>Logout</span>
+    <span>Cerrar sesión</span>
   </button>
 </aside>
 <!--End SideBar-->
