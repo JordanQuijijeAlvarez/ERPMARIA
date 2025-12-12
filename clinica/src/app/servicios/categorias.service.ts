@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
-import { InSubcategoria } from '../modelos/modeloSubcategoria/InSubcategoria';
 import { InCategoria } from '../modelos/modeloCategoria/InCategoria';
 
 @Injectable({
@@ -27,28 +26,28 @@ export class CategoriasService {
   }
 
 
-  LSubcategorias (): Observable<InSubcategoria[]> {
+  LSubcategorias (): Observable<InCategoria[]> {
 
-    return this.http.get<InSubcategoria[]>(`${this.urlServidor}/Subcategorias/listar`);
+    return this.http.get<InCategoria[]>(`${this.urlServidor}/categorias/listar`);
   }
-  LSubcategoriasId(id: number): Observable<InSubcategoria> {
+  LSubcategoriasId(id: number): Observable<InCategoria> {
 
-    return this.http.get<InSubcategoria[]>(`${this.urlServidor}/Subcategorias/${id}`).pipe(map((Subcategorias) => Subcategorias[0]));
-  }
-
-
-  CrearConsultorio(Subcategorias: InSubcategoria): Observable<any> {
-
-    return this.http.post(`${this.urlServidor}/Subcategorias/Registrar`, Subcategorias);
+    return this.http.get<InCategoria[]>(`${this.urlServidor}/categorias/${id}`).pipe(map((Subcategorias) => Subcategorias[0]));
   }
 
 
-  EliminarConsultorio(id:number):Observable<any>{
-    return this.http.delete(`${this.urlServidor}/Subcategorias/eliminar/${id}`);
+  CrearConsultorio(Subcategorias: InCategoria): Observable<any> {
+
+    return this.http.post(`${this.urlServidor}/categorias/Registrar`, Subcategorias);
+  }
+
+
+  EliminarCategoria(id:number):Observable<any>{
+    return this.http.delete(`${this.urlServidor}/categorias/eliminar/${id}`);
 
   }
-  ActualizarConsultorio(Subcategorias: InSubcategoria): Observable<any> {
+  ActualizarCategoria(Subcategorias: InCategoria): Observable<any> {
 
-    return this.http.put(`${this.urlServidor}/Subcategorias/Actualizar`, Subcategorias);
+    return this.http.put(`${this.urlServidor}/categorias/Actualizar`, Subcategorias);
   }
 }

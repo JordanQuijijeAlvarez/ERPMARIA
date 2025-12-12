@@ -1,21 +1,11 @@
 import { Routes } from '@angular/router';
 import { ComponenteloginComponent } from './components/pages/login/componentelogin/componentelogin.component';
 import { DashboardComponent } from './components/pages/dashboard/dashboard.component';
-import { ListapacientesComponent } from './components/pages/pacientes/listapacientes/listapacientes.component';
-import { FrmpacientesComponent } from './components/pages/pacientes/frmpacientes/frmpacientes.component';
-import { ListamedicosComponent } from './components/pages/medicos/listamedicos/listamedicos.component';
-import { FrmmedicosComponent } from './components/pages/medicos/frmmedicos/frmmedicos.component';
-import { FrmcitasComponent } from './components/pages/citas/frmcitas/frmcitas.component';
-import { FrmconsultasComponent } from './components/pages/consultas/frmconsultas/frmconsultas.component';
-import { ListaconsultoriosComponent } from './components/pages/consultorios/listaconsultorios/listaconsultorios.component';
-import { FrmconsultoriosComponent } from './components/pages/consultorios/frmconsultorio/frmconsultorios.component';
 import { listaEspecialidadesComponent } from './components/pages/especialidades/listaespecialidades/listaespecialidades.component';
 import { FrmespecialidadsComponent } from './components/pages/especialidades/frmespecialidades/frmespecialidades.component';
 import { listaHorariosComponent } from './components/pages/horarios/listahorarios/listahorarios.component';
 import { FrmhorariosComponent } from './components/pages/horarios/frmhorarios/frmhorarios.component';
 import { PanelprincipalComponent } from './components/ui/panelprincipal/panelprincipal.component';
-import { listaConsultasComponent } from './components/pages/consultas/listaconsultas/listaconsultas.component';
-import { listaHistorialComponent } from './components/pages/historial/listaHistorial/listahistorial.component';
 import { ListausuariosComponent } from './components/pages/usuarios/listausuarios/listausuarios.component';
 import { FrmusuariosComponent } from './components/pages/usuarios/frmusuarios/frmusuarios.component';
 
@@ -31,6 +21,12 @@ import { ListaproductosComponent } from './components/pages/productos/listaprodu
 import { FrmproductoComponent } from './components/pages/productos/frmproductos/frmproductos.component';
 import { FrmventasComponent } from './components/pages/ventas/frmventas/frmventas.component';
 import { listaVentasComponent } from './components/pages/ventas/listaventas/listaventas.component';
+import { ListaproveedoresComponent } from './components/pages/proveedores/listaproveedores/listaproveedores.component';
+import { frmProveedoresComponent } from './components/pages/proveedores/frmproveedores/frmproveedores.component';
+import { FrmCategoriasComponent } from './components/pages/categorias/frmcategorias/frmcategorias.component';
+import { ListaCategoriasComponent } from './components/pages/categorias/listacategorias/listacategorias.component';
+import { ListaComprasComponent } from './components/pages/ventas copy/listacompras/listacompras.component';
+import { FrmComprasComponent } from './components/pages/ventas copy/frmcompras/frmcompras.component';
 
 export const routes: Routes = [
 
@@ -116,64 +112,64 @@ export const routes: Routes = [
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
       },
-      // Médicos
+      
+      // COMPRAS
       {
-        path: 'listamedicos',
-        component: ListamedicosComponent,
+        path: 'crearCompra',
+        component: FrmComprasComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
       },
-      {
-        path: 'crearMedico',
-        component: FrmmedicosComponent,
+       {
+        path: 'listacompras',
+        component: ListaComprasComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
       },
-      {
-        path: 'actualizarMedico/:id',
-        component: FrmmedicosComponent,
+ {
+        path: 'actualizarCompra/:id',
+        component: FrmComprasComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
       },
 
-      // Citas (Ejemplo: solo rol "recepcionista" puede agendar citas)
-      {
-        path: 'frmcitas',
-        component: FrmcitasComponent,
-        canActivate: [RoleGuard],
-        data: { roles: ['ADMINISTRADOR', 'recepcionista'] },
-      },
 
-      // Consultas
+            // PROVEEDOR
       {
-        path: 'listaconsultas',
-        component: listaConsultasComponent,
-        canActivate: [RoleGuard],
-        data: { roles: ['ADMINISTRADOR', 'medico'] },
-      },
-      {
-        path: 'realizarConsulta',
-        component: FrmconsultasComponent,
-        canActivate: [RoleGuard],
-        data: { roles: ['ADMINISTRADOR', 'medico'] },
-      },
-
-      // Consultorios
-      {
-        path: 'listaconsultorios',
-        component: ListaconsultoriosComponent,
+        path: 'crearProveedor',
+        component: frmProveedoresComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
       },
-      {
-        path: 'crearConsultorios',
-        component: FrmconsultoriosComponent,
+       {
+        path: 'listaproveedor',
+        component: ListaproveedoresComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
       },
+ {
+        path: 'actualizarProveedor/:id',
+        component: frmProveedoresComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['ADMINISTRADOR'] },
+      },
+     
+             // CATEGORIAS
       {
-        path: 'actualizarConsultorios/:id',
-        component: FrmconsultoriosComponent,
+        path: 'crearCategoria',
+        component: FrmCategoriasComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['ADMINISTRADOR'] },
+      },
+       {
+        path: 'listacategoria',
+        component: ListaCategoriasComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['ADMINISTRADOR'] },
+      },
+ {
+        path: 'actualizarCategoria/:id',
+        component: FrmCategoriasComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
       },
@@ -238,13 +234,7 @@ export const routes: Routes = [
         data: { roles: ['ADMINISTRADOR'] },
       },
 
-      // Historial Clínico (Ejemplo: solo rol "medico" puede ver el historial)
-      {
-        path: 'listahistorial',
-        component: listaHistorialComponent,
-        canActivate: [RoleGuard],
-        data: { roles: ['ADMINISTRADOR', 'medico', 'recepcionista'] },
-      },
+      
       {
         path: 'historial/imprimir/:codigo',
         component: reporteHistorialComponent,

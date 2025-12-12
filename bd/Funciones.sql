@@ -729,3 +729,253 @@ EXCEPTION
         );
 END;
  
+
+
+
+ ----------------------------------PROVEEDOR -----------------------------------------------
+
+
+ -- =============================================
+-- 1. TRIGGER DE AUDITORÍA PARA PROVEEDORES
+-- =============================================
+CREATE OR REPLACE TRIGGER trg_auditoria_proveedor
+AFTER INSERT OR UPDATE OR DELETE ON PROVEEDOR
+FOR EACH ROW
+DECLARE
+    v_operacion     VARCHAR2(50);
+    v_id_afectado   NUMBER;
+    v_antiguo       CLOB;
+    v_nuevo         CLOB;
+BEGIN
+
+    IF DELETING THEN
+        v_operacion := 'ELIMINAR';
+        v_id_afectado := :OLD.prove_id;
+
+        v_antiguo := TO_CLOB(
+            JSON_OBJECT(
+                'prove_id'          VALUE :OLD.prove_id,
+                'prove_ruc'         VALUE :OLD.prove_ruc,
+                'prove_nombre'      VALUE :OLD.prove_nombre,
+                'prove_telefono'    VALUE :OLD.prove_telefono,
+                'prove_correo'      VALUE :OLD.prove_correo,
+                'prove_direccion'   VALUE :OLD.prove_direccion,
+                'prove_descripcion' VALUE :OLD.prove_descripcion,
+                'prove_estado'      VALUE :OLD.prove_estado
+            )
+        );
+
+        v_nuevo := NULL;
+
+    ELSIF UPDATING THEN
+
+        v_operacion := 'ACTUALIZAR';
+        v_id_afectado := :NEW.prove_id;
+
+        v_antiguo := TO_CLOB(
+            JSON_OBJECT(
+                'prove_id'          VALUE :OLD.prove_id,
+                'prove_ruc'         VALUE :OLD.prove_ruc,
+                'prove_nombre'      VALUE :OLD.prove_nombre,
+                'prove_telefono'    VALUE :OLD.prove_telefono,
+                'prove_correo'      VALUE :OLD.prove_correo,
+                'prove_direccion'   VALUE :OLD.prove_direccion,
+                'prove_descripcion' VALUE :OLD.prove_descripcion,
+                'prove_estado'      VALUE :OLD.prove_estado
+            )
+        );
+
+        v_nuevo := TO_CLOB(
+            JSON_OBJECT(
+                'prove_id'          VALUE :NEW.prove_id,
+                'prove_ruc'         VALUE :NEW.prove_ruc,
+                'prove_nombre'      VALUE :NEW.prove_nombre,
+                'prove_telefono'    VALUE :NEW.prove_telefono,
+                                'prove_correo'      VALUE :NEW.prove_correo,
+
+                'prove_direccion'   VALUE :NEW.prove_direccion,
+                'prove_descripcion' VALUE :NEW.prove_descripcion,
+                'prove_estado'      VALUE :NEW.prove_estado
+            )
+        );
+
+    ELSIF INSERTING THEN
+
+        v_operacion := 'REGISTRAR';
+        v_id_afectado := :NEW.prove_id;
+
+        v_antiguo := NULL;
+
+        v_nuevo := TO_CLOB(
+            JSON_OBJECT(
+                'prove_id'          VALUE :NEW.prove_id,
+                'prove_ruc'         VALUE :NEW.prove_ruc,
+                'prove_nombre'      VALUE :NEW.prove_nombre,
+                'prove_telefono'    VALUE :NEW.prove_telefono,
+                                'prove_correo'      VALUE :NEW.prove_correo,
+
+                'prove_direccion'   VALUE :NEW.prove_direccion,
+                'prove_descripcion' VALUE :NEW.prove_descripcion,
+                'prove_estado'      VALUE :NEW.prove_estado
+            )
+        );
+
+    END IF;
+
+    -- Insertamos sin el ID (asumiendo IDENTITY en la tabla AUDITORIA)
+    INSERT INTO AUDITORIA (
+        audi_tabla, audi_registroid, audi_operacion,
+        audi_datoantig, audi_datonuevo, audi_fechregistro, audi_estado
+    ) VALUES (
+        'PROVEEDOR', v_id_afectado, v_operacion,
+        v_antiguo, v_nuevo, SYSDATE, '1'
+    );
+
+END;
+/
+
+ALTER TRIGGER trg_auditoria_proveedor ENABLE;
+
+
+-- =============================================
+-- 2. PROCEDIMIENTOS CRUD
+-- =============================================
+
+-- Registrar Proveedor
+CREATE OR REPLACE PROCEDURE registrarproveedor(
+    p_ruc           IN VARCHAR2,
+    p_nombre        IN VARCHAR2,
+    p_telefono      IN VARCHAR2,
+    p_correo        IN VARCHAR2,
+    p_direccion     IN VARCHAR2,
+    p_descripcion   IN VARCHAR2
+) AS
+BEGIN
+    INSERT INTO PROVEEDOR (
+        prove_ruc, 
+        prove_nombre, 
+        prove_telefono, 
+        prove_direccion, 
+                        prove_correo   ,
+        prove_descripcion, 
+        prove_estado, 
+        prove_fechregistro
+    ) VALUES (
+        p_ruc, 
+        p_nombre, 
+        p_telefono, 
+        p_correo,
+        p_direccion, 
+        p_descripcion, 
+        '1', 
+        SYSDATE
+    );
+
+    COMMIT;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
+END;
+/
+
+-- Actualizar Proveedor
+CREATE OR REPLACE PROCEDURE actualizarproveedor(
+    p_id            IN NUMBER,
+    p_ruc           IN VARCHAR2,
+    p_nombre        IN VARCHAR2,
+    p_telefono      IN VARCHAR2,
+    p_correo        IN VARCHAR2,
+    p_direccion     IN VARCHAR2,
+    p_descripcion   IN VARCHAR2
+) AS
+BEGIN
+    UPDATE PROVEEDOR
+    SET 
+        prove_ruc         = p_ruc,
+        prove_nombre      = p_nombre,
+        prove_telefono    = p_telefono,
+        prove_correo      = p_correo,  
+        prove_direccion   = p_direccion,
+        prove_descripcion = p_descripcion
+    WHERE prove_id = p_id;
+
+    COMMIT;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
+END;
+/
+
+-- Eliminar Proveedor (Lógico)
+CREATE OR REPLACE PROCEDURE eliminarproveedor(p_id IN NUMBER) 
+AS
+BEGIN
+    UPDATE PROVEEDOR 
+    SET prove_estado = '0' 
+    WHERE prove_id = p_id;
+
+    COMMIT;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
+END;
+/
+
+-- =============================================
+-- 3. FUNCIÓN DE LISTADO
+-- =============================================
+
+CREATE OR REPLACE FUNCTION listarproveedoresestado(p_estado IN CHAR) 
+RETURN SYS_REFCURSOR 
+AS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR 
+        SELECT 
+            prove_id,        
+            prove_ruc,
+            prove_nombre,
+            prove_telefono,
+            prove_correo,
+            prove_direccion,
+            prove_descripcion,
+            prove_fechregistro
+        FROM PROVEEDOR
+        WHERE prove_estado = p_estado;
+        
+    RETURN v_cursor;
+END;
+/
+
+
+-- =============================================
+-- 3. FUNCIÓN DE LISTADO
+-- =============================================
+
+CREATE OR REPLACE FUNCTION listarproveedoresrucestado(p_ruc in VARCHAR2,p_estado IN CHAR) 
+RETURN SYS_REFCURSOR 
+AS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR 
+        SELECT 
+            prove_id,        
+            prove_ruc,
+            prove_nombre,
+            prove_telefono,
+            prove_correo,
+            prove_direccion,
+            prove_descripcion,
+            prove_fechregistro
+        FROM PROVEEDOR
+        WHERE prove_estado = p_estado and prove_ruc=p_ruc;
+        
+    RETURN v_cursor;
+END;
+/

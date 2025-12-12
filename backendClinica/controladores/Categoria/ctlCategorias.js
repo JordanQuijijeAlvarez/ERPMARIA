@@ -1,4 +1,4 @@
-const poolsec = require('../../configuracion/dbmini'); // Si ya no usas pg, esta linea quiza sobre, pero la dejo por si acaso
+// Eliminamos la referencia a Postgres y dejamos solo Oracle
 const { getConnection, oracledb } = require('../../configuracion/oraclePool');
 
 // ==========================================================
@@ -16,105 +16,172 @@ function formatearSalida(rows) {
     });
 }
 
-
-
-
+// ==========================================================
+// 1. LISTAR CATEGORÍAS POR ESTADO (Usando Cursor)
+// ==========================================================
 exports.getCategoriasEstado = async (req, res) => {
-  
-         const { estado } = req.params;
-         let connection;
-     
-         try {
-             connection = await getConnection();
-             const result = await connection.execute(
-                 `SELECT cat_id,cat_nombre FROM CATEGORIA WHERE cat_estado = :estado`,
-                 [estado],
-                 { outFormat: oracledb.OUT_FORMAT_OBJECT }
-             );
-     
-             if (result.rows.length > 0) {
-                 const categoriaFormat = formatearSalida(result.rows);
-                 res.json(categoriaFormat);
-             } else {
-                 res.status(400).json({ error: "NO EXISTE CATEGORIAS" });
-             }
-     
-         } catch (error) {
-             console.log(error);
-             res.status(500).json({ error: "ERROR EN EL SERVIDOR" });
-         } finally {
-             if (connection) await connection.close();
-         }
-   };
+     const { estado } = req.params;
+       let connection;
    
+       try {
+           connection = await getConnection();
+           
+           const result = await connection.execute(
+               `BEGIN :cursor := listarcategoriasestado(:estado); END;`,
+               {
+                   estado: estado,
+                   cursor: { type: oracledb.CURSOR, dir: oracledb.BIND_OUT }
+               },
+               { outFormat: oracledb.OUT_FORMAT_OBJECT }
+           );
+   
+           const resultSet = result.outBinds.cursor;
+           let rows = [];
+           let row;
+           
+           while ((row = await resultSet.getRow())) {
+               rows.push(row);
+           }
+   
+           await resultSet.close();
+   
+           // Enviamos formateado a minúsculas
+           res.json(formatearSalida(rows));
+   
+       } catch (error) {
+           console.error(error);
+           res.status(500).json({ message: error.message });
+       } finally {
+           if (connection) {
+               try { await connection.close(); } catch (err) { console.error(err); }
+           }
+       }
+};
 
+// ==========================================================
+// 2. OBTENER CATEGORÍA POR ID (Para cargar el formulario de editar)
+// ==========================================================
+exports.getCategoriaId = async (req, res) => {
+    const { id } = req.params;
+    let connection;
 
+    try {
+        connection = await getConnection();
 
+        const result = await connection.execute(
+            `BEGIN :cursor := obtenercategoriaid(:id); END;`,
+            {
+                id: id,
+                     cursor: { type: oracledb.CURSOR, dir: oracledb.BIND_OUT }
+               },
+               { outFormat: oracledb.OUT_FORMAT_OBJECT }
+           );
+   
+           const resultSet = result.outBinds.cursor;
+           let rows = [];
+           let row;
+           
+           while ((row = await resultSet.getRow())) {
+               rows.push(row);
+           }
+   //
+           await resultSet.close();
+   
+           // Enviamos formateado a minúsculas
+           res.json(formatearSalida(rows));
+   
+       } catch (error) {
+           console.error(error);
+           res.status(500).json({ message: error.message });
+       } finally {
+           if (connection) {
+               try { await connection.close(); } catch (err) { console.error(err); }
+           }
+       }
+    };
+
+// ==========================================================
+// 3. REGISTRAR CATEGORÍA
+// ==========================================================
 exports.Registrarcategoria = async (req, res) => {
-    
+    // Asegúrate que desde el front envíes estos nombres exactos en el JSON
     const { cat_nombre, cat_descripcion } = req.body;
     let connection;
 
     try {
         connection = await getConnection();
 
-        // 1. CORREGIDO: Se agregó el nombre de la tabla 'CATEGORIA'
-        // 2. CORREGIDO: Se eliminó el 'commit;' del string
-        const query = `INSERT INTO CATEGORIA (cat_nombre, cat_descripcion) VALUES (:cat_nombre, :cat_descripcion)`;
+        // Usamos el PROCEDIMIENTO ALMACENADO
+        const query = `BEGIN registrarcategoria(:nombre, :descripcion); END;`;
         
-        // 3. CORREGIDO: Se usa un Objeto {} en lugar de un Array [] para coincidir con los :nombres
         const values = {
-            cat_nombre: cat_nombre,
-            cat_descripcion: cat_descripcion
+            nombre: cat_nombre,
+            descripcion: cat_descripcion
         };
 
         await connection.execute(query, values, { autoCommit: true });
         
-        res.status(200).json({ message: 'Categoria registrada exitosamente' });
+        res.status(200).json({ message: 'Categoría registrada exitosamente' });
 
     } catch (error) {
         console.log(error);
-        res.status(400).json({ error: "No se pudo registrar la categoria", details: error.message });
+        res.status(400).json({ error: "No se pudo registrar la categoría", details: error.message });
     } finally {
         if (connection) await connection.close();
     }
 };
+
+// ==========================================================
+// 4. ACTUALIZAR CATEGORÍA
+// ==========================================================
 exports.Actualizarcategoria = async (req, res) => {
-    // CORRECCIÓN: Necesitamos el ID para saber qué actualizar
-    const {cat_id, nombre, descripcion} = req.body; 
+    const { cat_id, cat_nombre, cat_descripcion } = req.body; 
+    let connection;
     
-    const query ='SELECT actualizarcategoria($1, $2, $3);';
-    const values = [cat_id, nombre, descripcion];
-    
-    console.log(values);
     try {
-        const actor = await poolsec.connect();
-        await actor.query(query,values);
-        actor.release();
-        res.status(200).json({message:'categoria actualizada'});
+        connection = await getConnection();
+
+        const query = `BEGIN actualizarcategoria(:id, :nombre, :descripcion); END;`;
+        
+        const values = {
+            id: cat_id,
+            nombre: cat_nombre,
+            descripcion: cat_descripcion
+        };
+
+        await connection.execute(query, values, { autoCommit: true });
+
+        res.status(200).json({ message: 'Categoría actualizada correctamente' });
     
     } catch (error) {
         console.log(error);
-        res.status(400).json({error: error.message});
+        res.status(400).json({ error: "Error al actualizar la categoría", details: error.message });
+    } finally {
+        if (connection) await connection.close();
     }
 };
 
+// ==========================================================
+// 5. ELIMINAR CATEGORÍA (Lógico)
+// ==========================================================
 exports.eliminarCategoria = async (req, res) => {
-    const {id} = req.params;
-    // CORRECCIÓN: Sintaxis correcta y sin callbacks
-    const query ='SELECT eliminarcategoria($1);';
-    const values = [id];
+    const { id } = req.params;
+    let connection;
 
-    console.log(values);
     try {
-        const actor = await poolsec.connect();
-        await actor.query(query, values);
-        actor.release();
+        connection = await getConnection();
+
+        const query = `BEGIN eliminarcategoria(:id); END;`;
+        const values = { id: id };
+
+        await connection.execute(query, values, { autoCommit: true });
         
-        res.status(200).json({message:"El registro se eliminó correctamente"});
+        res.status(200).json({ message: "La categoría se eliminó correctamente" });
         
     } catch (error) {
         console.log(error);
-        res.status(500).json({error:"ERROR EN EL SERVIDOR"});
+        res.status(500).json({ error: "ERROR EN EL SERVIDOR", details: error.message });
+    } finally {
+        if (connection) await connection.close();
     }
 };

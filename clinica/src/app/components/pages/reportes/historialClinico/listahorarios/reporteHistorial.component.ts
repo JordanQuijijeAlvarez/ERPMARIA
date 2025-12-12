@@ -3,8 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { CommonModule } from '@angular/common';
-import { historialService } from '../../../../../servicios/historial.service';
-import { InHistorial } from '../../../../../modelos/modeloHistorial/InHistorial';
 import { jsPDF } from 'jspdf';
 
 
@@ -15,14 +13,14 @@ import { jsPDF } from 'jspdf';
     styleUrl: './reporteHistorial.component.css'
 })
 export class reporteHistorialComponent {
-  listaHistorial: InHistorial|null=null;
+  listaHistorial: any|null=null;
 
   constructor(
     private http: HttpClient,
     private router : Router,
     private route: ActivatedRoute,
 
-    private servicioHistorial: historialService,
+    //private servicioHistorial: historialService,
     
     
   ){
@@ -34,7 +32,7 @@ export class reporteHistorialComponent {
       const codigo = parametros.get('codigo');
 
       if (codigo) {
-        this.BuscarConsultaPorCodigoConsulta(parseInt(codigo));
+        //this.BuscarConsultaPorCodigoConsulta(parseInt(codigo));
       } else {
         
       }
@@ -42,18 +40,18 @@ export class reporteHistorialComponent {
   }
 
 
-  BuscarConsultaPorCodigoConsulta(codigoConsulta: number): void {
-    this.servicioHistorial.LhistorialCodigoConsulta(codigoConsulta).subscribe({
-      next: (res) => {
+  // BuscarConsultaPorCodigoConsulta(codigoConsulta: number): void {
+  //   this.servicioHistorial.LhistorialCodigoConsulta(codigoConsulta).subscribe({
+  //     next: (res) => {
 
-        this.listaHistorial=res;
-      },
-      error: (err) => {
-        console.error('Error cargar medicos:', err.message);
+  //       this.listaHistorial=res;
+  //     },
+  //     error: (err) => {
+  //       console.error('Error cargar medicos:', err.message);
           
-      },
-    });
-  }
+  //     },
+  //   });
+  // }
 
 
 

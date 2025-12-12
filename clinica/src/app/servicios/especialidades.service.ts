@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { InEspecialidades } from '../modelos/modeloEspecialidades/InEspecialidades';
-import { InMedico } from '../modelos/modelMedicos/InMedico';
 
 @Injectable({
   providedIn: 'root'
@@ -48,10 +47,6 @@ export class especialidadesService {
   }
 
 
-  LespecialidadesMedicos (id: number): Observable<InMedico[]> {
-
-    return this.http.get<InMedico[]>(`${this.urlServidor}/citas/medicoEspecialidad/${id}`);
-  }
-
+ 
 
 }

@@ -1,0 +1,251 @@
+<div class="min-h-screen p-6">
+  <div class="max-w-7xl mx-auto">
+    <div class="mb-8">
+      <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">
+              GESTIÓN DE CATEGORÍAS
+            </h2>
+            <p class="text-gray-500 text-sm">Administre las categorías de productos registradas en el sistema</p>
+          </div>
+          
+          <div class="flex items-center gap-4 w-full sm:w-auto">
+            <div class="relative flex-1 sm:w-80">
+              <input
+                type="text"
+                [(ngModel)]="searchTerm"
+                (input)="onSearch($any($event.target).value)"
+                class="w-full px-4 py-3 pl-12 pr-10 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
+                placeholder="Buscar por nombre o descripción..."
+              />
+              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <i class="fas fa-search text-gray-400"></i>
+              </div>
+              
+              <button
+                *ngIf="isSearching"
+                type="button"
+                (click)="clearSearch()"
+                class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                title="Limpiar búsqueda"
+              >
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+        <div class="flex items-center gap-4">
+          <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+            <i class="fas fa-layer-group text-gray-600 mr-2"></i>
+            Categorías Registradas
+          </h3>
+          
+          <div *ngIf="isSearching" class="flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
+            <i class="fas fa-search text-xs"></i>
+            <span>{{ filteredCategorias.length }} resultado(s) para "{{ searchTerm }}"</span>
+            <button 
+              (click)="clearSearch()"
+              class="ml-1 text-blue-600 hover:text-blue-800 transition-colors duration-200"
+              title="Limpiar búsqueda"
+            >
+              <i class="fas fa-times text-xs"></i>
+            </button>
+          </div>
+        </div>
+        
+        <a routerLink="../crearCategoria">
+          <button
+            type="button"
+            class="px-6 py-3 bg-gray-800 text-white font-semibold rounded-lg shadow-md hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 cursor-pointer flex items-center gap-2"
+          >
+            <i class="fas fa-plus-circle"></i>
+            <span>Nueva Categoría</span>
+          </button>
+        </a>
+      </div>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-1/4">
+                <div class="flex items-center gap-1">
+                  <i class="fas fa-tag text-gray-400 text-xs"></i>
+                  Nombre
+                </div>
+              </th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-2/4">
+                <div class="flex items-center gap-1">
+                  <i class="fas fa-align-left text-gray-400 text-xs"></i>
+                  Descripción
+                </div>
+              </th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-1/4">
+                <div class="flex items-center gap-1">
+                  <i class="fas fa-calendar-alt text-gray-400 text-xs"></i>
+                  Fecha Registro
+                </div>
+              </th>
+              <th class="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider w-24">
+                <div class="flex items-center justify-center gap-1">
+                  <i class="fas fa-cogs text-gray-400 text-xs"></i>
+                  Acciones
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngIf="filteredCategorias.length === 0" class="border-b border-gray-200">
+              <td colspan="4" class="px-6 py-8 text-center">
+                <div class="flex flex-col items-center justify-center space-y-3">
+                  <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-search text-gray-400 text-2xl" *ngIf="isSearching"></i>
+                    <i class="fas fa-folder-open text-gray-400 text-2xl" *ngIf="!isSearching"></i>
+                  </div>
+                  <div class="text-gray-500">
+                    <p class="text-lg font-medium" *ngIf="isSearching">No se encontraron categorías</p>
+                    <p class="text-lg font-medium" *ngIf="!isSearching">No hay categorías registradas</p>
+                    <p class="text-sm mt-1" *ngIf="isSearching">
+                      No hay registros que coincidan con "{{ searchTerm }}"
+                    </p>
+                    <p class="text-sm mt-1" *ngIf="!isSearching">
+                      Comience agregando una nueva categoría al sistema
+                    </p>
+                  </div>
+                  <button 
+                    *ngIf="isSearching"
+                    (click)="clearSearch()"
+                    class="px-4 py-2 text-sm text-blue-600 hover:text-blue-800 transition-colors duration-200"
+                  >
+                    <i class="fas fa-times mr-1"></i>
+                    Limpiar búsqueda
+                  </button>
+                </div>
+              </td>
+            </tr>
+            
+            <tr *ngFor="let categoria of paginatedCategorias" class="hover:bg-gray-50 transition-colors duration-200">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="h-10 w-10 flex-shrink-0">
+                    <div class="h-10 w-10 rounded-full bg-gradient-to-r from-indigo-400 to-indigo-600 flex items-center justify-center">
+                      <i class="fas fa-tag text-white text-sm"></i>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900">{{ categoria.cat_nombre }}</div>
+                  </div>
+                </div>
+              </td>
+              
+              <td class="px-6 py-4">
+                <div class="text-sm text-gray-500 line-clamp-2" title="{{ categoria.cat_descripcion }}">
+                  {{ categoria.cat_descripcion || 'Sin descripción' }}
+                </div>
+              </td>
+
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center text-sm text-gray-500">
+                   <i class="far fa-calendar mr-2 text-gray-400"></i>
+                   {{ categoria.cat_id | date:'dd/MM/yyyy' }}
+                </div>
+              </td>
+
+              <td class="px-6 py-4 whitespace-nowrap text-center">
+                <div class="flex items-center justify-center space-x-2">
+                  <button
+                    (click)="ActualizarCategoria(categoria.cat_id)"
+                    type="button"
+                    class="inline-flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200"
+                    title="Editar categoría"
+                  >
+                    <i class="fas fa-pen text-xs"></i>
+                  </button>
+                  
+                  <button
+                    (click)="eliminarCategoria(categoria.cat_id, categoria.cat_nombre)"
+                    type="button"
+                    class="inline-flex items-center justify-center w-8 h-8 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200"
+                    title="Eliminar categoría"
+                  >
+                    <i class="fas fa-trash text-xs"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="px-6 py-4 bg-gray-50 border-t border-gray-200" *ngIf="totalItems > 0">
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
+          <div class="flex flex-col sm:flex-row items-center gap-4">
+            <div class="text-sm text-gray-600">
+              Mostrando <span class="font-medium">{{ getItemRange().start }}-{{ getItemRange().end }}</span> de <span class="font-medium">{{ totalItems }}</span> categorías
+            </div>
+            
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+              <label for="itemsPerPage" class="text-gray-600">Mostrar:</label>
+              <select 
+                id="itemsPerPage"
+                (change)="changeItemsPerPage(+$any($event.target).value)"
+                [value]="itemsPerPage"
+                class="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 cursor-pointer"
+              >
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+              <span>por página</span>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              (click)="previousPage()"
+              [disabled]="currentPage === 1"
+              class="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              <i class="fas fa-chevron-left mr-1"></i>
+              Anterior
+            </button>
+            
+            <div class="flex items-center gap-1">
+              <button
+                *ngFor="let page of getPageNumbers()"
+                type="button"
+                (click)="goToPage(page)"
+                [class]="page === currentPage 
+                  ? 'w-8 h-8 text-sm font-medium text-white bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 cursor-pointer'
+                  : 'w-8 h-8 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 cursor-pointer'"
+              >
+                {{ page }}
+              </button>
+              
+              <span *ngIf="totalPages > 5 && currentPage < totalPages - 2" class="px-2 text-gray-500">...</span>
+            </div>
+            
+            <button
+              type="button"
+              (click)="nextPage()"
+              [disabled]="currentPage === totalPages"
+              class="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              Siguiente
+              <i class="fas fa-chevron-right ml-1"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
