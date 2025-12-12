@@ -17,22 +17,22 @@
 }
 
 .sidebar__logo {
-	width: 56px;
-	height: 56px;
-	border-radius: var(--radius-full);
-	background: var(--color-bg-card);
+	width: 100%;
+	/* width: 56px;
+	height: 56px; */
+	/* border-radius: var(--radius-full); */
+	/* background: var(--color-bg-card); */
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	margin-bottom: var(--spacing-xl);
+	/* margin-bottom: var(--spacing-xl); */
 	overflow: hidden;
 }
 
 .sidebar__logo-img {
-	width: 80%;
-	height: 80%;
-	object-fit: contain;
-	border-radius: var(--radius-full);
+	width: 90%;
+	/* object-fit: contain; */
+	/* border-radius: var(--radius-full); */
 }
 
 .sidebar__brand {
