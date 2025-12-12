@@ -1,236 +1,138 @@
-<div>
-  <!--Start SideBar-->
-  <aside>
-    <div>
-      <!--Start logo -->
-      <div>
-        <div>
-          <img
+<!--Start SideBar-->
+<aside class="sidebar">
+  <!--Start logo -->
+  <div class="sidebar__logo">
+    <img
+      routerLink="./dashboard"
+      src="/images/icons/iconoestetocopio.png"
+      class="sidebar__logo-img"
+    />
+  </div>
+  <!--End logo -->
 
-          routerLink="./dashboard"
-            src="/images/icons/iconoestetocopio.png"
-            
-          />
-        </div>
-      </div>
-      <!--End logo -->
-      <!--Start NavItem   error mover a .ts  @click="openMenu !== 1 ? openMenu = 1 : openMenu = null"-->
-      <div>
-        <ul>
-          <li
-            (click)="toggleMenu(1)"
-          >
-            <i class="fas fa-align-left fa-sm"></i>
-          </li>
-          
+  <nav class="sidebar__nav">
+    <ul class="sidebar__nav-list">
+      <!-- CLIENTES -->
+      <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR']">
+        Clientes
+      </p>
 
-          <li
-            (click)="cerrarSesion()"
-          >
-            <i class="fas fa-power-off fa-sm colorIconosSliderStandar"></i>
-          </li>
-        </ul>
-      </div>
-      <!--End NavItem -->
-    </div>
-  </aside>
-  <!-- Start Open Menu  "-->
-  <aside
-    [class.animate__fadeInLeft]="openMenu === 1 && !isClosing"
-    [class.animate__fadeOutLeft]="isClosing"
-    *ngIf="openMenu === 1 || isClosing"
-  >
-    <div>
-      <!--Start Sidebar for open menu -->
-      <div>
-
-    <!-- CLIENTES -->
-        <div
-        *appMostrarSiRol="['ADMINISTRADOR']"
-        >
-          <p class="font-bold numletrasidebar">
-            Clientes
-          </p>
-        </div>
-
-        <!-- boton lista clientes -->
-        <a
-          *appMostrarSiRol="['ADMINISTRADOR']"
-          routerLink="listarclientes"
-        >
-          <div>
-            <i class="fa fa-street-view colorIconosSliderStandar"></i>
-          </div>
-          <p>Clientes</p>
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
+        <a routerLink="listarclientes" class="sidebar__nav-link">
+          <i class="fa fa-street-view sidebar__icon"></i>
+          <span>Clientes</span>
         </a>
+      </li>
 
-
-         <!-- boton lista productos -->
-        <a
-          *appMostrarSiRol="['ADMINISTRADOR']"
-          routerLink="listarproductos"
-        >
-          <div>
-            <i class="fa fa-street-view colorIconosSliderStandar"></i>
-          </div>
-          <p>PRODUCTOS</p>
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
+        <a routerLink="listarproductos" class="sidebar__nav-link">
+          <i class="fa fa-box sidebar__icon"></i>
+          <span>Productos</span>
         </a>
-          <!-- boton lista ventas -->
-        <a
-          *appMostrarSiRol="['ADMINISTRADOR']"
-          routerLink="listaventas"
-        >
-          <div>
-            <i class="fa fa-street-view colorIconosSliderStandar"></i>
-          </div>
-          <p>VENTAS</p>
+      </li>
+
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
+        <a routerLink="listaventas" class="sidebar__nav-link">
+          <i class="fa fa-shopping-cart sidebar__icon"></i>
+          <span>Ventas</span>
         </a>
+      </li>
 
+      <!-- CITAS -->
+      <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR', 'recepcionista']">
+        Citas
+      </p>
 
-
-
-
-        <!-- CITAS -->
-        <div *appMostrarSiRol="['ADMINISTRADOR', 'recepcionista']">
-          <p class="font-bold numletrasidebar">Citas</p>
-        </div>
-
-        <a
-          *appMostrarSiRol="['medico']"
-          routerLink="dashboard"
-        >
-          <div>
-            <i class="fas fa-chart-pie fa-sm colorIconosSliderStandar"></i>
-          </div>
-          <p>Dashboard</p>
+      <li class="sidebar__nav-item" *appMostrarSiRol="['medico']">
+        <a routerLink="dashboard" class="sidebar__nav-link">
+          <i class="fas fa-chart-pie sidebar__icon"></i>
+          <span>Dashboard</span>
         </a>
+      </li>
 
-        <!-- boton lista citas -->
-        <a
-          *appMostrarSiRol="['ADMINISTRADOR', 'recepcionista']"
-          routerLink="frmcitas"
-        >
-          <div>
-            <i class="fas fa-stethoscope colorIconosSliderStandar"></i>
-          </div>
-          <p>Citas</p>
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR', 'recepcionista']">
+        <a routerLink="frmcitas" class="sidebar__nav-link">
+          <i class="fas fa-stethoscope sidebar__icon"></i>
+          <span>Citas</span>
         </a>
+      </li>
 
-        <!-- PACIENTES -->
-        <div
-          *appMostrarSiRol="['ADMINISTRADOR', 'recepcionista']"
-        >
-          <p class="font-bold numletrasidebar">
-            Pacientes
-          </p>
-        </div>
+      <!-- PACIENTES -->
+      <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR', 'recepcionista']">
+        Pacientes
+      </p>
 
-        <!-- boton lista paciente -->
-        <a
-          *appMostrarSiRol="['ADMINISTRADOR', 'recepcionista']"
-          routerLink="listapacientes"
-        >
-          <div>
-            <i class="fa fa-street-view colorIconosSliderStandar"></i>
-          </div>
-          <p>Pacientes</p>
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR', 'recepcionista']">
+        <a routerLink="listapacientes" class="sidebar__nav-link">
+          <i class="fa fa-user sidebar__icon"></i>
+          <span>Pacientes</span>
         </a>
+      </li>
 
-        <!-- boton lista historial clinico -->
-        <a
-          *appMostrarSiRol="['ADMINISTRADOR', 'medico', 'recepcionista']"
-          routerLink="listahistorial"
-        >
-          <div>
-            <i class="fa fa-history colorIconosSliderStandar"></i>
-          </div>
-          <p>Historial</p>
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR', 'medico', 'recepcionista']">
+        <a routerLink="listahistorial" class="sidebar__nav-link">
+          <i class="fa fa-history sidebar__icon"></i>
+          <span>Historial</span>
         </a>
+      </li>
 
-        <!-- MEDICOS -->
-        <div *appMostrarSiRol="['ADMINISTRADOR']">
-          <p class="font-bold numletrasidebar">
-            Médicos
-          </p>
-        </div>
+      <!-- MEDICOS -->
+      <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR']">
+        Médicos
+      </p>
 
-        <!-- boton lista medico -->
-        <a
-          *appMostrarSiRol="['ADMINISTRADOR']"
-          routerLink="listamedicos"
-        >
-          <div>
-            <i class="fa fa-user-md colorIconosSliderStandar"></i>
-          </div>
-          <p>Médicos</p>
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
+        <a routerLink="listamedicos" class="sidebar__nav-link">
+          <i class="fa fa-user-md sidebar__icon"></i>
+          <span>Médicos</span>
         </a>
+      </li>
 
-        <!-- boton lista especialidades -->
-        <a
-          *appMostrarSiRol="['ADMINISTRADOR']"
-          routerLink="listaespecialidades"
-        >
-          <div>
-            <i class="fa fa-book colorIconosSliderStandar"></i>
-          </div>
-          <p>Especialidades</p>
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
+        <a routerLink="listaespecialidades" class="sidebar__nav-link">
+          <i class="fa fa-book sidebar__icon"></i>
+          <span>Especialidades</span>
         </a>
+      </li>
 
-        <!-- boton lista consultas -->
-        <a
-          *appMostrarSiRol="['ADMINISTRADOR', 'medico']"
-          routerLink="listaconsultas"
-        >
-          <div>
-            <i class="fa fa-thermometer-empty colorIconosSliderStandar"></i>
-          </div>
-          <p>Consultas</p>
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR', 'medico']">
+        <a routerLink="listaconsultas" class="sidebar__nav-link">
+          <i class="fa fa-thermometer-empty sidebar__icon"></i>
+          <span>Consultas</span>
         </a>
+      </li>
 
-        <!-- boton lista horarios -->
-        <a
-          *appMostrarSiRol="['ADMINISTRADOR']"
-          routerLink="listahorarios"
-        >
-          <div>
-            <i class="fa fa-calendar colorIconosSliderStandar"></i>
-          </div>
-          <p>Horarios</p>
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
+        <a routerLink="listahorarios" class="sidebar__nav-link">
+          <i class="fa fa-calendar sidebar__icon"></i>
+          <span>Horarios</span>
         </a>
+      </li>
 
+      <!-- ADMINISTRACIÓN -->
+      <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR']">
+        Administración
+      </p>
 
-
-        <!-- Otros -->
-        <div *appMostrarSiRol="['ADMINISTRADOR']">
-          <p class="font-bold numletrasidebar">Administración</p>
-        </div>
-
-        <!-- boton lista consultorios -->
-        <a
-          *appMostrarSiRol="['ADMINISTRADOR']"
-          routerLink="listaconsultorios"
-        >
-          <div>
-            <i class="fa fa-bed colorIconosSliderStandar"></i>
-          </div>
-          <p>Consultorios</p>
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
+        <a routerLink="listaconsultorios" class="sidebar__nav-link">
+          <i class="fa fa-bed sidebar__icon"></i>
+          <span>Consultorios</span>
         </a>
+      </li>
 
-        <!-- boton lista usuarios -->
-        <a
-          *appMostrarSiRol="['ADMINISTRADOR']"
-          routerLink="listausuarios"
-        >
-          <div>
-            <i class="fa fa-users colorIconosSliderStandar"></i>
-          </div>
-          <p>Usuarios</p>
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
+        <a routerLink="listausuarios" class="sidebar__nav-link">
+          <i class="fa fa-users sidebar__icon"></i>
+          <span>Usuarios</span>
         </a>
-      </div>
-      <!--End Sidebar for open menu -->
-    </div>
-  </aside>
-  <!-- End Open Menu -->
+      </li>
+    </ul>
+  </nav>
 
-  <!-- End Sidebar -->
-</div>
+  <button class="sidebar__logout" (click)="cerrarSesion()">
+    <i class="fas fa-power-off sidebar__logout-icon"></i>
+    <span>Logout</span>
+  </button>
+</aside>
+<!--End SideBar-->

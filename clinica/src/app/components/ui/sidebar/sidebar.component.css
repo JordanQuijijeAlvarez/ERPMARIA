@@ -1,0 +1,107 @@
+/* BEM: sidebar principal rojo moderno */
+.sidebar {
+	width: 240px;
+	background: #e50914;
+	color: #fff;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 32px 0 24px 0;
+	border-radius: 32px 0 0 32px;
+	box-shadow: 0 4px 32px rgba(0,0,0,0.08);
+}
+.sidebar__logo {
+	width: 56px;
+	height: 56px;
+	border-radius: 50%;
+	background: #fff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: 32px;
+	overflow: hidden;
+}
+.sidebar__logo-img {
+	width: 80%;
+	height: 80%;
+	object-fit: contain;
+	border-radius: 50%;
+}
+.sidebar__brand {
+	font-size: 1.5rem;
+	font-weight: bold;
+	margin-bottom: 40px;
+	letter-spacing: 1px;
+	text-align: center;
+}
+.sidebar__nav {
+	width: 100%;
+	flex: 1;
+}
+.sidebar__nav-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	width: 100%;
+}
+.sidebar__nav-item {
+	width: 100%;
+	margin-bottom: 8px;
+}
+.sidebar__nav-link {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding: 12px 32px;
+	color: #fff;
+	text-decoration: none;
+	border-radius: 12px;
+	font-size: 1rem;
+	font-weight: 500;
+	transition: background 0.2s, color 0.2s;
+	position: relative;
+}
+.sidebar__nav-link--active,
+.sidebar__nav-link:hover {
+	background: #fff;
+	color: #e50914;
+}
+.sidebar__nav-link .sidebar__icon {
+	font-size: 1.2rem;
+	width: 24px;
+	text-align: center;
+}
+.sidebar__logout {
+	margin-top: 32px;
+	width: 80%;
+	background: #fff;
+	color: #e50914;
+	border: none;
+	border-radius: 24px;
+	padding: 12px 0;
+	font-size: 1.1rem;
+	font-weight: bold;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	cursor: pointer;
+	transition: background 0.2s, color 0.2s;
+}
+.sidebar__logout:hover {
+	background: #e50914;
+	color: #fff;
+	border: 2px solid #fff;
+}
+.sidebar__logout-icon {
+	font-size: 1.2rem;
+}
+.sidebar__section-title {
+	font-size: 0.95rem;
+	font-weight: bold;
+	margin: 24px 0 8px 32px;
+	color: #fff;
+	opacity: 0.8;
+	letter-spacing: 0.5px;
+}
