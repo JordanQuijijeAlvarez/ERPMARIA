@@ -1,0 +1,55 @@
+/* ========================================
+   TEMA ALTERNATIVO: AZUL
+   Descomenta este bloque para usar la paleta azul
+   ======================================== */
+
+/* 
+:root {
+  --color-primary: #1976d2;
+  --color-primary-hover: #1565c0;
+  --color-primary-light: #e3f2fd;
+  --color-primary-dark: #0d47a1;
+}
+*/
+
+/* ========================================
+   TEMA ALTERNATIVO: VERDE
+   Descomenta este bloque para usar la paleta verde
+   ======================================== */
+
+/* 
+:root {
+  --color-primary: #4caf50;
+  --color-primary-hover: #388e3c;
+  --color-primary-light: #e8f5e9;
+  --color-primary-dark: #2e7d32;
+}
+*/
+
+/* ========================================
+   TEMA ALTERNATIVO: MORADO
+   Descomenta este bloque para usar la paleta morada
+   ======================================== */
+
+/* 
+:root {
+  --color-primary: #9c27b0;
+  --color-primary-hover: #7b1fa2;
+  --color-primary-light: #f3e5f5;
+  --color-primary-dark: #6a1b9a;
+}
+*/
+
+/* ========================================
+   TEMA ALTERNATIVO: NARANJA
+   Descomenta este bloque para usar la paleta naranja
+   ======================================== */
+
+/* 
+:root {
+  --color-primary: #ff9800;
+  --color-primary-hover: #f57c00;
+  --color-primary-light: #fff3e0;
+  --color-primary-dark: #e65100;
+}
+*/

@@ -1,75 +1,8 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 /* ========================================
-   VARIABLES CSS - TEMA
+   IMPORTAR ARQUITECTURA DE ESTILOS
    ======================================== */
-:root {
-  /* Colores primarios */
-  --color-primary: #e50914;
-  --color-primary-hover: #b00710;
-  --color-primary-light: #ffebee;
-  
-  /* Colores secundarios */
-  --color-secondary: #333;
-  --color-secondary-hover: #555;
-  
-  /* Colores de texto */
-  --color-text-primary: #333;
-  --color-text-secondary: #666;
-  --color-text-light: #999;
-  
-  /* Colores de fondo */
-  --color-bg-main: #f9f9f9;
-  --color-bg-card: #fff;
-  --color-bg-hover: #f5f5f5;
-  --color-bg-input: #fff;
-  
-  /* Colores de bordes */
-  --color-border: #e0e0e0;
-  --color-border-light: #f0f0f0;
-  
-  /* Colores de estado */
-  --color-success: #4caf50;
-  --color-success-hover: #388e3c;
-  --color-success-light: #e8f5e9;
-  
-  --color-warning: #ff9800;
-  --color-warning-hover: #e65100;
-  --color-warning-light: #fff3e0;
-  
-  --color-danger: #f44336;
-  --color-danger-hover: #c62828;
-  --color-danger-light: #ffebee;
-  
-  --color-info: #2196f3;
-  --color-info-hover: #1976d2;
-  --color-info-light: #e3f2fd;
-  
-  /* Sombras */
-  --shadow-sm: 0 2px 4px rgba(0,0,0,0.04);
-  --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
-  --shadow-lg: 0 4px 16px rgba(0,0,0,0.12);
-  
-  /* Espaciados */
-  --spacing-xs: 8px;
-  --spacing-sm: 12px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-  
-  /* Border radius */
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-full: 9999px;
-  
-  /* Transiciones */
-  --transition-fast: 0.15s ease;
-  --transition-normal: 0.2s ease;
-  --transition-slow: 0.3s ease;
-}
+@import './styles/_variables.css';
+@import './styles/_themes.css';
 
 /* ========================================
    RESET Y BASE
