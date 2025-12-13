@@ -21,7 +21,7 @@ export interface InDetalleCompra {
     prod_id:number,
 	detc_cantidad: number,
 	detc_subtotal: number,
-	detc_estado:number,
+	detc_estado?:number,
 }
 
 export interface InCompraCompleto {

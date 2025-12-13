@@ -12,6 +12,7 @@ router.get('/listar', authenticateToken,
 router.get('/:id', authenticateToken,
     ctlCompras.getcompraId);
 
+  
 router.delete('/Eliminar/:id', authenticateToken,
    ctlCompras.eliminarcompra);
 

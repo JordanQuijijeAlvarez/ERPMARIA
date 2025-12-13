@@ -25,67 +25,34 @@ export class compraService {
   
 CrearCompra(venta: InCompraCompleto): Observable<any> {
 
-    return this.http.post(`${this.urlServidor}/ventas/Registrar`, venta);
+    return this.http.post(`${this.urlServidor}/compras/Registrar`, venta);
   }
 
 
 
   getDetalleCompras(id: number): Observable<any> {
 
-    return this.http.get<any>(`${this.urlServidor}/ventas/detalle/${id}`);
+    return this.http.get<any>(`${this.urlServidor}/compras/detalle/${id}`);
   }
 
   getComprasEstado(estado: number): Observable<any> {
 
-    return this.http.get<any>(`${this.urlServidor}/ventas/${estado}`);
+    return this.http.get<any>(`${this.urlServidor}/compras/listar/${estado}`);
   }
 
-  ObtenerCompraPorId(idVenta: number): Observable<any> {
-    return this.http.get<any>(`${this.urlServidor}/ventas/obtener/${idVenta}`);
-
+  ObtenerCompraPorId(idCompra: number): Observable<any> {
+    return this.http.get<any>(`${this.urlServidor}/compras/${idCompra}`);
   }
 
-    ActualizarCompra(idVenta: number,venta: InCompraCompleto): Observable<any> {
-    return this.http.put(`${this.urlServidor}/ventas/Actualizar/${idVenta}`,venta);
+    ActualizarCompra(venta: InCompraCompleto): Observable<any> {
+    return this.http.put(`${this.urlServidor}/compras/Actualizar`,venta);
 
   } 
 
   
   AnularCompra(id:number):Observable<any>{
-    return this.http.delete(`${this.urlServidor}/ventas/Anular/${id}`);
+    return this.http.delete(`${this.urlServidor}/compras/Anular/${id}`);
 
   }
-
-
-  LproductosEstado (estado: number): Observable<InProductoDetalle[]> {
-
-    return this.http.get<InProductoDetalle[]>(`${this.urlServidor}/productos/listar/${estado}`);
-  }
-
-  BuscarprodCodBarras (codbarra: string,estado: number): Observable<InProducto> {
-
-    return this.http.get<InProducto>(`${this.urlServidor}/productos/${codbarra}/${estado}`);
-  }
-
-  Lproductos (): Observable<InProducto[]> {
-
-    return this.http.get<InProducto[]>(`${this.urlServidor}/productos/listar`);
-  }
-  LproductosId(id: number): Observable<InProducto> {
-
-    return this.http.get<InProducto>(`${this.urlServidor}/productos/${id}`);
-  }
-
-  LproductosinUsuario (): Observable<InProducto[]> {
-    return this.http.get<InProducto[]>(`${this.urlServidor}/productos/ListarSinUsuario`);
-  }
-
-  
-
-  Actualizarproducto(producto: InProducto): Observable<any> {
-
-    return this.http.put(`${this.urlServidor}/productos/Actualizar`, producto);
-  }
-
 
 }

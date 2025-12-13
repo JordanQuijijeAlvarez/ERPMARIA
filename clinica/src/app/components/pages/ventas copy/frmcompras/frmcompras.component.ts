@@ -35,7 +35,8 @@ export class FrmComprasComponent implements OnInit {
   
   // Totales
   ivaPorcentaje: number = 15; // Ajustable
-  iva: number = 0;
+  iva: number = 15;
+  subiva: number = 0;
   subtotal: number = 0;
   total: number = 0;
 
@@ -89,10 +90,11 @@ export class FrmComprasComponent implements OnInit {
     // Usamos el método que busca por RUC y estado '1' (activo)
     this.servicioProveedor.LproveedorRucEstado(ruc, '1').subscribe({
       next: (res: any) => {
-        if (res) {
-          this.proveedorId = res.PROVE_ID || res.prove_id; // Ajusta según tu BD (Oracle devuelve mayúsculas a veces)
-          this.getNombreProveedor.setValue(res.PROVE_NOMBRE || res.prove_nombre);
-          this.getDatosAdicionales.setValue((res.PROVE_DIRECCION || res.prove_direccion) + ' - ' + (res.PROVE_TELEFONO || res.prove_telefono));
+        const proveedor = Array.isArray(res) ? (res[0] || null) : res;
+        if (proveedor) {
+          this.proveedorId = proveedor.prove_id;
+          this.getNombreProveedor.setValue(proveedor.PROVE_NOMBRE || proveedor.prove_nombre);
+          this.getDatosAdicionales.setValue((proveedor.PROVE_DIRECCION || proveedor.prove_direccion) + ' - ' + (proveedor.PROVE_TELEFONO || proveedor.prove_telefono));
         } else {
           this.alertaServ.info('No encontrado', 'No existe un proveedor activo con ese RUC.');
           this.limpiarProveedor();
@@ -191,9 +193,8 @@ export class FrmComprasComponent implements OnInit {
 
   calcularTotales() {
     this.subtotal = this.listaDetalles.reduce((acc, item) => acc + item.subtotal, 0);
-    // Calcular IVA
-    this.iva = this.subtotal * (this.ivaPorcentaje / 100);
-    this.total = this.subtotal + this.iva;
+    this.subiva = this.subtotal * (this.iva / 100);
+    this.total = this.subtotal + this.subiva;
   }
 
   // ==========================================
@@ -206,9 +207,8 @@ export class FrmComprasComponent implements OnInit {
         compra_id: this.eventoUpdate ? this.codigoCompra : 0, // <--- AQUÍ EL CAMBIO IMPORTANTE
         prod_id: item.id_producto,
         detc_cantidad: item.cantidad,
-        detc_subtotal: item.subtotal,
-        detc_estado: 1
-    }));
+        detc_subtotal: item.subtotal
+          }));
 
     const objCompra: InCompraCompleto = {
       compra_id: this.eventoUpdate ? this.codigoCompra : 0,
@@ -217,9 +217,9 @@ export class FrmComprasComponent implements OnInit {
       user_id: 1, // ID del usuario logueado
       compra_total: this.total,
       compra_iva: this.iva,
+      compra_subiva: this.subiva,
       compra_horafecha: new Date().toISOString(), // Fecha actual
       detalle_compra: detalles,
-      compra_subiva: 0,
       compra_descripcion: ''
     };
 
@@ -246,7 +246,7 @@ export class FrmComprasComponent implements OnInit {
 
     if (this.eventoUpdate) {
       // ACTUALIZAR (Solo si está permitido editar compras)
-      this.servicioCompras.ActualizarCompra(this.codigoCompra, compraObjeto).subscribe({
+      this.servicioCompras.ActualizarCompra( compraObjeto).subscribe({
         next: (res) => {
           this.alertaServ.success('Actualizado', 'Orden de compra modificada correctamente');
           this.router.navigate(['home/listacompras']);

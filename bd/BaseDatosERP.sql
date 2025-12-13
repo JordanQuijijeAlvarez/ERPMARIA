@@ -297,3 +297,9 @@ COMMIT;
 
 
 --se agrego el campo compra_descripcion y compra_subiva 
+
+---ejecutar una sola vez;
+
+ALTER TABLE COMPRA DROP CONSTRAINT SYS_C007828;
+ALTER TABLE COMPRA ADD CONSTRAINT CK_COMPRA_ESTADOREGISTRO 
+CHECK (compra_estadoregistro IN ('P', 'R', '0', '1'));

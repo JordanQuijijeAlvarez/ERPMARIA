@@ -1,191 +1,282 @@
-const poolsec = require('../../configuracion/dbmini');
+const { getConnection, oracledb } = require('../../configuracion/oraclePool');
 
+// ==========================================================
+// HELPER: Convertir llaves a minúsculas
+// ==========================================================
+function formatearSalida(rows) {
+    if (!rows || rows.length === 0) return [];
+    return rows.map(obj => {
+        const newObj = {};
+        Object.keys(obj).forEach(key => {
+            newObj[key.toLowerCase()] = obj[key];
+        });
+        return newObj;
+    });
+}
+
+// ==========================================================
+// 1. LISTAR COMPRAS POR ESTADO (Activas/Anuladas)
+// ==========================================================
 exports.getComprasEstado = async (req, res) => {
-     
-    const {estado} = req.params;
-    const query = 'SELECT * FROM listarComprasEstado($1)';
-    const values = [estado]
+    const { estado } = req.params;
+    let connection;
+
     try {
-        const result = await poolsec.query(query,values);
-        res.json(result.rows);
+        connection = await getConnection();
+
+        // Usamos la Vista VW_COMPRAS filtrando por estado
+        // estado: 1 (Activas), 0 (Anuladas)
+        const result = await connection.execute(
+            `SELECT * FROM VW_COMPRAS WHERE compra_estado = :estado ORDER BY compra_id DESC`,
+            [estado],
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        const compras = formatearSalida(result.rows);
+        res.json(compras);
+
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error(error);
+        res.status(500).json({ message: "Error al listar compras", details: error.message });
+    } finally {
+        if (connection) await connection.close();
     }
 };
 
-
+// ==========================================================
+// 2. LISTAR TODAS LAS COMPRAS
+// ==========================================================
 exports.getCompras = async (req, res) => {
-     
-    const query = 'SELECT * FROM compra;';
+    let connection;
     try {
-        const result = await poolsec.query(query);
-        res.json(result.rows);
+        connection = await getConnection();
+        
+        const result = await connection.execute(
+            `SELECT * FROM VW_COMPRAS ORDER BY compra_id DESC`,
+            [],
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        res.json(formatearSalida(result.rows));
     } catch (error) {
         res.status(500).json({ message: error.message });
+    } finally {
+        if (connection) await connection.close();
     }
 };
 
+// ==========================================================
+// 3. OBTENER COMPRA POR ID (Cabecera + Detalles)
+// ==========================================================
 exports.getcompraId = async (req, res) => {
-    const {id} = req.params;
-    
-    // CAMBIO: Usamos la función que trae todo junto
-    const query ='SELECT * FROM obtener_compra_full($1)'; 
-    const values = [id];
+    const { id } = req.params;
+    let connection;
 
     try {
-        const result = await poolsec.query(query,values);
-        
-        if (result.rowCount > 0){
-            // result.rows[0] tendrá { datos_compra: {...}, items: [...] }
-            res.json(result.rows[0]); 
-        } else {
-            res.status(400).json({error:"NO EXISTE ESA COMPRA"});
+        connection = await getConnection();
+
+        // A. Obtener Cabecera
+        const resultCabecera = await connection.execute(
+            `SELECT * FROM VW_COMPRAS WHERE compra_id = :id`,
+            [id],
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        if (resultCabecera.rows.length === 0) {
+            return res.status(404).json({ error: "NO EXISTE ESA COMPRA" });
         }
+
+        // B. Obtener Detalles
+        const resultDetalles = await connection.execute(
+            `SELECT * FROM VW_DETALLE_COMPRA WHERE compra_id = :id`,
+            [id],
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        // Formatear
+        const cabecera = formatearSalida(resultCabecera.rows)[0];
+        const items = formatearSalida(resultDetalles.rows);
+
+        // C. Unir respuesta (Formato que espera tu Front para Edición/Visualización)
+        // Nota: Adaptamos los nombres para que coincidan con lo que espera tu 'cargarVentaParaEditar' en Angular
+        const respuesta = {
+            ...cabecera,
+            detalle_compra: items 
+        };
+
+        res.json(respuesta);
+
     } catch (error) {
         console.log(error);
-        res.status(500).json({error:"ERROR EN EL SERVIDOR"});
+        res.status(500).json({ error: "ERROR EN EL SERVIDOR" });
+    } finally {
+        if (connection) await connection.close();
     }
 };
 
+// ==========================================================
+// 4. REGISTRAR COMPRA
+// ==========================================================
 exports.Registrarcompra = async (req, res) => {
-
-    // 1. AHORA EXTRAEMOS TAMBIÉN "detalles" DEL BODY
     const { 
         local_id, 
         prove_id, 
-        user_id, 
-        fecha_hora, 
-        monto, 
-        iva, 
-        estado_compra, 
-        detalles // <--- Este es el array de productos: [{prod_id:1, cantidad:10...}, ...]
+        user_id,
+        compra_total, // Asegúrate de que Angular envíe este nombre
+        compra_iva,
+        compra_subiva, 
+        compra_descripcion,       
+        detalle_compra 
     } = req.body;
 
-    // 2. CONVERTIMOS EL ARRAY A UN STRING JSON PARA QUE SQL LO ENTIENDA
-    const detallesJson = JSON.stringify(detalles);
-
-    // 3. CAMBIAMOS LA QUERY PARA LLAMAR A LA NUEVA FUNCIÓN QUE ACEPTA 8 PARÁMETROS
-    // (Asumiendo que creaste la función 'registrar_compra_completa' como vimos antes)
-    const query = 'SELECT registrar_compra_completa($1, $2, $3, $4, $5, $6, $7, $8) as respuesta;';
-
-    // 4. AGREGAMOS EL JSON AL FINAL DEL ARRAY DE VALORES
-    const values = [ 
-        local_id, 
-        prove_id, 
-        user_id, 
-        fecha_hora, 
-        monto, 
-        iva, 
-        estado_compra, 
-        detallesJson // <--- El $8
-    ];
-
-    console.log("Datos enviados a la BD:", values);
+    let connection;
 
     try {
-        const actor = await poolsec.connect();
-        const result = await poolsec.query(query, values);
-        actor.release();
+        connection = await getConnection();
 
-        // Si la función SQL devuelve un JSON con el resultado, lo enviamos al front
-        // result.rows[0].respuesta contendrá lo que retorne tu función (ej: { status: 'OK', id: 105 })
-        res.status(200).json(result.rows[0].respuesta); 
-    
+        const detallesJson = JSON.stringify(detalle_compra || []);
+
+        const query = `
+            BEGIN 
+                REGISTRAR_COMPRA_COMPLETA(
+                    :p_local_id, :p_prove_id, :p_user_id, 
+                    :p_monto, :p_iva, :p_subiva, :p_descripcion, 
+                    :p_detalles_json, :p_respuesta
+                ); 
+            END;
+        `;
+
+        const values = {
+            p_local_id: local_id || 1,
+            p_prove_id: prove_id,
+            p_user_id: user_id || 1,
+            p_monto: compra_total || 0,
+            p_iva: compra_iva || 0,
+            p_subiva: compra_subiva || 0,
+            p_descripcion: compra_descripcion || '',
+            p_detalles_json: detallesJson,
+            p_respuesta: { dir: oracledb.BIND_OUT, type: oracledb.CLOB }
+        };
+
+        const result = await connection.execute(query, values, { autoCommit: true });
+        
+        // Procesar CLOB
+        const lob = result.outBinds.p_respuesta;
+        let jsonRespuesta = typeof lob === 'string' ? JSON.parse(lob) : JSON.parse(await lob.getData());
+
+        if (jsonRespuesta.status === 'OK') {
+            res.status(200).json(jsonRespuesta);
+        } else {
+            res.status(400).json({ error: jsonRespuesta.message });
+        }
+
     } catch (error) {
         console.log(error);
-        // Enviamos error.message para saber si la BD falló (ej: "Stock insuficiente")
-        res.status(400).json({
-            error: "No se pudo registrar la compra", 
-            detalle: error.message 
-        });
+        res.status(400).json({ error: "No se pudo registrar la compra", details: error.message });
+    } finally {
+        if (connection) await connection.close();
     }
 };
 
+// ==========================================================
+// 5. ACTUALIZAR COMPRA
+// ==========================================================
 exports.Actualizarcompra = async (req, res) => {
-
     const {
-        compra_id, // Necesitamos el ID para saber cuál actualizar
+        compra_id, 
         local_id,
         prove_id,
         user_id,
-        fecha_hora,
-        monto,
-        iva,
-        estado_compra,
-        detalles // Array de productos modificados
+        compra_total,
+        compra_iva,
+        // compra_subiva, // Agregar si el SP lo pide
+        detalle_compra // Array de productos
     } = req.body;
-
-    // 1. Convertimos el array de detalles a String JSON
-    const detallesJson = JSON.stringify(detalles);
-
-    // 2. Llamamos a la función SQL pasando el ID y el JSON al final
-    // Nota: Asumo que la función recibirá 9 parámetros en total
-    const query = 'SELECT actualizar_compra($1, $2, $3, $4, $5, $6, $7, $8, $9) as respuesta;';
-    
-    const values = [
-        compra_id,     // $1
-        local_id,      // $2
-        prove_id,      // $3
-        user_id,       // $4
-        fecha_hora,    // $5
-        monto,         // $6
-        iva,           // $7
-        estado_compra, // $8
-        detallesJson   // $9 (El JSON con los items)
-    ];
-
-    console.log("Datos de actualización enviados:", values);
-
+    let connection;
     try {
-        const actor = await poolsec.connect();
-        const result = await poolsec.query(query, values);
-        actor.release();
+        connection = await getConnection();
+        const detallesJson = JSON.stringify(detalle_compra || []);
 
-        // Devolvemos lo que responda la BD (ej: "Compra actualizada y stock recalculado")
-        res.status(200).json(result.rows[0].respuesta); 
+        const query = `
+            BEGIN 
+                ACTUALIZAR_COMPRA_COMPLETA(
+                    :p_compra_id, :p_local_id, :p_prove_id, :p_user_id, 
+                    :p_monto, :p_iva, :p_detalles_json, :p_respuesta
+                ); 
+            END;
+        `;
+        
+        const values = {
+            p_compra_id: compra_id,
+            p_local_id: local_id || 1,
+            p_prove_id: prove_id,
+            p_user_id: user_id || 1,
+            p_monto: compra_montototal,
+            p_iva: compra_iva,
+            p_detalles_json: detallesJson,
+            p_respuesta: { dir: oracledb.BIND_OUT, type: oracledb.CLOB }
+        };
+
+        const result = await connection.execute(query, values, { autoCommit: true });
+
+        const lob = result.outBinds.p_respuesta;
+        let jsonRespuesta = typeof lob === 'string' ? JSON.parse(lob) : JSON.parse(await lob.getData());
+
+        if (jsonRespuesta.status === 'OK') {
+            res.status(200).json(jsonRespuesta);
+        } else {
+            res.status(400).json({ error: jsonRespuesta.message });
+        }
     
     } catch (error) {
         console.error(error);
-        res.status(400).json({
-            error: "No se pudo actualizar la compra", 
-            detalle: error.message 
-        });
+        res.status(400).json({ error: "No se pudo actualizar la compra", details: error.message });
+    } finally {
+        if (connection) await connection.close();
     }
 };
 
+// ==========================================================
+// 6. ELIMINAR (ANULAR) COMPRA
+// ==========================================================
 exports.eliminarcompra = async (req, res) => {
-
     const { id } = req.params;
-    
-    // Corregido: Quitamos el "FROM" que sobraba y usamos alias para la respuesta
-    const query = 'SELECT eliminar_compra($1) as respuesta;';
-    const values = [id];
+    // Asumiendo que el ID del usuario viene en el body o hardcodeado
+    const user_id = req.body.user_id || 1; 
 
-    console.log("ID a eliminar/anular:", values);
+    let connection;
 
     try {
-        const actor = await poolsec.connect();
+        connection = await getConnection();
         
-        // Usamos await puro, sin callback function
-        const result = await actor.query(query, values);
-        actor.release();
+        // Llamamos al procedimiento ANULAR_COMPRA que definimos previamente
+        const query = `
+            BEGIN 
+                ANULAR_COMPRA(:p_compra_id, :p_user_id, :p_respuesta); 
+            END;
+        `;
+        
+        const values = {
+            p_compra_id: id,
+            p_user_id: user_id,
+            p_respuesta: { dir: oracledb.BIND_OUT, type: oracledb.CLOB }
+        };
 
-        // Verificamos qué devolvió la base de datos
-        // La función SQL debería retornar un JSON o texto confirmando la anulación
-        const respuestaBD = result.rows[0].respuesta;
+        const result = await connection.execute(query, values, { autoCommit: true });
 
-        if (respuestaBD) {
-            res.status(200).json({ message: "Proceso completado", db_response: respuestaBD });
+        const lob = result.outBinds.p_respuesta;
+        let jsonRespuesta = typeof lob === 'string' ? JSON.parse(lob) : JSON.parse(await lob.getData());
+
+        if (jsonRespuesta.status === 'OK') {
+            res.status(200).json({ message: "Compra anulada correctamente", db_response: jsonRespuesta });
         } else {
-            res.status(404).json({ error: "No se encontró el registro o ya estaba anulado" });
+            res.status(404).json({ error: jsonRespuesta.message });
         }
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ 
-            error: "Error en el servidor al eliminar", 
-            detalle: error.message 
-        });
+        res.status(500).json({ error: "Error en el servidor al eliminar", details: error.message });
+    } finally {
+        if (connection) await connection.close();
     }
 };
-
