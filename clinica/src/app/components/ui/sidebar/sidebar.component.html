@@ -14,7 +14,7 @@
     <ul class="sidebar__nav-list">
       <!-- CLIENTES -->
       <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR']">
-        Clientes
+        Negocio
       </p>
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
@@ -39,9 +39,9 @@
       </li>
 
       <!-- CITAS -->
-      <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR', 'recepcionista']">
+      <!-- <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR', 'recepcionista']">
         Citas
-      </p>
+      </p> -->
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['medico']">
         <a routerLink="dashboard" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
@@ -50,19 +50,19 @@
         </a>
       </li>
 
-      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR', 'recepcionista']">
+      <!-- <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR', 'recepcionista']">
         <a routerLink="frmcitas" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
           <i class="fas fa-stethoscope sidebar__icon"></i>
           <span>Citas</span>
         </a>
-      </li>
+      </li> -->
 
       <!-- PACIENTES -->
-      <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR', 'recepcionista']">
-        Pacientes
-      </p>
+      <!-- <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR', 'recepcionista']">
+        AAA
+      </p> -->
 
-      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR', 'recepcionista']">
+      <!-- <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR', 'recepcionista']">
         <a routerLink="listapacientes" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
           <i class="fa fa-user sidebar__icon"></i>
           <span>Pacientes</span>
@@ -74,14 +74,14 @@
           <i class="fa fa-history sidebar__icon"></i>
           <span>Historial</span>
         </a>
-      </li>
+      </li>  -->
 
       <!-- MEDICOS -->
-      <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR']">
+      <!-- <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR']">
         Médicos
-      </p>
+      </p> -->
 
-      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
+      <!-- <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
         <a routerLink="listamedicos" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
           <i class="fa fa-user-md sidebar__icon"></i>
           <span>Médicos</span>
@@ -107,19 +107,19 @@
           <i class="fa fa-calendar sidebar__icon"></i>
           <span>Horarios</span>
         </a>
-      </li>
+      </li> -->
 
       <!-- ADMINISTRACIÓN -->
       <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR']">
         Administración
       </p>
 
-      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
+      <!-- <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
         <a routerLink="listaconsultorios" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
           <i class="fa fa-bed sidebar__icon"></i>
           <span>Consultorios</span>
         </a>
-      </li>
+      </li> -->
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
         <a routerLink="listausuarios" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">

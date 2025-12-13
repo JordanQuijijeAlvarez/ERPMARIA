@@ -11,7 +11,7 @@
 	background-size: 200px auto, cover;
 	background-blend-mode: soft-light;
 	color: var(--color-text-white);
-	min-height: 100vh;
+	height: 100%;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
