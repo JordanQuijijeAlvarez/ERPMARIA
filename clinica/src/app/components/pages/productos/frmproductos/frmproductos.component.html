@@ -1,13 +1,13 @@
 <form [formGroup]="frmProducto" (ngSubmit)="guardarproducto()">
-  <div class="min-h-screen p-6">
-    <div class="max-w-7xl mx-auto">
+  <div>
+    <div>
       <!-- Header Section -->
-      <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 mb-8">
-        <div class="text-center">
-          <h2 class="text-3xl font-bold text-gray-800 mb-2">
+      <div>
+        <div>
+          <h2>
             {{ eventoUpdate ? 'ACTUALIZAR MÉDICO' : 'REGISTRO DE MÉDICO' }}
           </h2>
-          <p class="text-gray-500 text-sm">
+          <p>
             {{ eventoUpdate ?
             'Modifique la información del médico según sea necesario' : 
             'Complete la información personal y profesional del nuevo médico' }}
@@ -16,28 +16,28 @@
       </div>
 
       <!-- Main Form Container -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div>
 
         <!-- Left Column - Personal Information -->
-        <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <h3 class="text-lg font-semibold text-gray-800 flex items-center">
-              <i class="fas fa-user-edit text-gray-600 mr-2"></i>
+        <div>
+          <div>
+            <h3>
+              <i class="fas fa-user-edit"></i>
               Información Personal
             </h3>
           </div>
 
-          <div class="p-6">
-            <div class="space-y-6">
+          <div>
+            <div>
               <!-- Codigo Barras -->
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">
-                  <i class="fas fa-id-card text-gray-500 mr-1"></i>
+                <label>
+                  <i class="fas fa-id-card"></i>
                   Código de Barras *
                 </label>
                 <input formControlName="txtCodigobarras" type="text" id="codigobarras" autocomplete="address-level2"
                   placeholder="Ingresa el codigo (13 dígitos)" maxlength="13"
-                  class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm" />
+                  />
                 <app-validators [control]="frmProducto.get('txtCodigobarras')!" [showCounter]="true"
                   [expectedLength]="13">
                 </app-validators>
@@ -45,68 +45,68 @@
 
               <!-- Nombres -->
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">
-                  <i class="fas fa-user text-gray-500 mr-1"></i>
+                <label>
+                  <i class="fas fa-user"></i>
                   Nombres *
                 </label>
                 <input formControlName="txtNombres" type="text" id="nombres" autocomplete="given-name"
                   placeholder="Ejemplo: Aceite Palma de oro"
-                  class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm" />
+                  />
                 <app-validators [control]="frmProducto.get('txtNombres')!"></app-validators>
               </div>
 
               <!-- Descripcion -->
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">
-                  <i class="fas fa-user-tag text-gray-500 mr-1"></i>
+                <label>
+                  <i class="fas fa-user-tag"></i>
                   Descripción *
                 </label>
                 <input formControlName="txtDescripcion" type="text" name="last-name" id="descripcion"
                   autocomplete="family-name" placeholder="Ejemplo: Producto de cocina"
-                  class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm" />
+                  />
                 <app-validators [control]="frmProducto.get('txtDescripcion')!"></app-validators>
               </div>
 
               <!-- precio compra -->
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">
-                  <i class="fas fa-calendar-alt text-gray-500 mr-1"></i>
+                <label>
+                  <i class="fas fa-calendar-alt"></i>
                   Precio de Compra *
                 </label>
                 <input formControlName="txtpreciocompra" type="text" id="preciocompra" autocomplete="address-level2"
-                  class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm cursor-pointer" />
+                  />
                 <app-validators [control]="frmProducto.get('txtpreciocompra')!"></app-validators>
               </div>
 
               <!-- precio venta -->
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">
-                  <i class="fas fa-calendar-alt text-gray-500 mr-1"></i>
+                <label>
+                  <i class="fas fa-calendar-alt"></i>
                   Precio de Venta *
                 </label>
                 <input formControlName="txtprecioventa" type="text" id="precioventa" autocomplete="address-level2"
-                  class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm cursor-pointer" />
+                  />
                 <app-validators [control]="frmProducto.get('txtprecioventa')!"></app-validators>
               </div>
 
               <!-- stock -->
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">
-                  <i class="fas fa-calendar-alt text-gray-500 mr-1"></i>
+                <label>
+                  <i class="fas fa-calendar-alt"></i>
                   Stock del Producto *
                 </label>
                 <input formControlName="txtstock" type="number" id="stock" autocomplete="address-level2"
-                  class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm cursor-pointer" />
+                  />
                 <app-validators [control]="frmProducto.get('txtstock')!"></app-validators>
               </div>
               <!-- stock minimo -->
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">
-                  <i class="fas fa-calendar-alt text-gray-500 mr-1"></i>
+                <label>
+                  <i class="fas fa-calendar-alt"></i>
                   Stock del Producto minimo *
                 </label>
                 <input formControlName="txtstockminimo" type="number" id="stock" autocomplete="address-level2"
-                  class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm cursor-pointer" />
+                  />
                 <app-validators [control]="frmProducto.get('txtstockminimo')!"></app-validators>
               </div>
             </div>
@@ -114,26 +114,25 @@
         </div>
 
         <!-- Right Column - Professional Information -->
-        <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <h3 class="text-lg font-semibold text-gray-800 flex items-center">
-              <i class="fas fa-user-md text-gray-600 mr-2"></i>
+        <div>
+          <div>
+            <h3>
+              <i class="fas fa-user-md"></i>
               Información Adicional
             </h3>
           </div>
 
-          <div class="p-6">
-            <div class="space-y-6">
+          <div>
+            <div>
 
               <!-- Subcategorias -->
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">
-                  <i class="fas fa-door-open text-gray-500 mr-1"></i>
+                <label>
+                  <i class="fas fa-door-open"></i>
                   Subcategoria *
                 </label>
-                <select formControlName="cbxSubcategoria" id="subcategoria"
-                  class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm cursor-pointer">
-                  <option value="" disabled selected class="text-gray-400">
+                <select formControlName="cbxSubcategoria" id="subcategoria">
+                  <option value="" disabled selected>
                     Seleccione una subcategoria
                   </option>
                   <option *ngFor="let subcategoria of listaSubcategorias" [value]="subcategoria.subcat_id">
@@ -146,9 +145,7 @@
 
 
 
- <button type="button" (click)="abrirModalAgregarSubcategoria()"
-                    class="px-4 py-3 bg-gray-800 text-white font-semibold rounded-lg shadow-md hover:bg-gray-900 transition-all duration-200 transform hover:scale-105 cursor-pointer"
-                    title="Agregar nueva subcategoría rápidamente">
+ <button type="button" (click)="abrirModalAgregarSubcategoria()" title="Agregar nueva subcategoría rápidamente">
                     <i class="fas fa-plus"></i>
                   </button>
               </div>
@@ -169,15 +166,13 @@
 
 
       <!-- Action Buttons -->
-      <div class="flex items-center justify-end gap-4 mt-8">
-        <button type="button" (click)="salirSinGuardar()"
-          class="px-6 py-3 bg-white text-gray-800 font-semibold rounded-lg shadow-md border border-gray-300 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 cursor-pointer">
-          <i class="fas fa-times mr-2"></i>
+      <div>
+        <button type="button" (click)="salirSinGuardar()">
+          <i class="fas fa-times"></i>
           Cancelar
         </button>
-        <button type="submit"
-          class="px-8 py-3 bg-gray-800 text-white font-semibold rounded-lg shadow-md hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 cursor-pointer">
-          <i class="fas fa-save mr-2"></i>
+        <button type="submit">
+          <i class="fas fa-save"></i>
           {{ eventoUpdate ? 'Actualizar Producto' : 'Guardar Producto' }}
         </button>
       </div>
