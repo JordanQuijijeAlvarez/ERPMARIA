@@ -6,6 +6,7 @@
 
 .panel-principal__sidebar {
   flex-shrink: 0;
+  align-self: stretch;
 }
 
 .panel-principal__contenido {
