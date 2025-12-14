@@ -1,275 +1,243 @@
-<div class="min-h-screen p-6">
-  <div class="max-w-7xl mx-auto">
-    <div class="mb-8">
-      <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h2 class="text-3xl font-bold text-gray-800 mb-2">
-              GESTIÓN DE PROVEEDORES
-            </h2>
-            <p class="text-gray-500 text-sm">Administre la información de los proveedores registrados en el sistema</p>
-          </div>
-          
-          <div class="flex items-center gap-4 w-full sm:w-auto">
-            <div class="relative flex-1 sm:w-80">
-              <input
-                type="text"
-                [(ngModel)]="searchTerm"
-                (input)="onSearch($any($event.target).value)"
-                class="w-full px-4 py-3 pl-12 pr-10 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
-                placeholder="Buscar por nombre, RUC, teléfono..."
-              />
-              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <i class="fas fa-search text-gray-400"></i>
-              </div>
-              
-              <button
-                *ngIf="isSearching"
-                type="button"
-                (click)="clearSearch()"
-                class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors duration-200"
-                title="Limpiar búsqueda"
-              >
-                <i class="fas fa-times"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+<!-- Header Section -->
+<div class="proveedores">
+  <!-- Title and Actions Bar -->
+  <div class="card proveedores-header">
+    <div class="card__header">
+      <h2 class="card__title">
+        GESTIÓN DE PROVEEDORES
+      </h2>
+      <p class="card__subtitle">Administre la información de los proveedores registrados en el sistema</p>
     </div>
-
-    <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-      <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-        <div class="flex items-center gap-4">
-          <h3 class="text-lg font-semibold text-gray-800 flex items-center">
-            <i class="fas fa-truck text-gray-600 mr-2"></i>
-            Proveedores Registrados
-          </h3>
-          
-          <div *ngIf="isSearching" class="flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
-            <i class="fas fa-search text-xs"></i>
-            <span>{{ filteredProveedores.length }} resultado(s) para "{{ searchTerm }}"</span>
-            <button 
-              (click)="clearSearch()"
-              class="ml-1 text-blue-600 hover:text-blue-800 transition-colors duration-200"
-              title="Limpiar búsqueda"
-            >
-              <i class="fas fa-times text-xs"></i>
-            </button>
-          </div>
+    
+    <!-- Search and Actions -->
+    <div class="proveedores-header__search">
+      <!-- Search Input -->
+      <div class="search-box">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="onSearch($any($event.target).value)"
+          placeholder="Buscar por nombre, RUC, teléfono..."
+          class="search-box__input"
+        />
+        <div class="search-box__icon">
+          <i class="fas fa-search"></i>
         </div>
         
-        <a routerLink="../crearProveedor">
-          <button
-            type="button"
-            class="px-6 py-3 bg-gray-800 text-white font-semibold rounded-lg shadow-md hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 cursor-pointer flex items-center gap-2"
-          >
-            <i class="fas fa-plus-circle"></i>
-            <span>Nuevo Proveedor</span>
-          </button>
-        </a>
-      </div>
-      
-      <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th class="px-3 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-32">
-                <div class="flex items-center gap-1">
-                  <i class="fas fa-id-card text-gray-400 text-xs"></i>
-                  RUC
-                </div>
-              </th>
-              <th class="px-3 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-48">
-                <div class="flex items-center gap-1">
-                  <i class="fas fa-building text-gray-400 text-xs"></i>
-                  Proveedor
-                </div>
-              </th>
-             
-              <th class="px-3 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-40">
-                <div class="flex items-center gap-1">
-                  <i class="fas fa-phone text-gray-400 text-xs"></i>
-                  Teléfono
-                </div>
-              </th>
-              <th class="px-3 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider w-44">
-                <div class="flex items-center gap-1">
-                  <i class="fas fa-map-marker-alt text-gray-400 text-xs"></i>
-                  Dirección
-                </div>
-              </th>
-              <th class="px-3 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider w-24">
-                <div class="flex items-center justify-center gap-1">
-                  <i class="fas fa-cogs text-gray-400 text-xs"></i>
-                  Acciones
-                </div>
-              </th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr *ngIf="filteredProveedores.length === 0" class="border-b border-gray-200">
-              <td colspan="8" class="px-6 py-8 text-center">
-                <div class="flex flex-col items-center justify-center space-y-3">
-                  <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-search text-gray-400 text-2xl" *ngIf="isSearching"></i>
-                    <i class="fas fa-truck-loading text-gray-400 text-2xl" *ngIf="!isSearching"></i>
-                  </div>
-                  <div class="text-gray-500">
-                    <p class="text-lg font-medium" *ngIf="isSearching">No se encontraron proveedores</p>
-                    <p class="text-lg font-medium" *ngIf="!isSearching">No hay proveedores registrados</p>
-                    <p class="text-sm mt-1" *ngIf="isSearching">
-                      No hay registros que coincidan con "{{ searchTerm }}"
-                    </p>
-                    <p class="text-sm mt-1" *ngIf="!isSearching">
-                      Comience agregando un nuevo proveedor al sistema
-                    </p>
-                  </div>
-                  <button 
-                    *ngIf="isSearching"
-                    (click)="clearSearch()"
-                    class="px-4 py-2 text-sm text-blue-600 hover:text-blue-800 transition-colors duration-200"
-                  >
-                    <i class="fas fa-times mr-1"></i>
-                    Limpiar búsqueda
-                  </button>
-                </div>
-              </td>
-            </tr>
-            
-            <tr *ngFor="let proveedor of paginatedProveedores" class="hover:bg-gray-50 transition-colors duration-200">
-              <td class="px-3 py-3 whitespace-nowrap w-32">
-                <div class="flex items-center">
-                  <div class="h-8 w-8 flex-shrink-0">
-                    <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
-                      <i class="fas fa-hashtag text-gray-500 text-xs"></i>
-                    </div>
-                  </div>
-                  <div class="ml-2">
-                    <div class="text-sm font-medium text-gray-900">{{proveedor.prove_ruc}}</div>
-                  </div>
-                </div>
-              </td>
-              
-              <td class="px-3 py-3 whitespace-nowrap w-48">
-                <div class="flex items-center">
-                  <div class="h-8 w-8 flex-shrink-0">
-                    <div class="h-8 w-8 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center">
-                      <i class="fas fa-building text-white text-xs"></i>
-                    </div>
-                  </div>
-                  <div class="ml-2">
-                    <div class="text-sm font-medium text-gray-900 truncate" title="{{proveedor.prove_nombre}}">
-                      {{proveedor.prove_nombre}}
-                    </div>
-                  </div>
-                </div>
-              </td>
-
-              <td class="px-3 py-3 whitespace-nowrap w-40">
-                <div class="text-sm text-gray-900 truncate">
-                  <i class="fas fa-phone-alt text-gray-400 mr-1 text-xs"></i>
-                  {{proveedor.prove_telefono}}
-                </div>
-              </td>
-
-              <td class="px-3 py-3 whitespace-nowrap w-44">
-                <div class="text-sm text-gray-900 truncate" title="{{proveedor.prove_direccion}}">
-                  {{proveedor.prove_direccion}}
-                </div>
-              </td>
-
-              <td class="px-3 py-3 whitespace-nowrap text-center w-24">
-                <div class="flex items-center justify-center space-x-1">
-                  <button
-                        *appMostrarSiRol="['ADMINISTRADOR']"
-
-                    (click)="ActualizarProveedor(proveedor.prove_ruc,proveedor.prove_id)"
-                    type="button"
-                    class="inline-flex items-center justify-center w-7 h-7 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200"
-                    title="Editar proveedor"
-                  >
-                    <i class="fas fa-pen text-xs"></i>
-                  </button>
-                  
-                  <button
-                    *appMostrarSiRol="['ADMINISTRADOR']"
-                    (click)="eliminarProveedor(proveedor.prove_id, proveedor.prove_nombre)"
-                    type="button"
-                    class="inline-flex items-center justify-center w-7 h-7 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200"
-                    title="Eliminar proveedor"
-                  >
-                    <i class="fas fa-trash text-xs"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      
-      <div class="px-6 py-4 bg-gray-50 border-t border-gray-200" *ngIf="totalItems > 0">
-        <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
-          <div class="flex flex-col sm:flex-row items-center gap-4">
-            <div class="text-sm text-gray-600">
-              Mostrando <span class="font-medium">{{ getItemRange().start }}-{{ getItemRange().end }}</span> de <span class="font-medium">{{ totalItems }}</span> proveedores
-            </div>
-            
-            <div class="flex items-center gap-2 text-sm text-gray-600">
-              <label for="itemsPerPage" class="text-gray-600">Mostrar:</label>
-              <select 
-                id="itemsPerPage"
-                (change)="changeItemsPerPage(+$any($event.target).value)"
-                [value]="itemsPerPage"
-                class="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 cursor-pointer"
-              >
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
-              <span>por página</span>
-            </div>
-          </div>
-          
-          <div class="flex items-center gap-2">
-            <button
-              type="button"
-              (click)="previousPage()"
-              [disabled]="currentPage === 1"
-              class="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-            >
-              <i class="fas fa-chevron-left mr-1"></i>
-              Anterior
-            </button>
-            
-            <div class="flex items-center gap-1">
-              <button
-                *ngFor="let page of getPageNumbers()"
-                type="button"
-                (click)="goToPage(page)"
-                [class]="page === currentPage 
-                  ? 'w-8 h-8 text-sm font-medium text-white bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 cursor-pointer'
-                  : 'w-8 h-8 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 cursor-pointer'"
-              >
-                {{ page }}
-              </button>
-              
-              <span *ngIf="totalPages > 5 && currentPage < totalPages - 2" class="px-2 text-gray-500">...</span>
-            </div>
-            
-            <button
-              type="button"
-              (click)="nextPage()"
-              [disabled]="currentPage === totalPages"
-              class="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-            >
-              Siguiente
-              <i class="fas fa-chevron-right ml-1"></i>
-            </button>
-          </div>
-        </div>
+        <!-- Clear search button -->
+        <button
+          *ngIf="isSearching"
+          type="button"
+          (click)="clearSearch()"
+          title="Limpiar búsqueda"
+          class="search-box__clear"
+        >
+          <i class="fas fa-times"></i>
+        </button>
       </div>
     </div>
+  </div>
+
+  <!-- Providers Table -->
+  <div class="table-container proveedores-table">
+    <div class="table-header">
+      <div class="proveedores-table__header">
+        <h3 class="table-header__title">
+          <i class="fas fa-truck"></i>
+          Proveedores Registrados
+        </h3>
+        
+        <!-- Search indicator -->
+        <div *ngIf="isSearching" class="badge badge--info">
+          <i class="fas fa-search"></i>
+          <span>{{ filteredProveedores.length }} resultado(s) para "{{ searchTerm }}"</span>
+          <button 
+            (click)="clearSearch()"
+            title="Limpiar búsqueda"
+            class="search-box__clear proveedores-search-badge"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- New Provider Button -->
+      <a routerLink="../crearProveedor">
+        <button type="button" class="btn btn--primary">
+          <i class="fas fa-plus"></i>
+          <span>Nuevo Proveedor</span>
+        </button>
+      </a>
+    </div>
+      
+    
+    <div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>
+              <i class="fas fa-hashtag"></i>
+              RUC
+            </th>
+            <th>
+              <i class="fas fa-building"></i>
+              Proveedor
+            </th>
+            <th>
+              <i class="fas fa-phone"></i>
+              Teléfono
+            </th>
+            <th>
+              <i class="fas fa-map-marker-alt"></i>
+              Dirección
+            </th>
+            <th>
+              <i class="fas fa-cogs"></i>
+              Acciones
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- No results message -->
+          <tr *ngIf="filteredProveedores.length === 0">
+            <td colspan="5">
+              <div class="table__empty">
+                <div class="table__empty-icon">
+                  <i class="fas fa-search" *ngIf="isSearching"></i>
+                  <i class="fas fa-truck" *ngIf="!isSearching"></i>
+                </div>
+                <div>
+                  <p *ngIf="isSearching"><strong>No se encontraron proveedores</strong></p>
+                  <p *ngIf="!isSearching"><strong>No hay proveedores registrados</strong></p>
+                  <p *ngIf="isSearching">
+                    No hay proveedores que coincidan con "{{ searchTerm }}"
+                  </p>
+                  <p *ngIf="!isSearching">
+                    Comience agregando un nuevo proveedor al sistema
+                  </p>
+                </div>
+                <button 
+                  *ngIf="isSearching"
+                  (click)="clearSearch()"
+                  class="btn btn--outline btn--sm proveedores-table__empty-button"
+                >
+                  <i class="fas fa-times"></i>
+                  Limpiar búsqueda
+                </button>
+              </div>
+            </td>
+          </tr>
+            
+          
+          <!-- Provider rows -->
+          <tr *ngFor="let proveedor of paginatedProveedores">
+            <td>
+              <div class="proveedores-table__row-info">
+                <i class="fas fa-hashtag"></i>
+                <span>{{proveedor.prove_ruc}}</span>
+              </div>
+            </td>
+            <td>
+              <div class="proveedores-table__row-info">
+                <i class="fas fa-building"></i>
+                <span>{{proveedor.prove_nombre}}</span>
+              </div>
+            </td>
+            <td title="{{proveedor.prove_telefono}}">{{proveedor.prove_telefono}}</td>
+            <td title="{{proveedor.prove_direccion}}">{{proveedor.prove_direccion}}</td>
+            <td>
+              <div class="table__actions">
+                <!-- Edit Button -->
+                <button
+                  (click)="ActualizarProveedor(proveedor.prove_ruc,proveedor.prove_id)"
+                  type="button"
+                  title="Editar proveedor"
+                  class="btn btn--warning btn--sm btn--icon"
+                >
+                  <i class="fas fa-pen"></i>
+                </button>
+                
+                <!-- Delete Button -->
+                <button
+                  *appMostrarSiRol="['ADMINISTRADOR']"
+                  (click)="eliminarProveedor(proveedor.prove_id, proveedor.prove_nombre)"
+                  type="button"
+                  title="Eliminar proveedor"
+                  class="btn btn--danger btn--sm btn--icon"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Pagination Section -->
+    <div *ngIf="totalItems > 0" class="pagination">
+      <!-- Results info y selector de items por página -->
+      <div class="pagination__info">
+        <div class="pagination__text">
+          Mostrando <span>{{ getItemRange().start }}-{{ getItemRange().end }}</span> de <span>{{ totalItems }}</span> proveedores
+        </div>
+        
+        <!-- Selector de items por página -->
+        <div class="pagination__select-wrapper">
+          <label for="itemsPerPage">Mostrar:</label>
+          <select 
+            id="itemsPerPage"
+            (change)="changeItemsPerPage(+$any($event.target).value)"
+            [value]="itemsPerPage"
+            class="pagination__select"
+          >
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+          <span>por página</span>
+        </div>
+      </div>
+      
+      <!-- Pagination controls -->
+      <div class="pagination__controls">
+        <button
+          type="button"
+          (click)="previousPage()"
+          [disabled]="currentPage === 1"
+          class="pagination__button"
+        >
+          <i class="fas fa-chevron-left"></i>
+          Anterior
+        </button>
+        
+        <div class="pagination__numbers">
+          <button
+            *ngFor="let page of getPageNumbers()"
+            type="button"
+            (click)="goToPage(page)"
+            [class.pagination__number--active]="page === currentPage"
+            class="pagination__number"
+          >
+            {{ page }}
+          </button>
+          
+          <!-- Ellipsis for large page counts -->
+          <span *ngIf="totalPages > 5 && currentPage < totalPages - 2">...</span>
+        </div>
+        
+        <button
+          type="button"
+          (click)="nextPage()"
+          [disabled]="currentPage === totalPages"
+          class="pagination__button"
+        >
+          Siguiente
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
