@@ -12,57 +12,86 @@
 
   <nav class="sidebar__nav">
     <ul class="sidebar__nav-list">
-
-      <!-- NEGOCIO -->
+      <!-- COMERCIAL -->
       <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR']">
-        Negocio
+        Comercial
       </p>
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a routerLink="listarClientes" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
+        <a
+          routerLink="listarClientes"
+          routerLinkActive="sidebar__nav-link--active"
+          class="sidebar__nav-link"
+        >
           <i class="fa fa-street-view sidebar__icon"></i>
           <span>Clientes</span>
         </a>
       </li>
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a routerLink="listarProductos" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
+        <a
+          routerLink="listarVentas"
+          routerLinkActive="sidebar__nav-link--active"
+          class="sidebar__nav-link"
+        >
+          <i class="fa fa-shopping-cart sidebar__icon"></i>
+          <span>Ventas</span>
+        </a>
+      </li>
+
+      <!-- INVENTARIO -->
+      <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR']">
+        Inventario
+      </p>
+
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
+        <a
+          routerLink="listarProductos"
+          routerLinkActive="sidebar__nav-link--active"
+          class="sidebar__nav-link"
+        >
           <i class="fa fa-box sidebar__icon"></i>
           <span>Productos</span>
         </a>
       </li>
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a routerLink="listarVentas" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
-          <i class="fa fa-shopping-cart sidebar__icon"></i>
-          <span>Ventas</span>
+        <a
+          routerLink="listarCategorias"
+          routerLinkActive="sidebar__nav-link--active"
+          class="sidebar__nav-link"
+        >
+          <i class="fa fa-tags sidebar__icon"></i>
+          <span>Categorias</span>
         </a>
       </li>
 
+      <!-- COMPRAS -->
+      <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR']">
+        Compras
+      </p>
+
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a routerLink="listarProveedores" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
+        <a
+          routerLink="listarProveedores"
+          routerLinkActive="sidebar__nav-link--active"
+          class="sidebar__nav-link"
+        >
           <i class="fa fa-truck sidebar__icon"></i>
           <span>Proveedores</span>
         </a>
       </li>
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a routerLink="listarCategorias" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
-          <i class="fa fa-tags sidebar__icon"></i>
-          <span>Categorias</span>
-        </a>
-      </li>
-      
-      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a routerLink="listarCompras" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
+        <a
+          routerLink="listarCompras"
+          routerLinkActive="sidebar__nav-link--active"
+          class="sidebar__nav-link"
+        >
           <i class="fa fa-shopping-bag sidebar__icon"></i>
           <span>Compras</span>
         </a>
       </li>
-
-
-
-
 
       <!-- ADMINISTRACIÓN -->
       <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR']">
@@ -70,7 +99,11 @@
       </p>
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a routerLink="listarUsuarios" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
+        <a
+          routerLink="listarUsuarios"
+          routerLinkActive="sidebar__nav-link--active"
+          class="sidebar__nav-link"
+        >
           <i class="fa fa-users sidebar__icon"></i>
           <span>Usuarios</span>
         </a>
