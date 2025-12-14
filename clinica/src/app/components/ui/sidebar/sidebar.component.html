@@ -12,117 +12,65 @@
 
   <nav class="sidebar__nav">
     <ul class="sidebar__nav-list">
-      <!-- CLIENTES -->
+
+      <!-- NEGOCIO -->
       <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR']">
         Negocio
       </p>
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a routerLink="listarclientes" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
+        <a routerLink="listarClientes" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
           <i class="fa fa-street-view sidebar__icon"></i>
           <span>Clientes</span>
         </a>
       </li>
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a routerLink="listarproductos" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
+        <a routerLink="listarProductos" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
           <i class="fa fa-box sidebar__icon"></i>
           <span>Productos</span>
         </a>
       </li>
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a routerLink="listaventas" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
+        <a routerLink="listarVentas" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
           <i class="fa fa-shopping-cart sidebar__icon"></i>
           <span>Ventas</span>
         </a>
       </li>
 
-      <!-- CITAS -->
-      <!-- <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR', 'recepcionista']">
-        Citas
-      </p> -->
-
-      <li class="sidebar__nav-item" *appMostrarSiRol="['medico']">
-        <a routerLink="dashboard" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
-          <i class="fas fa-chart-pie sidebar__icon"></i>
-          <span>Dashboard</span>
-        </a>
-      </li>
-
-      <!-- <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR', 'recepcionista']">
-        <a routerLink="frmcitas" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
-          <i class="fas fa-stethoscope sidebar__icon"></i>
-          <span>Citas</span>
-        </a>
-      </li> -->
-
-      <!-- PACIENTES -->
-      <!-- <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR', 'recepcionista']">
-        AAA
-      </p> -->
-
-      <!-- <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR', 'recepcionista']">
-        <a routerLink="listapacientes" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
-          <i class="fa fa-user sidebar__icon"></i>
-          <span>Pacientes</span>
-        </a>
-      </li>
-
-      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR', 'medico', 'recepcionista']">
-        <a routerLink="listahistorial" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
-          <i class="fa fa-history sidebar__icon"></i>
-          <span>Historial</span>
-        </a>
-      </li>  -->
-
-      <!-- MEDICOS -->
-      <!-- <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR']">
-        Médicos
-      </p> -->
-
-      <!-- <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a routerLink="listamedicos" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
-          <i class="fa fa-user-md sidebar__icon"></i>
-          <span>Médicos</span>
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
+        <a routerLink="listarProveedores" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
+          <i class="fa fa-truck sidebar__icon"></i>
+          <span>Proveedores</span>
         </a>
       </li>
 
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a routerLink="listaespecialidades" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
-          <i class="fa fa-book sidebar__icon"></i>
-          <span>Especialidades</span>
+        <a routerLink="listarCategorias" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
+          <i class="fa fa-tags sidebar__icon"></i>
+          <span>Categorias</span>
         </a>
       </li>
-
-      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR', 'medico']">
-        <a routerLink="listaconsultas" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
-          <i class="fa fa-thermometer-empty sidebar__icon"></i>
-          <span>Consultas</span>
-        </a>
-      </li>
-
+      
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a routerLink="listahorarios" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
-          <i class="fa fa-calendar sidebar__icon"></i>
-          <span>Horarios</span>
+        <a routerLink="listarCompras" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
+          <i class="fa fa-shopping-bag sidebar__icon"></i>
+          <span>Compras</span>
         </a>
-      </li> -->
+      </li>
+
+
+
+
 
       <!-- ADMINISTRACIÓN -->
       <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR']">
         Administración
       </p>
 
-      <!-- <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a routerLink="listaconsultorios" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
-          <i class="fa fa-bed sidebar__icon"></i>
-          <span>Consultorios</span>
-        </a>
-      </li> -->
-
       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a routerLink="listausuarios" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
+        <a routerLink="listarUsuarios" routerLinkActive="sidebar__nav-link--active" class="sidebar__nav-link">
           <i class="fa fa-users sidebar__icon"></i>
           <span>Usuarios</span>
         </a>
