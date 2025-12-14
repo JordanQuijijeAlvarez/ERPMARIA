@@ -1,7 +1,65 @@
-.margenx{
-    
-        margin-left: -3rem;
-        margin-right: -3rem;
-    
+/* === Contenedor principal === */
+.proveedor-form {
+  padding: 1.5rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* === Sección header === */
+.proveedor-form__section-header {
+  margin-bottom: 1.5rem;
+}
+
+.proveedor-form__section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.proveedor-form__section-title i {
+  color: var(--color-primary);
+  font-size: 1.25rem;
+}
+
+/* === Campos del formulario === */
+.proveedor-form__fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.proveedor-form__field--full {
+  grid-column: 1 / -1;
+}
+
+/* === Acciones === */
+.proveedor-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+/* === Responsividad === */
+@media (max-width: 768px) {
+  .proveedor-form {
+    padding: 1rem;
+  }
+
+  .proveedor-form__fields {
+    grid-template-columns: 1fr;
+  }
+
+  .proveedor-form__actions {
+    flex-direction: column-reverse;
+  }
+
+  .proveedor-form__actions button {
+    width: 100%;
+  }
 }
 
