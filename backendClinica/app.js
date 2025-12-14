@@ -17,6 +17,7 @@ const rutasRoles = require('./rutas/rutasRoles');
 
 const login = require('./controladores/Login/ctlLogin');
 const verificacion = require('./controladores/Verificacion-otp/ctlVerificacion');
+const ctl2FA = require('./controladores/2FA/ctl2FA');
 const authenticateToken = require('./middleware/auth');
 
 const app = express();
@@ -55,4 +56,11 @@ app.post('/recuperacion/cambiarcontrasenia', login.cambiarContrasenia);
 
 // Ruta para verificar OTP
 app.post('/validar-otp', verificacion.validarOTP);
+
+// Rutas para autenticación 2FA
+app.post('/2fa/setup', authenticateToken, ctl2FA.setup2FA);
+app.post('/2fa/verify', ctl2FA.verify2FA);
+app.post('/2fa/disable', authenticateToken, ctl2FA.disable2FA);
+app.get('/2fa/status', ctl2FA.check2FAStatus);
+
 module.exports = app;

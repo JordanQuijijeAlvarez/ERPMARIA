@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const speakeasy = require('speakeasy');
 const SessionManager = require('../../middleware/sessionManager');
 const { sendOTPEmail } = require('../../utils/sendEmail');
 const { getConnection, oracledb } = require('../../configuracion/oraclePool');
@@ -11,6 +12,58 @@ const { getConnection, oracledb } = require('../../configuracion/oraclePool');
 // Función auxiliar para generar código OTP
 function generarCodigoOTP() {
   return Math.floor(100000 + Math.random() * 900000).toString(); // 6 dígitos
+}
+
+// Función auxiliar para verificar 2FA con Google Authenticator
+async function verificar2FAUsuario(connection, userId, token2FA) {
+  const result = await connection.execute(
+    `SELECT secret_2fa, enabled, last_used_code, last_used_at FROM USUARIO_2FA WHERE usuario_id = :id`,
+    { id: userId },
+    { outFormat: oracledb.OUT_FORMAT_OBJECT }
+  );
+
+  if (result.rows.length === 0 || result.rows[0].ENABLED !== 1) {
+    return { required: false, valid: true }; // 2FA no está habilitado
+  }
+
+  if (!token2FA) {
+    return { required: true, valid: false }; // 2FA requerido pero no proporcionado
+  }
+
+  const record = result.rows[0];
+
+  // Verificar si el código ya fue usado recientemente (últimos 90 segundos)
+  if (record.LAST_USED_CODE === token2FA && record.LAST_USED_AT) {
+    const lastUsedTime = new Date(record.LAST_USED_AT).getTime();
+    const now = Date.now();
+    const timeDiff = (now - lastUsedTime) / 1000; // diferencia en segundos
+
+    if (timeDiff < 90) {
+      console.log(`Código 2FA reutilizado. Usado hace ${timeDiff.toFixed(0)} segundos`);
+      return { required: true, valid: false }; // Código ya usado
+    }
+  }
+
+  // Verificar el código TOTP (reducido window a 1 para mayor seguridad)
+  const verified = speakeasy.totp.verify({
+    secret: record.SECRET_2FA,
+    encoding: 'base32',
+    token: token2FA,
+    window: 1 // Solo permite 1 período antes/después (60 segundos total)
+  });
+
+  if (verified) {
+    // Guardar el código usado para prevenir reutilización
+    await connection.execute(
+      `UPDATE USUARIO_2FA 
+       SET last_used_code = :code, last_used_at = CURRENT_TIMESTAMP 
+       WHERE usuario_id = :id`,
+      { code: token2FA, id: userId },
+      { autoCommit: true }
+    );
+  }
+
+  return { required: true, valid: verified };
 }
 
 exports.validacionUsers = async (req, res) => {
@@ -387,7 +440,7 @@ exports.cambiarContrasenia = async (req, res) => {
 
 
 exports.validacionProvUsers = async (req, res) => {
-  const { nombre_usuario, contrasenia } = req.body;
+  const { nombre_usuario, contrasenia, token2fa } = req.body;
   
   if (!nombre_usuario || !contrasenia) {
     return res.status(400).json({ 
@@ -396,23 +449,23 @@ exports.validacionProvUsers = async (req, res) => {
     });
   }
 
-  connection = await getConnection();
-  const query = `
-  SELECT 
-        u.user_id          AS id_usuario,
-        u.user_username    AS nombre_usuario,
-        u.user_contrasenia AS contrasenia,
-        r.rol_nombre       AS rol
-      FROM USUARIO u
-      JOIN USUARIO_ROL ur ON u.user_id = ur.user_id
-      JOIN ROL r ON ur.rol_id = r.rol_id
-      WHERE u.user_username = :username
-        AND u.user_estado = 1
-  `;
-
-
+  let connection;
   try {
-    // const result = await pool.query(query, values);
+    connection = await getConnection();
+    
+    const query = `
+    SELECT 
+          u.user_id          AS id_usuario,
+          u.user_username    AS nombre_usuario,
+          u.user_contrasenia AS contrasenia,
+          r.rol_nombre       AS rol
+        FROM USUARIO u
+        JOIN USUARIO_ROL ur ON u.user_id = ur.user_id
+        JOIN ROL r ON ur.rol_id = r.rol_id
+        WHERE u.user_username = :username
+          AND u.user_estado = 1
+    `;
+
     const result = await connection.execute(
       query,
       { username: nombre_usuario },
@@ -428,17 +481,23 @@ exports.validacionProvUsers = async (req, res) => {
 
     const usuario = result.rows[0];
 
-    
-    console.log("Hash recibido desde Oracle:", usuario.CONTRASENIA);
-    console.log("Contraseña enviada desde Insomnia:", contrasenia);
-    console.log("Resultado de bcrypt.compare:", await bcrypt.compare(contrasenia, usuario.CONTRASENIA));
-
-
     const contraseñaValida = await bcrypt.compare(contrasenia, usuario.CONTRASENIA);
     if (!contraseñaValida) {
       return res.status(401).json({ 
         success: false,
         message: 'Contraseña Incorrecta' 
+      });
+    }
+
+    // Verificar 2FA
+    const verificacion2FA = await verificar2FAUsuario(connection, usuario.ID_USUARIO, token2fa);
+    
+    if (verificacion2FA.required && !verificacion2FA.valid) {
+      return res.status(401).json({
+        success: false,
+        requires2FA: true,
+        message: token2fa ? 'Código 2FA inválido' : 'Código 2FA requerido',
+        userId: usuario.ID_USUARIO
       });
     }
    
@@ -491,5 +550,9 @@ exports.validacionProvUsers = async (req, res) => {
       success: false,
       message: 'Error interno del servidor' 
     });
+  } finally {
+    if (connection) {
+      try { await connection.close(); } catch (e) { console.error('Error cerrando conexión:', e); }
+    }
   }
 };
