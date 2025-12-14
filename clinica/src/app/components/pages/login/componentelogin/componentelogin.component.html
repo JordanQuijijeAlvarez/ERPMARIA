@@ -51,6 +51,32 @@
           />
         </div>
 
+        <!-- 2FA Token Field (Solo se muestra si se requiere) -->
+        <div class="login__field" *ngIf="requires2FA">
+          <label class="login__label" for="token2fa">
+            <i class="fas fa-shield-alt login__label-icon"></i>
+            Código de Autenticación (2FA)
+          </label>
+          <input
+            class="login__input"
+            type="text"
+            formControlName="token2fa"
+            id="token2fa"
+            maxlength="6"
+            placeholder="000000"
+            style="text-align: center; letter-spacing: 0.5rem; font-size: 1.2rem;"
+          />
+          <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+            Ingresa el código de 6 dígitos de tu app de autenticación
+          </small>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="errorMessage" style="background: #f8d7da; color: #721c24; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.9rem;">
+          <i class="fas fa-exclamation-circle"></i>
+          {{ errorMessage }}
+        </div>
+
         <!-- Forgot Password Link -->
         <div class="login__forgot" >
           <a [routerLink]="['/login/recuperacion', Getusername]">

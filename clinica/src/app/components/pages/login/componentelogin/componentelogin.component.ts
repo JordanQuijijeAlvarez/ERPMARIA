@@ -13,7 +13,11 @@ import { CommonModule } from '@angular/common';
 })
 export class ComponenteloginComponent implements OnInit {
 
-  formLogin: FormGroup; 
+  formLogin: FormGroup;
+  requires2FA: boolean = false;
+  userId: number = 0;
+  errorMessage: string = '';
+  
   constructor(
     private formBuilder :FormBuilder,
     private authservicio: AuthService,
@@ -21,8 +25,8 @@ export class ComponenteloginComponent implements OnInit {
   ){
       this.formLogin= formBuilder.group({
         usuario : ['',Validators.required],
-        password: ['',Validators.required]
-        
+        password: ['',Validators.required],
+        token2fa: ['']
       });
   }
   ngOnInit(): void {
@@ -32,36 +36,44 @@ export class ComponenteloginComponent implements OnInit {
 }
 
   Login(): void {
-  const usuarioLogin: InLogin = {
-    nombre_usuario: this.formLogin.value.usuario,
-    contrasenia: this.formLogin.value.password
-  };
+    const usuarioLogin: any = {
+      nombre_usuario: this.formLogin.value.usuario,
+      contrasenia: this.formLogin.value.password
+    };
 
-  // this.authservicio.loginConOTP(usuarioLogin).subscribe({
-  //   next: res => {
-  //     const codigoUsuario = res.usuario_codigo;
-      
-  //     // Aquí puedes navegar a la ruta del nuevo componente o mostrar un modal
-  //     this.router.navigate(['/verificacion-otp'], { queryParams: { codigo_usuario: codigoUsuario } });
-
-  //   }, error: err => {
-  //     alert('Hubo un problema con la autenticación: ' + err.error.mensaje);
-  //   }
-  // });
-
-  this.authservicio.login(usuarioLogin).subscribe({
-    next: res => {      
-      
-      this.router.navigate(['home/dashboard'])
-
-    }, error: err => {
-      alert('Hubo un problema con la autenticación: ' + err.error.mensaje);
+    // Si ya se solicitó 2FA, incluir el código
+    if (this.requires2FA && this.formLogin.value.token2fa) {
+      usuarioLogin.token2fa = this.formLogin.value.token2fa;
     }
-  });
 
-
-
-}
+    this.authservicio.login(usuarioLogin).subscribe({
+      next: res => {
+        console.log('Respuesta del login:', res);
+        // Si la respuesta indica que requiere 2FA
+        if (res.requires2FA) {
+          console.log('2FA requerido para userId:', res.userId);
+          this.requires2FA = true;
+          this.userId = res.userId || 0;
+          this.errorMessage = res.message || '';
+          // Agregar validación al campo token2fa
+          this.formLogin.get('token2fa')?.setValidators([Validators.required, Validators.pattern(/^\d{6}$/)]);
+          this.formLogin.get('token2fa')?.updateValueAndValidity();
+        } else {
+          // Login exitoso
+          console.log('Login exitoso, redirigiendo...');
+          this.router.navigate(['home/dashboard']);
+        }
+      }, 
+      error: err => {
+        this.errorMessage = err.error?.message || 'Hubo un problema con la autenticación';
+        // Si el error es por 2FA inválido, mantener el campo visible
+        if (err.error?.requires2FA) {
+          this.requires2FA = true;
+          this.userId = err.error.userId || 0;
+        }
+      }
+    });
+  }
 
 
     get  Getusername(): string {
