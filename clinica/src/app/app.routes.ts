@@ -54,7 +54,7 @@ export const routes: Routes = [
 
       // Clientes (Ejemplo: solo rol "admin" puede crear/actualizar)
       {
-        path: 'listarclientes',
+        path: 'listarClientes',
         component: ListaclientesComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
@@ -74,7 +74,7 @@ export const routes: Routes = [
 
       // Productos (Ejemplo: solo rol "admin" puede crear/actualizar)
       {
-        path: 'listarproductos',
+        path: 'listarProductos',
         component: ListaproductosComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
@@ -101,7 +101,7 @@ export const routes: Routes = [
         data: { roles: ['ADMINISTRADOR'] },
       },
        {
-        path: 'listaventas',
+        path: 'listarVentas',
         component: listaVentasComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
@@ -121,7 +121,7 @@ export const routes: Routes = [
         data: { roles: ['ADMINISTRADOR'] },
       },
        {
-        path: 'listacompras',
+        path: 'listarCompras',
         component: ListaComprasComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
@@ -142,7 +142,7 @@ export const routes: Routes = [
         data: { roles: ['ADMINISTRADOR'] },
       },
        {
-        path: 'listaproveedor',
+        path: 'listarProveedor',
         component: ListaproveedoresComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
@@ -162,7 +162,7 @@ export const routes: Routes = [
         data: { roles: ['ADMINISTRADOR'] },
       },
        {
-        path: 'listacategoria',
+        path: 'listarCategoria',
         component: ListaCategoriasComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
@@ -176,7 +176,7 @@ export const routes: Routes = [
 
       // Especialidades
       {
-        path: 'listaespecialidades',
+        path: 'listarespecialidades',
         component: listaEspecialidadesComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
@@ -196,7 +196,7 @@ export const routes: Routes = [
 
       // Horarios
       {
-        path: 'listahorarios',
+        path: 'listarhorarios',
         component: listaHorariosComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
@@ -216,7 +216,7 @@ export const routes: Routes = [
 
       //Usuarios
       {
-        path: 'listausuarios',
+        path: 'listarusuarios',
         component: ListausuariosComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
