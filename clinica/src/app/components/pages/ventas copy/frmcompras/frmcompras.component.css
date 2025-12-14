@@ -1,0 +1,466 @@
+/* ========================================
+   FORMULARIO DE COMPRAS - ESTILOS ESPECÍFICOS
+   ======================================== */
+
+/* ----- Contenedor principal ----- */
+.compra-form {
+  padding: 24px;
+}
+
+/* ----- Sección de encabezado ----- */
+.compra-form__header {
+  margin-bottom: 24px;
+}
+
+.compra-form__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 8px 0;
+}
+
+.compra-form__subtitle {
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* ----- Sección de contenido ----- */
+.compra-form__section-header {
+  margin-top: 24px;
+  margin-bottom: 16px;
+}
+
+.compra-form__section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.compra-form__section-title i {
+  color: var(--color-primary);
+}
+
+/* ----- Grid de campos ----- */
+.compra-form__fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+/* ----- Campo de formulario ----- */
+.compra-form__field {
+  display: flex;
+  flex-direction: column;
+}
+
+.compra-form__field label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.compra-form__field label i {
+  color: var(--color-primary);
+  font-size: 0.85rem;
+}
+
+.compra-form__field input {
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background-color: var(--color-bg-input);
+  color: var(--color-text-primary);
+  transition: all 0.2s ease;
+}
+
+.compra-form__field input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.compra-form__field input:read-only {
+  background-color: var(--color-bg-hover);
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
+}
+
+/* ----- Campo de búsqueda con botón ----- */
+.compra-form__search-group {
+  display: flex;
+  gap: 8px;
+}
+
+.compra-form__search-group input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background-color: var(--color-bg-input);
+  color: var(--color-text-primary);
+  transition: all 0.2s ease;
+}
+
+.compra-form__search-group input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.compra-form__search-btn {
+  padding: 10px 16px;
+  background-color: var(--color-primary);
+  color: var(--color-text-white);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.compra-form__search-btn:hover {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.compra-form__search-btn:active {
+  transform: translateY(0);
+}
+
+/* ----- Búsqueda de producto ----- */
+.compra-form__product-search {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 16px;
+  align-items: end;
+}
+
+.compra-form__search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.compra-form__search-input-wrapper i {
+  position: absolute;
+  left: 12px;
+  color: var(--color-text-light);
+}
+
+.compra-form__search-input-wrapper input {
+  width: 100%;
+  padding: 10px 12px 10px 36px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background-color: var(--color-bg-input);
+  color: var(--color-text-primary);
+  transition: all 0.2s ease;
+}
+
+.compra-form__search-input-wrapper input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.compra-form__stock-display {
+  padding: 10px 16px;
+  background-color: var(--color-bg-hover);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-align: center;
+  min-width: 100px;
+}
+
+/* ----- Tabla de productos ----- */
+.compra-form__table-wrapper {
+  margin-top: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-card);
+}
+
+.compra-form__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.compra-form__table thead {
+  background-color: var(--color-primary-light);
+}
+
+.compra-form__table thead th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  border-bottom: 2px solid var(--color-border);
+}
+
+.compra-form__table thead th i {
+  margin-right: 6px;
+  color: var(--color-primary);
+}
+
+.compra-form__table tbody td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border-light);
+  color: var(--color-text-primary);
+}
+
+.compra-form__table tbody tr:hover {
+  background-color: var(--color-bg-hover);
+}
+
+.compra-form__product-name {
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.compra-form__product-code {
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+  margin-top: 4px;
+}
+
+.compra-form__product-price {
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+/* ----- Controles de cantidad ----- */
+.compra-form__quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.compra-form__quantity-btn {
+  padding: 6px 10px;
+  background-color: var(--color-bg-hover);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--color-text-primary);
+}
+
+.compra-form__quantity-btn:hover {
+  background-color: var(--color-primary-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.compra-form__quantity-input {
+  width: 60px;
+  padding: 6px 8px;
+  text-align: center;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.compra-form__quantity-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+/* ----- Botones de acción ----- */
+.compra-form__action-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.compra-form__action-btn--add {
+  background-color: var(--color-success);
+  color: var(--color-text-white);
+}
+
+.compra-form__action-btn--add:hover {
+  background-color: var(--color-success-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.compra-form__action-btn--delete {
+  background-color: var(--color-danger);
+  color: var(--color-text-white);
+}
+
+.compra-form__action-btn--delete:hover {
+  background-color: var(--color-danger-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ----- Estado vacío ----- */
+.compra-form__empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--color-text-light);
+}
+
+.compra-form__empty-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
+
+.compra-form__empty-text {
+  font-size: 0.95rem;
+}
+
+/* ----- Resumen de totales ----- */
+.compra-form__totals {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.compra-form__totals-card {
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 20px;
+  min-width: 320px;
+  box-shadow: var(--shadow-md);
+}
+
+.compra-form__total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 0.95rem;
+}
+
+.compra-form__total-row span:first-child {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.compra-form__total-row span:last-child {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.compra-form__total-divider {
+  height: 1px;
+  background-color: var(--color-border);
+  margin: 12px 0;
+}
+
+.compra-form__total-row--final {
+  padding: 12px 0 0 0;
+  font-size: 1.1rem;
+}
+
+.compra-form__total-row--final span {
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* ----- Footer de acciones ----- */
+.compra-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border);
+}
+
+.compra-form__btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.compra-form__btn--cancel {
+  background-color: var(--color-bg-hover);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
+
+.compra-form__btn--cancel:hover {
+  background-color: var(--color-border);
+}
+
+.compra-form__btn--submit {
+  background-color: var(--color-primary);
+  color: var(--color-text-white);
+}
+
+.compra-form__btn--submit:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.compra-form__btn--submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ----- Responsividad ----- */
+@media (max-width: 768px) {
+  .compra-form__product-search {
+    grid-template-columns: 1fr;
+  }
+
+  .compra-form__totals {
+    justify-content: stretch;
+  }
+
+  .compra-form__totals-card {
+    width: 100%;
+  }
+
+  .compra-form__table-wrapper {
+    overflow-x: auto;
+  }
+
+  .compra-form__actions {
+    flex-direction: column;
+  }
+
+  .compra-form__btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
