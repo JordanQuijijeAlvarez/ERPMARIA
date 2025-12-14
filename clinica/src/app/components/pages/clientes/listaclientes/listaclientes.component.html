@@ -1,9 +1,9 @@
 
 
 <!-- Header Section -->
-<div style="padding: 24px;">
+<div class="clientes">
   <!-- Title and Actions Bar -->
-  <div class="card">
+  <div class="card clientes-header">
     <div class="card__header">
       <h2 class="card__title">
         GESTIÓN DE CLIENTES
@@ -12,15 +12,15 @@
     </div>
     
     <!-- Search and Actions -->
-    <div style="display: flex; gap: 16px; margin-top: 16px;">
+    <div class="clientes-header__search">
       <!-- Search Input -->
       <div class="search-box">
         <input
           type="text"
           [(ngModel)]="searchTerm"
           (input)="onSearch($any($event.target).value)"
-          class="search-box__input"
           placeholder="Buscar cliente por nombre, cédula, teléfono, email..."
+          class="search-box__input"
         />
         <div class="search-box__icon">
           <i class="fas fa-search"></i>
@@ -31,8 +31,8 @@
           *ngIf="isSearching"
           type="button"
           (click)="clearSearch()"
-          class="search-box__clear"
           title="Limpiar búsqueda"
+          class="search-box__clear"
         >
           <i class="fas fa-times"></i>
         </button>
@@ -41,9 +41,9 @@
   </div>
 
   <!-- Patients Table -->
-  <div class="table-container" style="margin-top: 24px;">
+  <div class="table-container clientes-table">
     <div class="table-header">
-      <div style="display: flex; align-items: center; gap: 16px;">
+      <div class="clientes-table__header">
         <h3 class="table-header__title">
           <i class="fas fa-users"></i>
           Clientes Registrados
@@ -55,9 +55,8 @@
           <span>{{ filteredClientes.length }} resultado(s) para "{{ searchTerm }}"</span>
           <button 
             (click)="clearSearch()"
-            class="search-box__clear"
             title="Limpiar búsqueda"
-            style="position: static; transform: none;"
+            class="search-box__clear clientes-search-badge"
           >
             <i class="fas fa-times"></i>
           </button>
@@ -121,8 +120,7 @@
                 <button 
                   *ngIf="isSearching"
                   (click)="clearSearch()"
-                  class="btn btn--outline btn--sm"
-                  style="margin-top: 16px;"
+                  class="btn btn--outline btn--sm clientes-table__empty-button"
                 >
                   <i class="fas fa-times"></i>
                   Limpiar búsqueda
@@ -134,13 +132,13 @@
           <!-- Patient rows -->
           <tr *ngFor="let clientes of paginatedClientes">
             <td>
-              <div style="display: flex; align-items: center; gap: 12px;">
+              <div class="clientes-table__row-info">
                 <i class="fas fa-id-card"></i>
                 <span>{{clientes.client_cedula}}</span>
               </div>
             </td>
             <td>
-              <div style="display: flex; align-items: center; gap: 12px;">
+              <div class="clientes-table__row-info">
                 <i class="fas fa-user"></i>
                 <span>{{clientes.client_nombres}} {{clientes.client_apellidos}}</span>
               </div>
@@ -246,11 +244,11 @@
 
 <!-- Modal comentado para referencia futura -->
 <!-- 
-<div data-dialog-backdrop="dialog" data-dialog-backdrop-close="true" class="absolute left-0 top-0 inset-0 z-[999] grid h-screen w-screen place-items-center bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300">
-  <div data-dialog="dialog" class="relative mx-auto flex w-full max-w-[24rem] flex-col rounded-xl bg-white bg-clip-border text-slate-700 shadow-md">
-    <div class="flex flex-col p-6">
-      <h4 class="text-2xl mb-1 font-semibold text-slate-700">Edit Member Details</h4>
-      <p class="mb-3 mt-1 text-slate-400">Enter or reset each information for the member access.</p>
+<div data-dialog-backdrop="dialog" data-dialog-backdrop-close="true">
+  <div data-dialog="dialog">
+    <div>
+      <h4>Edit Member Details</h4>
+      <p>Enter or reset each information for the member access.</p>
     </div>
   </div>
 </div> 

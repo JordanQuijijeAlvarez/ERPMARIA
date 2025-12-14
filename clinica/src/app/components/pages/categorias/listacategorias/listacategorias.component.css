@@ -1,6 +1,59 @@
-.margenx{
-    
-    margin-left: -3rem;
-    margin-right: -3rem;
+/* ========================================
+   LISTA DE CATEGORÍAS - ESTILOS ESPECÍFICOS
+   ======================================== */
 
+/* ----- Contenedor principal ----- */
+.categorias {
+  padding: 24px;
+}
+
+/* ----- Sección de encabezado ----- */
+.categorias-header {
+  margin-bottom: 24px;
+}
+
+.categorias-header__search {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+/* ----- Tabla de categorías ----- */
+.categorias-table {
+  margin-top: 24px;
+}
+
+.categorias-table__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.categorias-table__row-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.categorias-table__row-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+/* ----- Badge de búsqueda ----- */
+.categorias-search-badge {
+  position: static;
+  transform: none;
+}
+
+/* ----- Botón limpiar en tabla vacía ----- */
+.categorias-table__empty-button {
+  margin-top: 16px;
 }
