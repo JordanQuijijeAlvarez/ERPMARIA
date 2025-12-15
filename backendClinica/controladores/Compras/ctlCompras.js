@@ -189,7 +189,7 @@ exports.Actualizarcompra = async (req, res) => {
         user_id,
         compra_total,
         compra_iva,
-        // compra_subiva, // Agregar si el SP lo pide
+         compra_subiva, // Agregar si el SP lo pide
         detalle_compra // Array de productos
     } = req.body;
     let connection;
@@ -201,7 +201,7 @@ exports.Actualizarcompra = async (req, res) => {
             BEGIN 
                 ACTUALIZAR_COMPRA_COMPLETA(
                     :p_compra_id, :p_local_id, :p_prove_id, :p_user_id, 
-                    :p_monto, :p_iva, :p_detalles_json, :p_respuesta
+                    :p_monto, :p_iva,:p_subiva, :p_detalles_json, :p_respuesta
                 ); 
             END;
         `;
@@ -211,8 +211,9 @@ exports.Actualizarcompra = async (req, res) => {
             p_local_id: local_id || 1,
             p_prove_id: prove_id,
             p_user_id: user_id || 1,
-            p_monto: compra_montototal,
+            p_monto: compra_total,
             p_iva: compra_iva,
+            p_subiva: compra_subiva,
             p_detalles_json: detallesJson,
             p_respuesta: { dir: oracledb.BIND_OUT, type: oracledb.CLOB }
         };

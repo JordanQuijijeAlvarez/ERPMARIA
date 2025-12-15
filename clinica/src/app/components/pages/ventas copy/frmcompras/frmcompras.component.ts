@@ -208,7 +208,7 @@ export class FrmComprasComponent implements OnInit {
         prod_id: item.id_producto,
         detc_cantidad: item.cantidad,
         detc_subtotal: item.subtotal
-          }));
+     }));
 
     const objCompra: InCompraCompleto = {
       compra_id: this.eventoUpdate ? this.codigoCompra : 0,
