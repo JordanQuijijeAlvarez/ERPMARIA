@@ -1,0 +1,125 @@
+/* === Contenedor principal === */
+.proveedores {
+  padding: 1.5rem;
+}
+
+/* === Header === */
+.proveedores-header__search {
+  padding: 0 1.5rem 1.5rem;
+}
+
+/* === Tabla === */
+.proveedores-table {
+  margin-top: 1.5rem;
+}
+
+.proveedores-table__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* === Badge de búsqueda === */
+.proveedores-search-badge {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/* === Filas de la tabla === */
+.proveedores-table__row-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.proveedores-table__row-info i {
+  color: var(--color-text-secondary);
+}
+
+/* === Botón de estado vacío === */
+.proveedores-table__empty-button {
+  margin-top: 1rem;
+}
+
+/* === Responsividad === */
+@media (max-width: 768px) {
+  .proveedores {
+    padding: 1rem;
+  }
+
+  .proveedores-header__search {
+    padding: 0 1rem 1rem;
+  }
+}
+
+
+/* ==========================================
+   ESTILOS DE LAS PESTAÑAS (TABS)
+   ========================================== */
+
+/* Contenedor de la barra de pestañas */
+.tabs-container {
+  display: flex;
+  background-color: #f9fafb;      /* Fondo gris muy claro */
+  border-bottom: 1px solid #e5e7eb; /* Línea gris que separa las tabs del contenido */
+  padding: 0 1.5rem;              /* Espaciado lateral */
+  gap: 1rem;                      /* Espacio entre cada botón */
+  margin-top: 1rem;
+}
+
+/* Botón individual de la pestaña */
+.tab-btn {
+  padding: 1rem 1.25rem;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent; /* La línea de activo está invisible por defecto */
+  color: #6b7280;                 /* Color de texto gris (inactivo) */
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;                    /* Espacio entre el icono y el texto */
+  outline: none;
+}
+
+/* Efecto al pasar el mouse (Hover) */
+.tab-btn:hover {
+  color: #1f2937;                 /* Texto más oscuro */
+  background-color: #f3f4f6;      /* Fondo gris sutil */
+}
+
+/* Estado ACTIVO (Cuando la pestaña está seleccionada) */
+.tab-btn.active {
+  color: #2563eb;                 /* Color Azul Principal */
+  border-bottom-color: #2563eb;   /* Aparece la línea azul abajo */
+  background-color: #ffffff;      /* Fondo blanco para integrarse con el contenido */
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+
+/* ==========================================
+   ANIMACIÓN DE CONTENIDO
+   ========================================== */
+
+/* Clase para animar la entrada del contenido al cambiar de tab */
+.fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(5px); /* Entra desde un poco abajo */
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}

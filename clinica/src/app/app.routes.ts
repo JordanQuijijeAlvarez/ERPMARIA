@@ -27,6 +27,7 @@ import { FrmCategoriasComponent } from './components/pages/categorias/frmcategor
 import { ListaCategoriasComponent } from './components/pages/categorias/listacategorias/listacategorias.component';
 import { ListaComprasComponent } from './components/pages/ventas copy/listacompras/listacompras.component';
 import { FrmComprasComponent } from './components/pages/ventas copy/frmcompras/frmcompras.component';
+import { ListahistorialComponent } from './components/pages/historial/listaproveedores/listahistorial.component';
 
 export const routes: Routes = [
 
@@ -170,6 +171,15 @@ export const routes: Routes = [
  {
         path: 'actualizarCategoria/:id',
         component: FrmCategoriasComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['ADMINISTRADOR'] },
+      },
+
+         
+             // AUDITORIA
+      {
+        path: 'listarHistorial',
+        component: ListahistorialComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
       },

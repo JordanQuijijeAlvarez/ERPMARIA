@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
 
 @Component({
     selector: 'app-dashboard',
-    imports: [RouterLink,DirectivasModule],
+    imports: [DirectivasModule],
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.css'
 })

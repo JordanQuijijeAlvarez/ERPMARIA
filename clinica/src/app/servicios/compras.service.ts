@@ -32,7 +32,7 @@ CrearCompra(venta: InCompraCompleto): Observable<any> {
 
   getDetalleCompras(id: number): Observable<any> {
 
-    return this.http.get<any>(`${this.urlServidor}/compras/detalle/${id}`);
+    return this.http.get<any>(`${this.urlServidor}/compras/${id}`);
   }
 
   getComprasEstado(estado: number): Observable<any> {

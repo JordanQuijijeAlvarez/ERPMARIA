@@ -177,7 +177,9 @@ export class ListaComprasComponent implements OnInit {
 
     this.ServicioCompras.getDetalleCompras(id).subscribe({
       next: (res: any) => {
-        this.detalleCompra = Array.isArray(res) ? res : [res];
+    this.detalleCompra = res.detalle_compra ?? [];
+
+        console.log('Detalle de compra recibido:', this.detalleCompra);
       },
       error: (err) => {
         console.log('Error al cargar detalle', err);

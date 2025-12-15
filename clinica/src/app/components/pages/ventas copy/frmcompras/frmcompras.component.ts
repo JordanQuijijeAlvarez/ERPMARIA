@@ -246,6 +246,7 @@ export class FrmComprasComponent implements OnInit {
 
     if (this.eventoUpdate) {
       // ACTUALIZAR (Solo si está permitido editar compras)
+      console.log(this.proveedorId);
       this.servicioCompras.ActualizarCompra( compraObjeto).subscribe({
         next: (res) => {
           this.alertaServ.success('Actualizado', 'Orden de compra modificada correctamente');
