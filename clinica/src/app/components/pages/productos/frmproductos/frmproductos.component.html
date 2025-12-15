@@ -23,8 +23,8 @@
         </div>
 
         <div class="producto-form__fields">
-          <!-- Codigo Barras -->
-          <div class="form-group">
+          <!-- Codigo Barras - Full Width -->
+          <div class="form-group producto-form__field--full">
             <label class="form-label">
               <i class="fas fa-barcode"></i>
               Código de Barras *
@@ -44,8 +44,8 @@
             </app-validators>
           </div>
 
-          <!-- Nombres -->
-          <div class="form-group">
+          <!-- Nombres - Full Width -->
+          <div class="form-group producto-form__field--full">
             <label class="form-label">
               <i class="fas fa-tag"></i>
               Nombre del Producto *
@@ -58,6 +58,49 @@
               placeholder="Ejemplo: Aceite Palma de oro"
             />
             <app-validators [control]="frmProducto.get('txtNombres')!"></app-validators>
+          </div>
+
+          <!-- Descripcion - Full Width -->
+          <div class="form-group producto-form__field--full">
+            <label class="form-label">
+              <i class="fas fa-align-left"></i>
+              Descripción *
+            </label>
+            <input
+              class="form-input"
+              formControlName="txtDescripcion"
+              type="text"
+              id="descripcion"
+              placeholder="Ejemplo: Producto de cocina"
+            />
+            <app-validators [control]="frmProducto.get('txtDescripcion')!"></app-validators>
+          </div>
+
+          <!-- Subcategorias - Full Width -->
+          <div class="form-group producto-form__field--full">
+            <label class="form-label">
+              <i class="fas fa-list"></i>
+              Subcategoría *
+            </label>
+            <div class="producto-form__select-with-button">
+              <select class="form-select" formControlName="cbxSubcategoria" id="subcategoria">
+                <option value="" disabled selected>
+                  Seleccione una subcategoría
+                </option>
+                <option *ngFor="let subcategoria of listaSubcategorias" [value]="subcategoria.subcat_id">
+                  {{ subcategoria.subcat_nombre }}
+                </option>
+              </select>
+              <button
+                class="btn btn--primary btn--icon producto-form__add-button"
+                type="button"
+                (click)="abrirModalAgregarSubcategoria()"
+                title="Agregar nueva subcategoría rápidamente"
+              >
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+            <app-validators [control]="frmProducto.get('cbxSubcategoria')!"></app-validators>
           </div>
 
           <!-- precio compra -->
@@ -123,51 +166,6 @@
             />
             <app-validators [control]="frmProducto.get('txtstockminimo')!"></app-validators>
           </div>
-
-          <!-- Subcategorias -->
-          <div class="form-group producto-form__field--full">
-            <label class="form-label">
-              <i class="fas fa-list"></i>
-              Subcategoría *
-            </label>
-            <div class="producto-form__select-with-button">
-              <select class="form-select" formControlName="cbxSubcategoria" id="subcategoria">
-                <option value="" disabled selected>
-                  Seleccione una subcategoría
-                </option>
-                <option *ngFor="let subcategoria of listaSubcategorias" [value]="subcategoria.subcat_id">
-                  {{ subcategoria.subcat_nombre }}
-                </option>
-              </select>
-              <button
-                class="btn btn--primary btn--icon producto-form__add-button"
-                type="button"
-                (click)="abrirModalAgregarSubcategoria()"
-                title="Agregar nueva subcategoría rápidamente"
-              >
-                <i class="fas fa-plus"></i>
-              </button>
-            </div>
-            <app-validators [control]="frmProducto.get('cbxSubcategoria')!"></app-validators>
-          </div>
-
-          <!-- Descripcion -->
-          <div class="form-group producto-form__field--full">
-            <label class="form-label">
-              <i class="fas fa-align-left"></i>
-              Descripción *
-            </label>
-            <input
-              class="form-input"
-              formControlName="txtDescripcion"
-              type="text"
-              id="descripcion"
-              placeholder="Ejemplo: Producto de cocina"
-            />
-            <app-validators [control]="frmProducto.get('txtDescripcion')!"></app-validators>
-          </div>
-
-
 
         </div>
       </div>
