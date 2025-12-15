@@ -55,7 +55,7 @@ export const routes: Routes = [
 
       // Clientes (Ejemplo: solo rol "admin" puede crear/actualizar)
       {
-        path: 'listarclientes',
+        path: 'listarClientes',
         component: ListaclientesComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
@@ -75,7 +75,7 @@ export const routes: Routes = [
 
       // Productos (Ejemplo: solo rol "admin" puede crear/actualizar)
       {
-        path: 'listarproductos',
+        path: 'listarProductos',
         component: ListaproductosComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
@@ -102,7 +102,7 @@ export const routes: Routes = [
         data: { roles: ['ADMINISTRADOR'] },
       },
        {
-        path: 'listaventas',
+        path: 'listarVentas',
         component: listaVentasComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
@@ -122,7 +122,7 @@ export const routes: Routes = [
         data: { roles: ['ADMINISTRADOR'] },
       },
        {
-        path: 'listacompras',
+        path: 'listarCompras',
         component: ListaComprasComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
@@ -143,7 +143,7 @@ export const routes: Routes = [
         data: { roles: ['ADMINISTRADOR'] },
       },
        {
-        path: 'listaproveedor',
+        path: 'listarProveedores',
         component: ListaproveedoresComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
@@ -163,7 +163,7 @@ export const routes: Routes = [
         data: { roles: ['ADMINISTRADOR'] },
       },
        {
-        path: 'listacategoria',
+        path: 'listarCategorias',
         component: ListaCategoriasComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
@@ -175,61 +175,61 @@ export const routes: Routes = [
         data: { roles: ['ADMINISTRADOR'] },
       },
 
-      // Especialidades
-      {
-        path: 'listaespecialidades',
-        component: listaEspecialidadesComponent,
-        canActivate: [RoleGuard],
-        data: { roles: ['ADMINISTRADOR'] },
-      },
-      {
-        path: 'crearEspecialidades',
-        component: FrmespecialidadsComponent,
-        canActivate: [RoleGuard],
-        data: { roles: ['ADMINISTRADOR'] },
-      },
-      {
-        path: 'actualizarEspecialidades/:id',
-        component: FrmespecialidadsComponent,
-        canActivate: [RoleGuard],
-        data: { roles: ['ADMINISTRADOR'] },
-      },
+      // // Especialidades
+      // {
+      //   path: 'listarespecialidades',
+      //   component: listaEspecialidadesComponent,
+      //   canActivate: [RoleGuard],
+      //   data: { roles: ['ADMINISTRADOR'] },
+      // },
+      // {
+      //   path: 'crearEspecialidades',
+      //   component: FrmespecialidadsComponent,
+      //   canActivate: [RoleGuard],
+      //   data: { roles: ['ADMINISTRADOR'] },
+      // },
+      // {
+      //   path: 'actualizarEspecialidades/:id',
+      //   component: FrmespecialidadsComponent,
+      //   canActivate: [RoleGuard],
+      //   data: { roles: ['ADMINISTRADOR'] },
+      // },
 
       // Horarios
-      {
-        path: 'listahorarios',
-        component: listaHorariosComponent,
-        canActivate: [RoleGuard],
-        data: { roles: ['ADMINISTRADOR'] },
-      },
-      {
-        path: 'crearHorarios',
-        component: FrmhorariosComponent,
-        canActivate: [RoleGuard],
-        data: { roles: ['ADMINISTRADOR'] },
-      },
-      {
-        path: 'actualizarHorarios/:id',
-        component: FrmhorariosComponent,
-        canActivate: [RoleGuard],
-        data: { roles: ['ADMINISTRADOR'] },
-      },
+      // {
+      //   path: 'listarhorarios',
+      //   component: listaHorariosComponent,
+      //   canActivate: [RoleGuard],
+      //   data: { roles: ['ADMINISTRADOR'] },
+      // },
+      // {
+      //   path: 'crearHorarios',
+      //   component: FrmhorariosComponent,
+      //   canActivate: [RoleGuard],
+      //   data: { roles: ['ADMINISTRADOR'] },
+      // },
+      // {
+      //   path: 'actualizarHorarios/:id',
+      //   component: FrmhorariosComponent,
+      //   canActivate: [RoleGuard],
+      //   data: { roles: ['ADMINISTRADOR'] },
+      // },
 
       //Usuarios
       {
-        path: 'listausuarios',
+        path: 'listarUsuarios',
         component: ListausuariosComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
       },
       {
-        path: 'crearUsuarios',
+        path: 'crearUsuario',
         component: FrmusuariosComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },
       },
       {
-        path: 'actualizarUsuarios/:id',
+        path: 'actualizarUsuario/:id',
         component: FrmusuariosComponent,
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR'] },

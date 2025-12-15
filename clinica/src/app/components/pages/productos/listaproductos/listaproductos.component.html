@@ -1,248 +1,257 @@
 <!-- Header Section -->
-<div class="productos-page">
-  <div class="card">
-    <!-- Title and Actions Bar -->
+<div class="productos">
+  <!-- Title and Actions Bar -->
+  <div class="card productos-header">
     <div class="card__header">
-      <div class="productos-page__title-section">
-        <div>
-          <div>
-            <h2 class="card__title">
-              GESTIÓN DE PRODUCTOS
-            </h2>
-            <p class="card__subtitle">Administre la información de los productos registrados en el sistema</p>
-          </div>
-          
-          <!-- Search and Actions -->
-          <div class="productos-page__actions">
-            <!-- Search Input -->
-            <div class="search-box">
-              <input
-                type="text"
-                [(ngModel)]="searchTerm"
-                (input)="onSearch($any($event.target).value)"
-                class="search-box__input"
-                placeholder="Buscar producto por nombre, código de barras..."
-              />
-              <div class="search-box__icon">
-                <i class="fas fa-search"></i>
-              </div>
-              
-              <!-- Clear search button -->
-              <button
-                *ngIf="isSearching"
-                type="button"
-                (click)="clearSearch()"
-                class="search-box__clear"
-                title="Limpiar búsqueda"
-              >
-                <i class="fas fa-times"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <h2 class="card__title">
+        GESTIÓN DE PRODUCTOS
+      </h2>
+      <p class="card__subtitle">Administre la información de los productos registrados en el sistema</p>
     </div>
-
-    <!-- Doctors Table -->
-    <div class="table-container">
-      <div class="table-header">
-        <div>
-          <h3 class="table-header__title">
-            <i class="fas fa-box"></i>
-            Productos Registrados
-          </h3>
-          
-          <!-- Search indicator -->
-          <div class="search-indicator" *ngIf="isSearching">
-            <i class="fas fa-search"></i>
-            <span>{{ filteredProductos.length }} resultado(s) para "{{ searchTerm }}"</span>
-            <button class="btn btn--sm btn--outline" (click)="clearSearch()" title="Limpiar búsqueda">
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
+    
+    <!-- Search and Actions -->
+    <div class="productos-header__search">
+      <!-- Search Input -->
+      <div class="search-box">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="onSearch($any($event.target).value)"
+          placeholder="Buscar producto por nombre, código de barras..."
+          class="search-box__input"
+        />
+        <div class="search-box__icon">
+          <i class="fas fa-search"></i>
         </div>
         
-        <!-- New Doctor Button -->
-        <a routerLink="../creaproductos">
-          <button type="button" class="btn btn--primary">
-            <i class="fas fa-plus"></i>
-            <span>Nuevo Producto</span>
+        <!-- Clear search button -->
+        <button
+          *ngIf="isSearching"
+          type="button"
+          (click)="clearSearch()"
+          title="Limpiar búsqueda"
+          class="search-box__clear"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products Table -->
+  <div class="table-container productos-table">
+    <div class="table-header">
+      <div class="productos-table__header">
+        <h3 class="table-header__title">
+          <i class="fas fa-box"></i>
+          Productos Registrados
+        </h3>
+        
+        <!-- Search indicator -->
+        <div *ngIf="isSearching" class="badge badge--info">
+          <i class="fas fa-search"></i>
+          <span>{{ filteredProductos.length }} resultado(s) para "{{ searchTerm }}"</span>
+          <button 
+            (click)="clearSearch()"
+            title="Limpiar búsqueda"
+            class="search-box__clear productos-search-badge"
+          >
+            <i class="fas fa-times"></i>
           </button>
-        </a>
-      </div>
-      
-      <div class="table-wrapper">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>
-                <div class="table__header-cell">
-                  <i class="fas fa-barcode"></i>
-                  Código Barras
-                </div>
-              </th>
-              <th>
-                <div class="table__header-cell">
-                  <i class="fas fa-box"></i>
-                  Nombre
-                </div>
-              </th>
-              <th>
-                <div class="table__header-cell">
-                  <i class="fas fa-tag"></i>
-                  Subcategoria
-                </div>
-              </th>
-              <th>
-                <div class="table__header-cell">
-                  <i class="fas fa-dollar-sign"></i>
-                  Precio
-                </div>
-              </th>
-              <th>
-                <div class="table__header-cell">
-                  <i class="fas fa-warehouse"></i>
-                  Stock
-                </div>
-              </th>
-              <th>
-                <div class="table__header-cell">
-                  <i class="fas fa-cogs"></i>
-                  Acciones
-                </div>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- No results message -->
-            <tr *ngIf="filteredProductos.length === 0">
-              <td colspan="6">
-                <div class="table__empty">
-                  <div class="table__empty-icon">
-                    <i class="fas fa-search" *ngIf="isSearching"></i>
-                    <i class="fas fa-box-open" *ngIf="!isSearching"></i>
-                  </div>
-                  <div>
-                    <p *ngIf="isSearching">No se encontraron productos</p>
-                    <p *ngIf="!isSearching">No hay productos registrados</p>
-                    <p *ngIf="isSearching">
-                      No hay productos que coincidan con "{{ searchTerm }}"
-                    </p>
-                    <p *ngIf="!isSearching">
-                      Comience agregando un nuevo producto al sistema
-                    </p>
-                  </div>
-                  <button class="btn btn--primary" *ngIf="isSearching" (click)="clearSearch()">
-                    <i class="fas fa-times"></i>
-                    Limpiar búsqueda
-                  </button>
-                </div>
-              </td>
-            </tr>
-            
-            <!-- Doctor rows -->
-            <tr *ngFor="let productos of paginatedProductos">
-              <td>
-                <div class="product-info">
-                  <div class="product-info__icon">
-                    <i class="fas fa-barcode"></i>
-                  </div>
-                  <div class="product-info__content">
-                    <div class="product-info__code">{{ productos.prod_codbarra }}</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div class="product-info">
-                  <div class="product-info__icon">
-                    <i class="fas fa-box"></i>
-                  </div>
-                  <div class="product-info__content">
-                    <div class="product-info__name">{{ productos.prod_nombre }}</div>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <span class="badge badge--info">{{ productos.subcat_nombre }}</span>
-              </td>
-              <td>
-                <span class="product-price">
-                  ${{ productos.prod_precioventa | number:'1.2-2' }}
-                </span>
-              </td>
-              <td>
-                <span class="product-stock" [class.product-stock--low]="productos.prod_stock < 10">
-                  {{ productos.prod_stock }}
-                </span>
-              </td>
-              <td>
-                <div class="table__actions">
-                  <!-- Edit Button -->
-                  <button class="btn btn--sm btn--warning" (click)="Actualizarproducto(productos.prod_id)" type="button" title="Editar producto">
-                    <i class="fas fa-pen"></i>
-                  </button>
-                  
-                  <!-- Delete Button -->
-                  <button class="btn btn--sm btn--danger" (click)="eliminarproducto(productos.prod_id, productos.prod_nombre)" type="button" title="Eliminar producto">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      
-      <!-- Pagination Section -->
-      <div class="pagination" *ngIf="totalItems > 0">
-        <div class="pagination__wrapper">
-          <!-- Results info y selector de items por página -->
-          <div class="pagination__info">
-            <div class="pagination__text">
-              Mostrando <span>{{ getItemRange().start }}-{{ getItemRange().end }}</span> de <span>{{ totalItems }}</span> productos
-            </div>
-            
-            <!-- Selector de items por página -->
-            <div class="pagination__select-wrapper">
-              <label for="itemsPerPage">Mostrar:</label>
-              <select 
-                id="itemsPerPage"
-                class="pagination__select"
-                (change)="changeItemsPerPage(+$any($event.target).value)"
-                [value]="itemsPerPage"
-              >
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
-              <span>por página</span>
-            </div>
-          </div>
-          
-          <!-- Pagination controls -->
-          <div class="pagination__controls">
-            <button type="button" class="pagination__button" (click)="previousPage()" [disabled]="currentPage === 1">
-              <i class="fas fa-chevron-left"></i>
-              Anterior
-            </button>
-            
-            <div class="pagination__numbers">
-              <button *ngFor="let page of getPageNumbers()" type="button" class="pagination__number" [class.pagination__number--active]="page === currentPage" (click)="goToPage(page)">
-                {{ page }}
-              </button>
-              
-              <!-- Ellipsis for large page counts -->
-              <span class="pagination__ellipsis" *ngIf="totalPages > 5 && currentPage < totalPages - 2">...</span>
-            </div>
-            
-            <button type="button" class="pagination__button" (click)="nextPage()" [disabled]="currentPage === totalPages">
-              Siguiente
-              <i class="fas fa-chevron-right"></i>
-            </button>
-          </div>
         </div>
+      </div>
+      
+      <!-- New Product Button -->
+      <a routerLink="../creaproductos">
+        <button type="button" class="btn btn--primary">
+          <i class="fas fa-plus"></i>
+          <span>Nuevo Producto</span>
+        </button>
+      </a>
+    </div>
+      
+    
+    <div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>
+              <i class="fas fa-barcode"></i>
+              Código Barras
+            </th>
+            <th>
+              <i class="fas fa-box"></i>
+              Nombre
+            </th>
+            <th>
+              <i class="fas fa-tag"></i>
+              Subcategoría
+            </th>
+            <th>
+              <i class="fas fa-dollar-sign"></i>
+              Precio
+            </th>
+            <th>
+              <i class="fas fa-warehouse"></i>
+              Stock
+            </th>
+            <th>
+              <i class="fas fa-cogs"></i>
+              Acciones
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- No results message -->
+          <tr *ngIf="filteredProductos.length === 0">
+            <td colspan="6">
+              <div class="table__empty">
+                <div class="table__empty-icon">
+                  <i class="fas fa-search" *ngIf="isSearching"></i>
+                  <i class="fas fa-box-open" *ngIf="!isSearching"></i>
+                </div>
+                <div>
+                  <p *ngIf="isSearching"><strong>No se encontraron productos</strong></p>
+                  <p *ngIf="!isSearching"><strong>No hay productos registrados</strong></p>
+                  <p *ngIf="isSearching">
+                    No hay productos que coincidan con "{{ searchTerm }}"
+                  </p>
+                  <p *ngIf="!isSearching">
+                    Comience agregando un nuevo producto al sistema
+                  </p>
+                </div>
+                <button 
+                  *ngIf="isSearching"
+                  (click)="clearSearch()"
+                  class="btn btn--outline btn--sm productos-table__empty-button"
+                >
+                  <i class="fas fa-times"></i>
+                  Limpiar búsqueda
+                </button>
+              </div>
+            </td>
+          </tr>
+            
+          
+          <!-- Product rows -->
+          <tr *ngFor="let productos of paginatedProductos">
+            <td>
+              <div class="productos-table__row-info">
+                <i class="fas fa-barcode"></i>
+                <span>{{ productos.prod_codbarra }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="productos-table__row-info">
+                <i class="fas"></i>
+                <span>{{ productos.prod_nombre }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="badge badge--info">{{ productos.subcat_nombre }}</span>
+            </td>
+            <td>
+              <span class="productos-table__price">
+                ${{ productos.prod_precioventa | number:'1.2-2' }}
+              </span>
+            </td>
+            <td>
+              <span class="productos-table__stock" [class.productos-table__stock--low]="productos.prod_stock < 10">
+                {{ productos.prod_stock }}
+              </span>
+            </td>
+            <td>
+              <div class="table__actions">
+                <!-- Edit Button -->
+                <button
+                  (click)="Actualizarproducto(productos.prod_id)"
+                  type="button"
+                  title="Editar producto"
+                  class="btn btn--warning btn--sm btn--icon"
+                >
+                  <i class="fas fa-pen"></i>
+                </button>
+                
+                <!-- Delete Button -->
+                <button
+                  (click)="eliminarproducto(productos.prod_id, productos.prod_nombre)"
+                  type="button"
+                  title="Eliminar producto"
+                  class="btn btn--danger btn--sm btn--icon"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+      
+    
+    <!-- Pagination Section -->
+    <div *ngIf="totalItems > 0" class="pagination">
+      <!-- Results info y selector de items por página -->
+      <div class="pagination__info">
+        <div class="pagination__text">
+          Mostrando <span>{{ getItemRange().start }}-{{ getItemRange().end }}</span> de <span>{{ totalItems }}</span> productos
+        </div>
+        
+        <!-- Selector de items por página -->
+        <div class="pagination__select-wrapper">
+          <label for="itemsPerPage">Mostrar:</label>
+          <select 
+            id="itemsPerPage"
+            (change)="changeItemsPerPage(+$any($event.target).value)"
+            [value]="itemsPerPage"
+            class="pagination__select"
+          >
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+          <span>por página</span>
+        </div>
+      </div>
+      
+      <!-- Pagination controls -->
+      <div class="pagination__controls">
+        <button
+          type="button"
+          (click)="previousPage()"
+          [disabled]="currentPage === 1"
+          class="pagination__button"
+        >
+          <i class="fas fa-chevron-left"></i>
+          Anterior
+        </button>
+        
+        <div class="pagination__numbers">
+          <button
+            *ngFor="let page of getPageNumbers()"
+            type="button"
+            (click)="goToPage(page)"
+            [class.pagination__number--active]="page === currentPage"
+            class="pagination__number"
+          >
+            {{ page }}
+          </button>
+          
+          <!-- Ellipsis for large page counts -->
+          <span *ngIf="totalPages > 5 && currentPage < totalPages - 2">...</span>
+        </div>
+        
+        <button
+          type="button"
+          (click)="nextPage()"
+          [disabled]="currentPage === totalPages"
+          class="pagination__button"
+        >
+          Siguiente
+          <i class="fas fa-chevron-right"></i>
+        </button>
       </div>
     </div>
   </div>

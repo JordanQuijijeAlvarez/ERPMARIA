@@ -2,13 +2,11 @@
   <div class="venta-form__container">
     <div class="card">
       <div class="card__body">
-
         <div class="card__header">
-          <h2 class="card__title">
-            NUEVA VENTA
-          </h2>
+          <h2 class="card__title">NUEVA VENTA</h2>
           <p class="card__subtitle">
-            Complete la información del cliente y agregue los productos a la factura
+            Complete la información del cliente y agregue los productos a la
+            factura
           </p>
         </div>
 
@@ -21,15 +19,23 @@
 
         <div class="client-section">
           <div class="client-section__grid">
-
             <div class="form-group">
               <label class="form-label">
                 <i class="fas fa-id-card"></i> Cédula / RUC *
               </label>
               <div class="search-input-group">
-                <input formControlName="txtCedulaCliente" class="form-input" placeholder="Buscar cédula..." type="text"
-                  (keydown.enter)="$event.preventDefault(); buscarCliente()" />
-                <button type="button" class="btn btn--primary" (click)="buscarCliente()">
+                <input
+                  formControlName="txtCedulaCliente"
+                  class="form-input"
+                  placeholder="Buscar cédula..."
+                  type="text"
+                  (keydown.enter)="$event.preventDefault(); buscarCliente()"
+                />
+                <button
+                  type="button"
+                  class="btn btn--primary"
+                  (click)="buscarCliente()"
+                >
                   <i class="fas fa-search"></i>
                 </button>
               </div>
@@ -39,14 +45,24 @@
               <label class="form-label">
                 <i class="fas fa-user"></i> Nombres del Cliente
               </label>
-              <input readonly formControlName="txtNombreCliente" class="form-input" placeholder="Nombre del cliente..." />
+              <input
+                readonly
+                formControlName="txtNombreCliente"
+                class="form-input"
+                placeholder="Nombre del cliente..."
+              />
             </div>
 
             <div class="form-group">
               <label class="form-label">
                 <i class="fas fa-map-marker-alt"></i> Dirección / Teléfono
               </label>
-              <input readonly formControlName="txtDatosAdicionales" class="form-input" placeholder="Información de contacto..." />
+              <input
+                readonly
+                formControlName="txtDatosAdicionales"
+                class="form-input"
+                placeholder="Información de contacto..."
+              />
             </div>
           </div>
         </div>
@@ -60,32 +76,35 @@
 
         <div class="product-search">
           <div class="product-search__grid">
-
             <div class="form-group">
-              <label class="form-label">
-                Buscar Producto
-              </label>
+              <label class="form-label"> Buscar Producto </label>
               <div class="search-box">
                 <div class="search-box__icon">
                   <i class="fas fa-search"></i>
                 </div>
-                <input type="text" formControlName="txtCodBarra" class="form-input search-box__input--with-icon"
+                <input
+                  type="text"
+                  formControlName="txtCodBarra"
+                  class="form-input search-box__input--with-icon"
                   (keydown.enter)="$event.preventDefault(); agregarProducto()"
-                  placeholder="Escriba código o nombre del producto...">
+                  placeholder="Escriba código o nombre del producto..."
+                />
               </div>
             </div>
 
             <div class="form-group">
-              <label class="form-label">
-                Stock
-              </label>
+              <label class="form-label"> Stock </label>
               <div class="stock-display">
                 {{ stockActual || 0 }}
               </div>
             </div>
 
             <div class="form-group">
-              <button type="button" class="btn btn--success btn--add-product" (click)="agregarProducto()">
+              <button
+                type="button"
+                class="btn btn--primary btn--add-product"
+                (click)="agregarProducto()"
+              >
                 <i class="fas fa-plus"></i> Agregar
               </button>
             </div>
@@ -96,11 +115,26 @@
           <table class="table">
             <thead>
               <tr>
-                <th>Producto</th>
-                <th>Precio Unit.</th>
-                <th>Cantidad</th>
-                <th>Subtotal</th>
-                <th>Acción</th>
+                <th>
+                  <i class="fas fa-box"></i>
+                  Producto
+                </th>
+                <th>
+                  <i class="fas fa-dollar-sign"></i>
+                  Precio Unit.
+                </th>
+                <th>
+                  <i class="fas fa-sort-numeric-up"></i>
+                  Cantidad
+                </th>
+                <th>
+                  <i class="fas fa-calculator"></i>
+                  Subtotal
+                </th>
+                <th>
+                  <i class="fas fa-cogs"></i>
+                  Acción
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -110,25 +144,42 @@
                   <div class="product-code">{{ item.codigo }}</div>
                 </td>
                 <td class="product-price">
-                  ${{ item.precioUnitario | number:'1.2-2' }}
+                  ${{ item.precioUnitario | number : "1.2-2" }}
                 </td>
                 <td>
                   <div class="quantity-control">
-                    <button type="button" class="quantity-control__btn" (click)="disminuirCantidad(i)">
+                    <button
+                      type="button"
+                      class="quantity-control__btn"
+                      (click)="disminuirCantidad(i)"
+                    >
                       <i class="fas fa-minus"></i>
                     </button>
-                    <input type="number" class="quantity-control__input" [(ngModel)]="item.cantidad" [ngModelOptions]="{standalone: true}"
-                      (change)="calcularTotales()">
-                    <button type="button" class="quantity-control__btn" (click)="aumentarCantidad(i)">
+                    <input
+                      type="number"
+                      class="quantity-control__input"
+                      [(ngModel)]="item.cantidad"
+                      [ngModelOptions]="{ standalone: true }"
+                      (change)="calcularTotales()"
+                    />
+                    <button
+                      type="button"
+                      class="quantity-control__btn"
+                      (click)="aumentarCantidad(i)"
+                    >
                       <i class="fas fa-plus"></i>
                     </button>
                   </div>
                 </td>
                 <td class="product-subtotal">
-                  ${{ (item.cantidad * item.precioUnitario) | number:'1.2-2' }}
+                  ${{ item.cantidad * item.precioUnitario | number : "1.2-2" }}
                 </td>
                 <td>
-                  <button type="button" class="btn btn--sm btn--danger btn--icon" (click)="eliminarProducto(i)">
+                  <button
+                    type="button"
+                    class="btn btn--sm btn--danger btn--icon"
+                    (click)="eliminarProducto(i)"
+                  >
                     <i class="fas fa-trash-alt"></i>
                   </button>
                 </td>
@@ -150,35 +201,41 @@
             <div class="totals-section__content">
               <div class="totals-section__row">
                 <span>Subtotal:</span>
-                <span>${{ subtotal | number:'1.2-2' }}</span>
+                <span>${{ subtotal | number : "1.2-2" }}</span>
               </div>
               <div class="totals-section__row">
                 <span>IVA (15%):</span>
-                <span>${{ iva | number:'1.2-2' }}</span>
+                <span>${{ iva | number : "1.2-2" }}</span>
               </div>
               <div class="totals-section__divider"></div>
               <div class="totals-section__row totals-section__row--total">
                 <span>TOTAL A PAGAR:</span>
-                <span>${{ total | number:'1.2-2' }}</span>
+                <span>${{ total | number : "1.2-2" }}</span>
               </div>
             </div>
           </div>
         </div>
-
       </div>
 
       <div class="card__footer">
-        <button type="button" class="btn btn--outline btn--lg" (click)="cancelarVenta()">
+        <button
+          type="button"
+          class="btn btn--outline btn--lg"
+          (click)="cancelarVenta()"
+        >
           <i class="fas fa-times"></i>
           Cancelar
         </button>
 
-        <button type="submit" class="btn btn--success btn--lg" [disabled]="listaDetalles.length === 0">
+        <button
+          type="submit"
+          class="btn btn--primary btn--lg"
+          [disabled]="listaDetalles.length === 0"
+        >
           <i class="fas fa-save"></i>
           Generar Venta
         </button>
       </div>
-
     </div>
   </div>
 </form>

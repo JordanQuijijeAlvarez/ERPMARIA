@@ -1,161 +1,272 @@
 <!-- Header Section -->
-<div class="ventas-page">
-  <div class="card">
-    <!-- Title and Actions Bar -->
+<div class="ventas">
+  <!-- Title and Actions Bar -->
+  <div class="card ventas-header">
     <div class="card__header">
-      <div class="ventas-page__title-section">
-        <div>
-          <div>
-            <h2 class="card__title">
-              GESTIÓN DE VENTAS
-            </h2>
-            <p class="card__subtitle">Administre la información de ventas registradas en el sistema</p>
+      <h2 class="card__title">
+        GESTIÓN DE VENTAS
+      </h2>
+      <p class="card__subtitle">Administre la información de ventas registradas en el sistema</p>
+    </div>
+    
+    <!-- Search and Actions -->
+    <div class="ventas-header__search">
+      <!-- Search Input -->
+      <div class="search-box">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="onSearch($any($event.target).value)"
+          placeholder="Buscar ventas por cliente, fecha..."
+          class="search-box__input"
+        />
+        <div class="search-box__icon">
+          <i class="fas fa-search"></i>
+        </div>
+        
+        <!-- Clear search button -->
+        <button
+          *ngIf="isSearching"
+          type="button"
+          (click)="clearSearch()"
+          title="Limpiar búsqueda"
+          class="search-box__clear"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sales Table -->
+  <div class="table-container ventas-table">
+    <div class="table-header">
+      <div class="ventas-table__header">
+        <h3 class="table-header__title">
+          <i class="fas fa-shopping-cart"></i>
+          Ventas Registradas
+        </h3>
+        
+        <!-- Search indicator -->
+        <div *ngIf="isSearching" class="badge badge--info">
+          <i class="fas fa-search"></i>
+          <span>{{ filteredVentas.length }} resultado(s) para "{{ searchTerm }}"</span>
+          <button 
+            (click)="clearSearch()"
+            title="Limpiar búsqueda"
+            class="search-box__clear ventas-search-badge"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- New Sale Button -->
+      <a routerLink="../crearVenta">
+        <button type="button" class="btn btn--primary">
+          <i class="fas fa-plus"></i>
+          <span>Nueva venta</span>
+        </button>
+      </a>
+    </div>
+
+    
+    <!-- Tabs -->
+    <div class="tabs">
+      <ul class="tabs__list">
+        <li class="tabs__item">
+          <button class="tabs__button" [class.tabs__button--active]="estadoActual === 1" (click)="cambiarTab(1)">
+            <i class="fas fa-check-circle"></i> Activas
+          </button>
+        </li>
+        <li class="tabs__item">
+          <button class="tabs__button" [class.tabs__button--active]="estadoActual === 0" (click)="cambiarTab(0)">
+            <i class="fas fa-ban"></i> Anuladas
+          </button>
+        </li>
+      </ul>
+    </div>
+    
+    <div>
+      <table class="table">
+            <thead>
+              <tr>
+                <th>
+                  <i class="fas fa-hashtag"></i>
+                  ID
+                </th>
+                <th>
+                  <i class="fas fa-user"></i>
+                  Cliente
+                </th>
+                <th>
+                  <i class="fas fa-calendar-alt"></i>
+                  Fecha
+                </th>
+                <th>
+                  <i class="fas fa-dollar-sign"></i>
+                  Total
+                </th>
+                <th>
+                  <i class="fas fa-cogs"></i>
+                  Acciones
+                </th>
+              </tr>
+            </thead>
+          <tbody>
+            <!-- No results message -->
+            <tr *ngIf="paginatedVentas.length === 0">
+              <td colspan="5">
+                <div class="table__empty">
+                  <div class="table__empty-icon">
+                    <i class="fas fa-search" *ngIf="isSearching"></i>
+                    <i class="fas fa-shopping-cart" *ngIf="!isSearching"></i>
+                  </div>
+                  <div>
+                    <p *ngIf="isSearching"><strong>No se encontraron ventas</strong></p>
+                    <p *ngIf="!isSearching"><strong>No hay ventas registradas</strong></p>
+                    <p *ngIf="isSearching">
+                      No hay ventas que coincidan con "{{ searchTerm }}"
+                    </p>
+                    <p *ngIf="!isSearching">
+                      {{ estadoActual === 1 ? 'No hay ventas activas en el sistema' : 'No hay ventas anuladas' }}
+                    </p>
+                  </div>
+                  <button 
+                    *ngIf="isSearching"
+                    (click)="clearSearch()"
+                    class="btn btn--outline btn--sm ventas-table__empty-button"
+                  >
+                    <i class="fas fa-times"></i>
+                    Limpiar búsqueda
+                  </button>
+                </div>
+              </td>
+            </tr>
+            
+            <!-- Sale rows -->
+            <tr *ngFor="let venta of paginatedVentas">
+              <td>#{{ venta.venta_id }}</td>
+              <td>{{ venta.clientenombre }}</td>
+              <td>{{ venta.venta_horafecha | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>
+                <span class="ventas-table__total">
+                  {{ venta.venta_total | currency:'USD' }}
+                </span>
+              </td>
+              <td>
+                <div class="table__actions">
+                  <!-- View Detail Button -->
+                  <button
+                    (click)="verDetalle(venta.venta_id, venta.venta_total, venta.venta_iva, venta.venta_subiva)"
+                    type="button"
+                    title="Ver detalle"
+                    class="btn btn--info btn--sm btn--icon"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  
+                  <ng-container *ngIf="estadoActual === 1">
+                    <!-- Edit Button -->
+                    <button
+                      (click)="ActualizarVenta(venta.venta_id)"
+                      type="button"
+                      title="Editar venta"
+                      class="btn btn--warning btn--sm btn--icon"
+                    >
+                      <i class="fas fa-pen"></i>
+                    </button>
+                    
+                    <!-- Delete Button -->
+                    <button
+                      (click)="anularVenta(venta.venta_id)"
+                      type="button"
+                      title="Anular venta"
+                      class="btn btn--danger btn--sm btn--icon"
+                    >
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </ng-container>
+                  
+                  <span class="badge badge--danger" *ngIf="estadoActual === 0">
+                    Anulada
+                  </span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Pagination Section -->
+      <div *ngIf="totalItems > 0" class="pagination">
+        <!-- Results info y selector de items por página -->
+        <div class="pagination__info">
+          <div class="pagination__text">
+            Mostrando <span>{{ getItemRange().start }}-{{ getItemRange().end }}</span> de <span>{{ totalItems }}</span> ventas
           </div>
-
-          <!-- Search and Actions -->
-          <div class="ventas-page__actions">
-            <!-- Search Input -->
-            <div class="search-box">
-              <input type="text" [(ngModel)]="searchTerm" (input)="onSearch($any($event.target).value)"
-                class="search-box__input"
-                placeholder="Buscar ventas por nombre, cédula, teléfono, email..." />
-              <div class="search-box__icon">
-                <i class="fas fa-search"></i>
-              </div>
-
-              <!-- Clear search button -->
-              <button *ngIf="isSearching" type="button" (click)="clearSearch()"
-                class="search-box__clear"
-                title="Limpiar búsqueda">
-                <i class="fas fa-times"></i>
-              </button>
-            </div>
-
-
+          
+          <!-- Selector de items por página -->
+          <div class="pagination__select-wrapper">
+            <label for="itemsPerPage">Mostrar:</label>
+            <select 
+              id="itemsPerPage"
+              (change)="changeItemsPerPage(+$any($event.target).value)"
+              [value]="itemsPerPage"
+              class="pagination__select"
+            >
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+            <span>por página</span>
           </div>
+        </div>
+        
+        <!-- Pagination controls -->
+        <div class="pagination__controls">
+          <button
+            type="button"
+            (click)="previousPage()"
+            [disabled]="currentPage === 1"
+            class="pagination__button"
+          >
+            <i class="fas fa-chevron-left"></i>
+            Anterior
+          </button>
+          
+          <div class="pagination__numbers">
+            <button
+              *ngFor="let page of getPageNumbers()"
+              type="button"
+              (click)="goToPage(page)"
+              [class.pagination__number--active]="page === currentPage"
+              class="pagination__number"
+            >
+              {{ page }}
+            </button>
+            
+            <!-- Ellipsis for large page counts -->
+            <span *ngIf="totalPages > 5 && currentPage < totalPages - 2">...</span>
+          </div>
+          
+          <button
+            type="button"
+            (click)="nextPage()"
+            [disabled]="currentPage === totalPages"
+            class="pagination__button"
+          >
+            Siguiente
+            <i class="fas fa-chevron-right"></i>
+          </button>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Patients Table -->
-    <div class="table-container">
-      <div class="table-header">
-        <div>
-          <h3 class="table-header__title">
-            <i class="fas fa-users"></i>
-            Ventas Registrados
-          </h3>
-
-          <!-- Search indicator -->
-          <div class="search-indicator" *ngIf="isSearching">
-            <i class="fas fa-search"></i>
-            <span>{{ filteredVentas.length }} resultado(s) para "{{ searchTerm }}"</span>
-            <button class="btn btn--sm btn--outline" (click)="clearSearch()" title="Limpiar búsqueda">
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- New Patient Button -->
-        <a routerLink="../crearVenta">
-          <button type="button" class="btn btn--primary">
-            <i class="fas fa-user-plus"></i>
-            <span>Nueva venta</span>
-          </button>
-        </a>
-      </div>
-
-      <div class="tabs">
-        <ul class="tabs__list">
-          <li class="tabs__item">
-            <button class="tabs__button" [class.tabs__button--active]="estadoActual === 1" (click)="cambiarTab(1)">
-              <i class="fas fa-check-circle"></i> Activas
-            </button>
-          </li>
-          <li class="tabs__item">
-            <button class="tabs__button" [class.tabs__button--active]="estadoActual === 0" (click)="cambiarTab(0)">
-              <i class="fas fa-ban"></i> Anuladas
-            </button>
-          </li>
-        </ul>
-      </div>
-
-      <div class="card__body">
-        <div>
-          <a routerLink="../crearVenta" *ngIf="estadoActual === 1">
-          </a>
-        </div>
-
-        <div class="table-wrapper">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Cliente</th>
-                <th>Fecha</th>
-                <th>Total</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngIf="paginatedVentas.length === 0">
-                <td colspan="5">
-                  <div class="table__empty">
-                    <div class="table__empty-icon">
-                      <i class="fas fa-inbox"></i>
-                    </div>
-                    <p>No se encontraron ventas</p>
-                    <p>
-                      {{ estadoActual === 1 ? 'No hay ventas registradas aún.' : 'No hay ventas anuladas.' }}
-                    </p>
-                  </div>
-                </td>
-              </tr>
-              <tr *ngFor="let venta of paginatedVentas">
-
-                <td>
-                  #{{ venta.venta_id }}
-                </td>
-
-                <td>
-                  {{ venta.clientenombre }}
-                </td>
-
-                <td>
-                  {{ venta.venta_horafecha | date:'dd/MM/yyyy HH:mm' }}
-                </td>
-
-                <td>
-                  {{ venta.venta_total | currency:'USD' }}
-                </td>
-
-                <td>
-                  <div class="table__actions">
-
-                    <button class="btn btn--sm btn--outline" (click)="verDetalle(venta.venta_id, venta.venta_total, venta.venta_iva, venta.venta_subiva)" title="Ver detalle">
-                      <i class="fas fa-eye"></i>
-                    </button>
-
-                    <ng-container *ngIf="estadoActual === 1">
-                      <button class="btn btn--sm btn--warning" (click)="ActualizarVenta(venta.venta_id)" title="Editar">
-                        <i class="fas fa-edit"></i>
-                      </button>
-
-                      <button class="btn btn--sm btn--danger" (click)="anularVenta(venta.venta_id)" title="Anular">
-                        <i class="fas fa-trash"></i>
-                      </button>
-                    </ng-container>
-
-                    <span class="badge badge--danger" *ngIf="estadoActual === 0">
-                      Anulada
-                    </span>
-
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-                  <!-- Modal Detalle de Venta -->
+<!-- Modal Detalle de Venta -->
 <div class="modal" *ngIf="mostrarDetalle">
   <div class="modal__content">
     <div class="modal__header">
@@ -206,58 +317,5 @@
     </div>
   </div>
 </div>
-
-      </div>
-
-          <!-- Pagination Section -->
-          <div class="pagination" *ngIf="totalItems > 0">
-            <div class="pagination__wrapper">
-              <!-- Results info y selector de items por página -->
-              <div class="pagination__info">
-                <div class="pagination__text">
-                  Mostrando <span>{{ getItemRange().start }}-{{ getItemRange().end }}</span> de
-                  <span>{{ totalItems }}</span> Registros
-                </div>
-
-                <!-- Selector de items por página -->
-                <div class="pagination__select-wrapper">
-                  <label for="itemsPerPage">Mostrar:</label>
-                  <select id="itemsPerPage" class="pagination__select" (change)="changeItemsPerPage(+$any($event.target).value)"
-                    [value]="itemsPerPage">
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                  </select>
-                  <span>por página</span>
-                </div>
-              </div>
-
-              <!-- Pagination controls -->
-              <div class="pagination__controls">
-                <button type="button" class="pagination__button" (click)="previousPage()" [disabled]="currentPage === 1">
-                  <i class="fas fa-chevron-left"></i>
-                  Anterior
-                </button>
-
-                <div class="pagination__numbers">
-                  <button *ngFor="let page of getPageNumbers()" type="button" class="pagination__number" [class.pagination__number--active]="page === currentPage" (click)="goToPage(page)">
-                    {{ page }}
-                  </button>
-
-                  <!-- Ellipsis for large page counts -->
-                  <span class="pagination__ellipsis" *ngIf="totalPages > 5 && currentPage < totalPages - 2">...</span>
-                </div>
-
-                <button type="button" class="pagination__button" (click)="nextPage()" [disabled]="currentPage === totalPages">
-                  Siguiente
-                  <i class="fas fa-chevron-right"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       

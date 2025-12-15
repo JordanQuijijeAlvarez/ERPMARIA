@@ -1,6 +1,39 @@
-.margenx{
-    
-        margin-left: -3rem;
-        margin-right: -3rem;
-    
+/* ========================================
+   FORMULARIO DE CATEGORÍAS - ESTILOS ESPECÍFICOS
+   ======================================== */
+
+/* ----- Contenedor principal ----- */
+.categoria-form {
+  padding: 24px;
+}
+
+/* ----- Sección de encabezado ----- */
+.categoria-form__section-header {
+  margin-top: 24px;
+  margin-bottom: 16px;
+}
+
+.categoria-form__section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+/* ----- Grid de campos ----- */
+.categoria-form__fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+/* ----- Footer de acciones ----- */
+.categoria-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
 }

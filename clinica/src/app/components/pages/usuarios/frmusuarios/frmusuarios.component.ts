@@ -53,13 +53,10 @@ listaMedicoSinUsuario: any;
       });
     }
     ngOnInit(): void {
-      this.listarRoles();
-      //this.listarMedicos();
+      // this.listarRoles();
 
       this.route.paramMap.subscribe((parametros) => {
         const id = parametros.get('id');
-       
-
         if (id) {
           this.eventoUpdate = true;
           this.codigo = parseInt(id);
@@ -84,19 +81,17 @@ listaMedicoSinUsuario: any;
     //   });
     // }
 
-    listarRoles(): void {
-      this.rolServ.LRoles().subscribe({
-        next: (res) => {
-          this.listaRoles = res;
-  
-          console.log(res);
-        },
-        error: (err) => {
-          alert('NO EXISTEN REGISTROS');
-          
-        },
-      });
-    }
+    // listarRoles(): void {
+    //   this.rolServ.LRoles().subscribe({
+    //     next: (res) => {
+    //       this.listaRoles = res;
+    //       console.log(res);
+    //     },
+    //     error: (err) => {
+    //       alert('NO EXISTEN REGISTROS');
+    //     },
+    //   });
+    // }
 
     onRoleChange(event: any): void {
       const selectedRoleId = parseInt(event.target.value, 10); 

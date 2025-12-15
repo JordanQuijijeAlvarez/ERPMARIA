@@ -1,7 +1,7 @@
-const pool = require('../../configuracion/db');
+const { getConnection, oracledb } = require('../../configuracion/oraclePool');
 
 exports.getUsuarios = async (req, res) => {
-    const query = 'SELECT * FROM listarUsuario()';
+    const query = 'SELECT * FROM usuario WHERE user_estado = 1';
 
     try {
         const result = await pool.query(query);
@@ -9,6 +9,39 @@ exports.getUsuarios = async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Error en el servidor al obtener los usuarios' });
+    }
+};
+
+// helper para convertir llaves a minúsculas
+function formatearSalida(rows) {
+    if (!rows || rows.length === 0) return [];
+    return rows.map(obj => {
+        const nuevo = {};
+        Object.keys(obj).forEach(k => nuevo[k.toLowerCase()] = obj[k]);
+        return nuevo;
+    });
+}
+
+exports.getUsuariosEstado = async (req, res) => {
+    let connection;
+
+    try {
+        connection = await getConnection();
+
+        const result = await connection.execute(
+            `SELECT * FROM usuario WHERE user_estado = 1`,
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        // Formatear claves a minúscula
+        res.json(formatearSalida(result.rows));
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: error.message });
+
+    } finally {
+        if (connection) await connection.close();
     }
 };
 

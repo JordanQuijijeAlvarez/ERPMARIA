@@ -1,180 +1,195 @@
 <form [formGroup]="frmProducto" (ngSubmit)="guardarproducto()">
-  <div>
-    <div>
-      <!-- Header Section -->
-      <div>
-        <div>
-          <h2>
-            {{ eventoUpdate ? 'ACTUALIZAR MÉDICO' : 'REGISTRO DE MÉDICO' }}
+  <div class="producto-form">
+    <div class="card">
+      <div class="card__header">
+        <div class="card__title-group">
+          <h2 class="card__title">
+            {{ eventoUpdate ? 'ACTUALIZAR PRODUCTO' : 'REGISTRO DE PRODUCTO' }}
           </h2>
-          <p>
+          <p class="card__subtitle">
             {{ eventoUpdate ?
-            'Modifique la información del médico según sea necesario' : 
-            'Complete la información personal y profesional del nuevo médico' }}
+            'Modifique la información del producto según sea necesario' : 
+            'Complete la información del nuevo producto' }}
           </p>
         </div>
       </div>
 
-      <!-- Main Form Container -->
-      <div>
-
-        <!-- Left Column - Personal Information -->
-        <div>
-          <div>
-            <h3>
-              <i class="fas fa-user-edit"></i>
-              Información Personal
-            </h3>
-          </div>
-
-          <div>
-            <div>
-              <!-- Codigo Barras -->
-              <div>
-                <label>
-                  <i class="fas fa-id-card"></i>
-                  Código de Barras *
-                </label>
-                <input formControlName="txtCodigobarras" type="text" id="codigobarras" autocomplete="address-level2"
-                  placeholder="Ingresa el codigo (13 dígitos)" maxlength="13"
-                  />
-                <app-validators [control]="frmProducto.get('txtCodigobarras')!" [showCounter]="true"
-                  [expectedLength]="13">
-                </app-validators>
-              </div>
-
-              <!-- Nombres -->
-              <div>
-                <label>
-                  <i class="fas fa-user"></i>
-                  Nombres *
-                </label>
-                <input formControlName="txtNombres" type="text" id="nombres" autocomplete="given-name"
-                  placeholder="Ejemplo: Aceite Palma de oro"
-                  />
-                <app-validators [control]="frmProducto.get('txtNombres')!"></app-validators>
-              </div>
-
-              <!-- Descripcion -->
-              <div>
-                <label>
-                  <i class="fas fa-user-tag"></i>
-                  Descripción *
-                </label>
-                <input formControlName="txtDescripcion" type="text" name="last-name" id="descripcion"
-                  autocomplete="family-name" placeholder="Ejemplo: Producto de cocina"
-                  />
-                <app-validators [control]="frmProducto.get('txtDescripcion')!"></app-validators>
-              </div>
-
-              <!-- precio compra -->
-              <div>
-                <label>
-                  <i class="fas fa-calendar-alt"></i>
-                  Precio de Compra *
-                </label>
-                <input formControlName="txtpreciocompra" type="text" id="preciocompra" autocomplete="address-level2"
-                  />
-                <app-validators [control]="frmProducto.get('txtpreciocompra')!"></app-validators>
-              </div>
-
-              <!-- precio venta -->
-              <div>
-                <label>
-                  <i class="fas fa-calendar-alt"></i>
-                  Precio de Venta *
-                </label>
-                <input formControlName="txtprecioventa" type="text" id="precioventa" autocomplete="address-level2"
-                  />
-                <app-validators [control]="frmProducto.get('txtprecioventa')!"></app-validators>
-              </div>
-
-              <!-- stock -->
-              <div>
-                <label>
-                  <i class="fas fa-calendar-alt"></i>
-                  Stock del Producto *
-                </label>
-                <input formControlName="txtstock" type="number" id="stock" autocomplete="address-level2"
-                  />
-                <app-validators [control]="frmProducto.get('txtstock')!"></app-validators>
-              </div>
-              <!-- stock minimo -->
-              <div>
-                <label>
-                  <i class="fas fa-calendar-alt"></i>
-                  Stock del Producto minimo *
-                </label>
-                <input formControlName="txtstockminimo" type="number" id="stock" autocomplete="address-level2"
-                  />
-                <app-validators [control]="frmProducto.get('txtstockminimo')!"></app-validators>
-              </div>
-            </div>
-          </div>
+      <div class="card__body">
+        <div class="producto-form__section-header">
+          <h3 class="producto-form__section-title">
+            <i class="fas fa-box"></i>
+            Información del Producto
+          </h3>
         </div>
 
-        <!-- Right Column - Professional Information -->
-        <div>
-          <div>
-            <h3>
-              <i class="fas fa-user-md"></i>
-              Información Adicional
-            </h3>
+        <div class="producto-form__fields">
+          <!-- Codigo Barras - Full Width -->
+          <div class="form-group producto-form__field--full">
+            <label class="form-label">
+              <i class="fas fa-barcode"></i>
+              Código de Barras *
+            </label>
+            <input
+              class="form-input"
+              formControlName="txtCodigobarras"
+              type="text"
+              id="codigobarras"
+              placeholder="Ingresa el código (13 dígitos)"
+              maxlength="13"
+            />
+            <app-validators
+              [control]="frmProducto.get('txtCodigobarras')!"
+              [showCounter]="true"
+              [expectedLength]="13">
+            </app-validators>
           </div>
 
-          <div>
-            <div>
+          <!-- Nombres - Full Width -->
+          <div class="form-group producto-form__field--full">
+            <label class="form-label">
+              <i class="fas fa-tag"></i>
+              Nombre del Producto *
+            </label>
+            <input
+              class="form-input"
+              formControlName="txtNombres"
+              type="text"
+              id="nombres"
+              placeholder="Ejemplo: Aceite Palma de oro"
+            />
+            <app-validators [control]="frmProducto.get('txtNombres')!"></app-validators>
+          </div>
 
-              <!-- Subcategorias -->
-              <div>
-                <label>
-                  <i class="fas fa-door-open"></i>
-                  Subcategoria *
-                </label>
-                <select formControlName="cbxSubcategoria" id="subcategoria">
-                  <option value="" disabled selected>
-                    Seleccione una subcategoria
-                  </option>
-                  <option *ngFor="let subcategoria of listaSubcategorias" [value]="subcategoria.subcat_id">
-                    {{ subcategoria.subcat_nombre }}
-                  </option>
-                </select>
-                <app-validators [control]="frmProducto.get('cbxSubcategoria')!"></app-validators>
+          <!-- Descripcion - Full Width -->
+          <div class="form-group producto-form__field--full">
+            <label class="form-label">
+              <i class="fas fa-align-left"></i>
+              Descripción *
+            </label>
+            <input
+              class="form-input"
+              formControlName="txtDescripcion"
+              type="text"
+              id="descripcion"
+              placeholder="Ejemplo: Producto de cocina"
+            />
+            <app-validators [control]="frmProducto.get('txtDescripcion')!"></app-validators>
+          </div>
 
-              
-
-
-
- <button type="button" (click)="abrirModalAgregarSubcategoria()" title="Agregar nueva subcategoría rápidamente">
-                    <i class="fas fa-plus"></i>
-                  </button>
-              </div>
-
-
-  
-
-                 
-     
-
-
-
+          <!-- Subcategorias - Full Width -->
+          <div class="form-group producto-form__field--full">
+            <label class="form-label">
+              <i class="fas fa-list"></i>
+              Subcategoría *
+            </label>
+            <div class="producto-form__select-with-button">
+              <select class="form-select" formControlName="cbxSubcategoria" id="subcategoria">
+                <option value="" disabled selected>
+                  Seleccione una subcategoría
+                </option>
+                <option *ngFor="let subcategoria of listaSubcategorias" [value]="subcategoria.subcat_id">
+                  {{ subcategoria.subcat_nombre }}
+                </option>
+              </select>
+              <button
+                class="btn btn--primary btn--icon producto-form__add-button"
+                type="button"
+                (click)="abrirModalAgregarSubcategoria()"
+                title="Agregar nueva subcategoría rápidamente"
+              >
+                <i class="fas fa-plus"></i>
+              </button>
             </div>
+            <app-validators [control]="frmProducto.get('cbxSubcategoria')!"></app-validators>
           </div>
+
+          <!-- precio compra -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-dollar-sign"></i>
+              Precio de Compra *
+            </label>
+            <input
+              class="form-input"
+              formControlName="txtpreciocompra"
+              type="text"
+              id="preciocompra"
+              placeholder="0.00"
+            />
+            <app-validators [control]="frmProducto.get('txtpreciocompra')!"></app-validators>
+          </div>
+
+          <!-- precio venta -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-dollar-sign"></i>
+              Precio de Venta *
+            </label>
+            <input
+              class="form-input"
+              formControlName="txtprecioventa"
+              type="text"
+              id="precioventa"
+              placeholder="0.00"
+            />
+            <app-validators [control]="frmProducto.get('txtprecioventa')!"></app-validators>
+          </div>
+
+          <!-- stock -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-warehouse"></i>
+              Stock del Producto *
+            </label>
+            <input
+              class="form-input"
+              formControlName="txtstock"
+              type="number"
+              id="stock"
+              placeholder="0"
+            />
+            <app-validators [control]="frmProducto.get('txtstock')!"></app-validators>
+          </div>
+          
+          <!-- stock minimo -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-exclamation-triangle"></i>
+              Stock Mínimo *
+            </label>
+            <input
+              class="form-input"
+              formControlName="txtstockminimo"
+              type="number"
+              id="stockminimo"
+              placeholder="0"
+            />
+            <app-validators [control]="frmProducto.get('txtstockminimo')!"></app-validators>
+          </div>
+
         </div>
       </div>
 
 
 
-      <!-- Action Buttons -->
-      <div>
-        <button type="button" (click)="salirSinGuardar()">
-          <i class="fas fa-times"></i>
-          Cancelar
-        </button>
-        <button type="submit">
-          <i class="fas fa-save"></i>
-          {{ eventoUpdate ? 'Actualizar Producto' : 'Guardar Producto' }}
-        </button>
+      <div class="card__footer">
+        <div class="producto-form__actions">
+          <button
+            class="btn btn--outline"
+            type="button"
+            (click)="salirSinGuardar()"
+          >
+            <i class="fas fa-times"></i>
+            Cancelar
+          </button>
+          <button
+            class="btn btn--primary"
+            type="submit"
+          >
+            <i class="fas fa-save"></i>
+            {{ eventoUpdate ? 'Actualizar Producto' : 'Guardar Producto' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
