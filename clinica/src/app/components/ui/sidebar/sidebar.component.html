@@ -1,136 +1,119 @@
-<div class="flex h-screen w-full bg-transparent">
-  <!--Start SideBar-->
-  <aside
-    class="w-20 relative z-20 flex-shrink-0 px-2 overflow-y-auto bg-gray-800 sm:block"
-  >
-    <div class="mb-6">
-      <!--Start logo -->
-      <div class="flex justify-center">
-        <div
-          class="w-14 h-14 rounded-full bg-gray-300 border-2 border-white mt-2"
-        >
-          <img
+<!--Start SideBar-->
+<aside class="sidebar">
+  <!--Start logo -->
+  <div class="sidebar__logo">
+    <img
+      routerLink="./dashboard"
+      src="/assets/images/logo.png"
+      class="sidebar__logo-img"
+    />
+  </div>
+  <!--End logo -->
 
-          routerLink="./dashboard"
-            src="/images/icons/iconoestetocopio.png"
-            class="rounded-full w-auto"
-          />
-        </div>
-      </div>
-      <!--End logo -->
-      <!--Start NavItem   error mover a .ts  @click="openMenu !== 1 ? openMenu = 1 : openMenu = null"-->
-      <div>
-        <ul class="mt-6 leading-10 px-4">
-          <li
-            class="mb-3 p-2 rounded-md flex items-center justify-center bg-blue-400 cursor-pointer"
-            (click)="toggleMenu(1)"
-          >
-            <i class="fas fa-align-left fa-sm text-white"></i>
-          </li>
-          
+  <nav class="sidebar__nav">
+    <ul class="sidebar__nav-list">
+      <!-- COMERCIAL -->
+      <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR']">
+        Comercial
+      </p>
 
-          <li
-            class="absolute bottom-0 mb-3 p-2 rounded-full flex items-center mx-auto bg-white cursor-pointer"
-            (click)="cerrarSesion()"
-          >
-            <i class="fas fa-power-off fa-sm colorIconosSliderStandar"></i>
-          </li>
-        </ul>
-      </div>
-      <!--End NavItem -->
-    </div>
-  </aside>
-  <!-- Start Open Menu  "-->
-  <aside
-    class="animate__animated w-52 relative z-0 flex-shrink-0 px-4 overflow-y-auto bg-gray-800 sm:block sidebar-scroll"
-    [class.animate__fadeInLeft]="openMenu === 1 && !isClosing"
-    [class.animate__fadeOutLeft]="isClosing"
-    *ngIf="openMenu === 1 || isClosing"
-  >
-    <div class="mb-6">
-      <!--Start Sidebar for open menu -->
-      <div class="flex flex-col gap-1 mt-4 px-2">
-
-    <!-- CLIENTES -->
-        <div
-        *appMostrarSiRol="['ADMINISTRADOR']"
-          class="mb-2 mt-3"
-        >
-          <p class="font-bold numletrasidebar text-sm mb-2 text-white">
-            Clientes
-          </p>
-        </div>
-
-        <!-- boton lista clientes -->
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
         <a
-          *appMostrarSiRol="['ADMINISTRADOR']"
-          routerLink="listarclientes"
-          class="flex items-center p-3 bg-white rounded-md shadow-sm cursor-pointer hover:bg-gray-100 hover:shadow-md hover:scale-105 transition-all duration-200 mb-1"
+          routerLink="listarClientes"
+          routerLinkActive="sidebar__nav-link--active"
+          class="sidebar__nav-link"
         >
-          <div class="flex items-center justify-center w-8 h-8 mr-3">
-            <i class="fa fa-street-view colorIconosSliderStandar"></i>
-          </div>
-          <p class="text-sm font-semibold">Clientes</p>
+          <i class="fa fa-street-view sidebar__icon"></i>
+          <span>Clientes</span>
         </a>
+      </li>
 
-
-         <!-- boton lista productos -->
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
         <a
-          *appMostrarSiRol="['ADMINISTRADOR']"
-          routerLink="listarproductos"
-          class="flex items-center p-3 bg-white rounded-md shadow-sm cursor-pointer hover:bg-gray-100 hover:shadow-md hover:scale-105 transition-all duration-200 mb-1"
+          routerLink="listarVentas"
+          routerLinkActive="sidebar__nav-link--active"
+          class="sidebar__nav-link"
         >
-          <div class="flex items-center justify-center w-8 h-8 mr-3">
-            <i class="fa fa-street-view colorIconosSliderStandar"></i>
-          </div>
-          <p class="text-sm font-semibold">PRODUCTOS</p>
+          <i class="fa fa-shopping-cart sidebar__icon"></i>
+          <span>Ventas</span>
         </a>
-          <!-- boton lista ventas -->
+      </li>
+
+      <!-- INVENTARIO -->
+      <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR']">
+        Inventario
+      </p>
+
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
         <a
-          *appMostrarSiRol="['ADMINISTRADOR']"
-          routerLink="listaventas"
-          class="flex items-center p-3 bg-white rounded-md shadow-sm cursor-pointer hover:bg-gray-100 hover:shadow-md hover:scale-105 transition-all duration-200 mb-1"
+          routerLink="listarProductos"
+          routerLinkActive="sidebar__nav-link--active"
+          class="sidebar__nav-link"
         >
-          <div class="flex items-center justify-center w-8 h-8 mr-3">
-            <i class="fa fa-street-view colorIconosSliderStandar"></i>
-          </div>
-          <p class="text-sm font-semibold">VENTAS</p>
+          <i class="fa fa-box sidebar__icon"></i>
+          <span>Productos</span>
         </a>
+      </li>
 
-
-
-
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
         <a
-          *appMostrarSiRol="['medico']"
-          routerLink="dashboard"
-          class="flex items-center p-3 bg-white rounded-md shadow-sm cursor-pointer hover:bg-gray-100 hover:shadow-md hover:scale-105 transition-all duration-200 mb-1"
+          routerLink="listarCategorias"
+          routerLinkActive="sidebar__nav-link--active"
+          class="sidebar__nav-link"
         >
-          <div class="flex items-center justify-center w-8 h-8 mr-3">
-            <i class="fas fa-chart-pie fa-sm colorIconosSliderStandar"></i>
-          </div>
-          <p class="text-sm font-semibold">Dashboard</p>
+          <i class="fa fa-tags sidebar__icon"></i>
+          <span>Categorias</span>
         </a>
+      </li>
 
-       
+      <!-- COMPRAS -->
+      <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR']">
+        Compras
+      </p>
 
-
-
-        <!-- boton lista usuarios -->
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
         <a
-          *appMostrarSiRol="['ADMINISTRADOR']"
-          routerLink="listausuarios"
-          class="flex items-center p-3 bg-white rounded-md shadow-sm cursor-pointer hover:bg-gray-50 mb-1"
+          routerLink="listarProveedores"
+          routerLinkActive="sidebar__nav-link--active"
+          class="sidebar__nav-link"
         >
-          <div class="flex items-center justify-center w-8 h-8 mr-3">
-            <i class="fa fa-users colorIconosSliderStandar"></i>
-          </div>
-          <p class="text-sm font-semibold">Usuarios</p>
+          <i class="fa fa-truck sidebar__icon"></i>
+          <span>Proveedores</span>
         </a>
-      </div>
-      <!--End Sidebar for open menu -->
-    </div>
-  </aside>
-  <!-- End Open Menu -->
+      </li>
 
-  <!-- End Sidebar -->
-</div>
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
+        <a
+          routerLink="listarCompras"
+          routerLinkActive="sidebar__nav-link--active"
+          class="sidebar__nav-link"
+        >
+          <i class="fa fa-shopping-bag sidebar__icon"></i>
+          <span>Compras</span>
+        </a>
+      </li>
+
+      <!-- ADMINISTRACIÓN -->
+      <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR']">
+        Administración
+      </p>
+
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
+        <a
+          routerLink="listarUsuarios"
+          routerLinkActive="sidebar__nav-link--active"
+          class="sidebar__nav-link"
+        >
+          <i class="fa fa-users sidebar__icon"></i>
+          <span>Usuarios</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <button class="sidebar__logout" (click)="cerrarSesion()">
+    <i class="fas fa-power-off sidebar__logout-icon"></i>
+    <span>Cerrar sesión</span>
+  </button>
+</aside>
+<!--End SideBar-->

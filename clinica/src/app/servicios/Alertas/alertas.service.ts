@@ -16,8 +16,8 @@ export class AlertService {
       text,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
+      confirmButtonColor: 'var(--color-info)',
+      cancelButtonColor: 'var(--color-danger)',
       confirmButtonText,
       cancelButtonText,
     });
@@ -28,7 +28,7 @@ export class AlertService {
       title,
       text,
       icon: 'success',
-      confirmButtonColor: '#3085d6',
+      confirmButtonColor: 'var(--color-success)',
     });
   }
 
@@ -37,7 +37,7 @@ export class AlertService {
       title,
       text,
       icon: 'error',
-      confirmButtonColor: '#d33',
+      confirmButtonColor: 'var(--color-danger)',
     });
   }
 
@@ -46,7 +46,7 @@ export class AlertService {
       title,
       text,
       icon: 'info',
-      confirmButtonColor: '#3085d6',
+      confirmButtonColor: 'var(--color-info)',
     });
   }
 
@@ -55,7 +55,8 @@ export class AlertService {
     Swal.fire({
       title: "Eliminado!",
       text: "Registro Eliminado con éxito ",
-      icon: "success"
+      icon: "success",
+      confirmButtonColor: 'var(--color-success)',
     });
 
   }
@@ -69,6 +70,7 @@ export class AlertService {
       cancelButtonText: "NO",
       showCancelButton: true,
       showCloseButton: true,
+      confirmButtonColor: "var(--color-primary)",
     }).then((result) => {
       if (result.isConfirmed) {
         window.location.href = url;
@@ -81,7 +83,7 @@ export class AlertService {
       title,
       text,
       icon: 'info',
-      confirmButtonColor: '#3085d6',
+      confirmButtonColor: 'var(--color-info)',
     }).then((result) => {
       if (result.isConfirmed && redirectCallback) {
         redirectCallback();

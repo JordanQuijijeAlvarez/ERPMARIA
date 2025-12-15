@@ -1,0 +1,192 @@
+/* ========================================
+   LOGIN - USANDO VARIABLES GLOBALES
+   ======================================== */
+
+/* Fondo general */
+.login {
+	min-height: 100vh;
+	background: 
+		url('/assets/images/dodles.png') repeat,
+		linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary-hover) 60%, var(--color-primary) 100%);
+	background-size: 300px auto, cover;
+	background-blend-mode: soft-light;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* Contenedor principal */
+.login__container {
+	background: var(--color-bg-card);
+	border-radius: var(--spacing-xl);
+	box-shadow: var(--shadow-xl);
+	display: flex;
+	max-width: 900px;
+	width: 100%;
+	min-height: 540px;
+	overflow: hidden;
+}
+
+/* Lado izquierdo (formulario) */
+.login__left {
+	flex: 1 1 0;
+	padding: var(--spacing-2xl) 2.5rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+/* Header */
+.login__header {
+	margin-bottom: 2.5rem;
+	text-align: left;
+}
+.login__icon {
+	font-size: 2.5rem;
+	margin-bottom: 0.5rem;
+	color: var(--color-warning);
+}
+.login__title {
+	font-size: var(--font-size-3xl);
+	font-weight: 700;
+	color: var(--color-text-primary);
+	margin-bottom: 0.2rem;
+}
+.login__subtitle {
+	font-size: var(--font-size-xl);
+	font-weight: 500;
+	color: var(--color-secondary);
+	margin-bottom: 0.5rem;
+}
+.login__description {
+	color: var(--color-text-secondary);
+	font-size: var(--font-size-base);
+}
+
+/* Formulario */
+.login__form {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-md);
+}
+.login__field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.3rem;
+}
+.login__label {
+	font-weight: 600;
+	color: var(--color-text-primary);
+	font-size: var(--font-size-base);
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+.login__label-icon {
+	color: var(--color-text-light);
+	font-size: 1.1rem;
+}
+.login__input {
+	border: 1.5px solid var(--color-border);
+	border-radius: var(--radius-xl);
+	padding: 0.9rem 1.2rem;
+	font-size: var(--font-size-base);
+	color: var(--color-text-primary);
+	background: var(--color-bg-hover);
+	outline: none;
+	transition: border var(--transition-normal), box-shadow var(--transition-normal);
+}
+.login__input:focus {
+	border-color: var(--color-primary);
+	box-shadow: 0 0 0 2px var(--color-primary-light);
+}
+
+/* Forgot password */
+.login__forgot {
+	text-align: right;
+	margin-top: -0.7rem;
+	margin-bottom: 0.5rem;
+}
+.login__forgot a {
+	color: var(--color-text-secondary);
+	font-size: 0.95rem;
+	text-decoration: underline;
+	transition: color var(--transition-normal);
+}
+.login__forgot a:hover {
+	color: var(--color-text-primary);
+}
+
+/* Botón principal */
+.login__form button,
+.login__button {
+	width: 100%;
+	background: linear-gradient(90deg, var(--color-primary-hover) 60%, var(--color-primary) 100%);
+	color: var(--color-text-white);
+	font-weight: 700;
+	font-size: 1.1rem;
+	border: none;
+	border-radius: var(--radius-xl);
+	padding: 0.95rem 0;
+	margin-top: 0.5rem;
+	cursor: pointer;
+	box-shadow: var(--shadow-md);
+	transition: background var(--transition-normal), transform var(--transition-normal);
+}
+.login__form button:disabled {
+	background: var(--color-border);
+	color: var(--color-text-light);
+	cursor: not-allowed;
+}
+.login__form button:hover:not(:disabled) {
+	background: linear-gradient(90deg, var(--color-primary) 60%, var(--color-primary-hover) 100%);
+	transform: translateY(-2px) scale(1.03);
+}
+
+/* Signup link */
+.login__signup {
+	text-align: center;
+	margin-top: 1.2rem;
+	color: var(--color-text-secondary);
+	font-size: 0.98rem;
+}
+.login__signup a {
+	color: var(--color-warning);
+	font-weight: 600;
+	text-decoration: none;
+	margin-left: 0.3rem;
+	transition: color var(--transition-normal);
+}
+.login__signup a:hover {
+	color: var(--color-warning-hover);
+}
+
+/* Lado derecho (imagen) */
+.login__right {
+	flex: 1 1 0;
+  min-width: 320px;
+	display: block;
+}
+
+@media (max-width: 900px) {
+	.login__container {
+		flex-direction: column;
+		min-height: 700px;
+		max-width: 95vw;
+	}
+	.login__right {
+		min-height: 220px;
+		min-width: 100%;
+		height: 220px;
+	}
+}
+
+/* Imagen dentro del lado derecho */
+.login__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}

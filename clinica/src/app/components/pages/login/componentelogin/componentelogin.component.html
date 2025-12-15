@@ -1,89 +1,83 @@
-<div class="flex h-screen items-center justify-center bg-gray-800 p-5">
-  <div class="w-full max-w-md">
-    <div class="bg-white border border-gray-200 rounded-lg shadow-xl p-8">
-      
+<div class="login">
+  <div class="login__container">
+    <div class="login__left">
       <!-- Header with Icon -->
-      <div class="text-center mb-8">
-        <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-          <i class="fas fa-hospital text-gray-600 text-2xl"></i>
+      <div class="login__header">
+        <div class="login__icon">
+          <i></i>
         </div>
-        <h1 class="text-2xl font-bold text-gray-800 mb-2">
-          Sistema de Gestión
+        <h1 class="login__title">
+          Minimarket María
         </h1>
-        <h2 class="text-lg font-medium text-gray-600 mb-2">
-          Clínica Médica
+        <h2 class="login__subtitle">
+          Sistema de Gestión de Negocio
         </h2>
-        <p class="text-gray-500 text-sm">
+        <p class="login__description">
           Inicie sesión para acceder al sistema
         </p>
       </div>
 
       <!-- Login Form -->
-      <form [formGroup]="formLogin" (ngSubmit)="Login()" class="space-y-6">
-        
+      <form class="login__form" [formGroup]="formLogin" (ngSubmit)="Login()">
         <!-- Username Field -->
-        <div>
-          <label for="username" class="block text-sm font-semibold text-gray-700 mb-2">
-            <i class="fas fa-user text-gray-500 mr-2"></i>
-            Nombre de Usuario *
+        <div class="login__field">
+          <label class="login__label" for="username">
+            <i class="fas fa-user login__label-icon"></i>
+            Nombre de Usuario
           </label>
           <input
+            class="login__input"
             type="text"
             formControlName="usuario"
             id="username"
             autocomplete="username"
             placeholder="Ingrese su nombre de usuario"
-            class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
           />
         </div>
 
         <!-- Password Field -->
-        <div>
-          <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">
-            <i class="fas fa-lock text-gray-500 mr-2"></i>
-            Contraseña *
+        <div class="login__field">
+          <label class="login__label" for="password">
+            <i class="fas fa-lock login__label-icon"></i>
+            Contraseña
           </label>
           <input
+            class="login__input"
             type="password"
             formControlName="password"
             id="password"
             autocomplete="current-password"
             placeholder="Ingrese su contraseña"
-            class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
           />
         </div>
 
         <!-- Forgot Password Link -->
-        <div class="text-center" *ngIf="geTUser.value.length > 0">
-          <a 
-            [routerLink]="['/login/recuperacion', Getusername]"
-            class="text-sm text-gray-600 hover:text-gray-800 underline transition-colors duration-200"
-          >
+        <div class="login__forgot" >
+          <a [routerLink]="['/login/recuperacion', Getusername]">
             ¿Has olvidado tu contraseña?
           </a>
         </div>
 
         <!-- Login Button -->
         <button
+          class="login__button"
           type="submit"
           [disabled]="!formLogin.valid"
-          class="w-full px-6 py-3 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105"
-          [ngClass]="{
-            'bg-gray-800 hover:bg-gray-900 focus:ring-gray-500 cursor-pointer': formLogin.valid,
-            'bg-gray-700 cursor-not-allowed': !formLogin.valid
-          }"
         >
-          <i class="fas fa-sign-in-alt mr-2"></i>
+          <i class="fas fa-sign-in-alt"></i>
           Acceder al Sistema
         </button>
       </form>
 
       <!-- Additional Info -->
-      <div class="mt-6 text-center">
-        <p class="text-xs text-gray-500">
+      <div class="login__signup">
+        <p>
           Sistema protegido. Solo personal autorizado.
         </p>
       </div>
+    </div>
+    <div class="login__right">
+      <img src="assets/images/login_recortado.png" type="image/png" alt="Minimarket María" class="login__image" />
     </div>
   </div>
 </div>

@@ -1,23 +1,6 @@
-<div class="flex h-screen w-full  " (click)="toggleMenu(1)">
-                 <!--Start sidebar -->
-                 <app-sidebar> </app-sidebar>
-                 <!--End sidebar -->
-  
-        <div class="flex flex-col flex-1 w-full overflow-y-auto">
-                <!--Start Topbar -->
-                <!-- <div class="p-2 bg-transparent">
-                  
-                    <app-header></app-header>
-                </div>  -->
-                <!--End Topbar -->
-          <main class="relative z-0 flex-1 pb-8 px-6 bg-gray-700">
-            <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-              <!-- Start Content-->
-                  <app-panelcontenido></app-panelcontenido>                  
-                  <!-- End Content-->
-           
-                </div>
-          </main>
-        </div>
+<div class="panel-principal">
+  <app-sidebar class="panel-principal__sidebar"></app-sidebar>
+  <main class="panel-principal__contenido">
+    <app-panelcontenido></app-panelcontenido>
+  </main>
 </div>
-

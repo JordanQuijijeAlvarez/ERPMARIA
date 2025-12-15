@@ -1,7 +1,43 @@
-.margenx{
-    
-        margin-left: -3rem;
-        margin-right: -3rem;
-    
+/* ========================================
+   FORMULARIO DE CLIENTES - ESTILOS ESPECÍFICOS
+   ======================================== */
+
+/* ----- Contenedor principal ----- */
+.cliente-form {
+  padding: 24px;
 }
 
+/* ----- Sección de encabezado ----- */
+.cliente-form__section-header {
+  margin-top: 24px;
+  margin-bottom: 16px;
+}
+
+.cliente-form__section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+/* ----- Grid de campos ----- */
+.cliente-form__fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+/* ----- Campo completo (ocupa toda la fila) ----- */
+.cliente-form__field--full {
+  grid-column: 1 / -1;
+}
+
+/* ----- Footer de acciones ----- */
+.cliente-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}

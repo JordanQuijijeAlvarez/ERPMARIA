@@ -1,0 +1,135 @@
+/* === Contenedor principal === */
+.productos {
+  padding: 1.5rem;
+}
+
+/* === Header === */
+.productos-header__search {
+  padding: 0 1.5rem 1.5rem;
+}
+
+/* === Tabla === */
+.productos-table {
+  margin-top: 1.5rem;
+}
+
+.productos-table__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* === Badge de búsqueda === */
+.productos-search-badge {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/* === Filas de la tabla === */
+.productos-table__row-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.productos-table__row-info i {
+  color: var(--color-text-secondary);
+}
+
+/* ----- PRECIO DEL PRODUCTO ----- */
+.product-price {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-success);
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  background: var(--color-success-light);
+  border-radius: var(--radius-sm);
+}
+
+/* ----- STOCK DEL PRODUCTO ----- */
+.product-stock {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--color-success);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+  padding: 6px 12px;
+  background: var(--color-success-light);
+  border-radius: var(--radius-sm);
+}
+
+.product-stock--low {
+  color: var(--color-danger);
+  background: var(--color-danger-light);
+  font-weight: 700;
+}
+
+/* ----- PAGINACIÓN WRAPPER ----- */
+.pagination__wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+.pagination__ellipsis {
+  padding: 0 8px;
+  color: var(--color-text-secondary);
+}
+
+/* ----- ANIMACIONES ----- */
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+  }
+  to { 
+    opacity: 1; 
+  }
+}
+
+/* === Precio y Stock === */
+.productos-table__price {
+  font-weight: 600;
+  color: var(--color-success);
+}
+
+.productos-table__stock {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--border-radius);
+  background-color: var(--color-success-light);
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.productos-table__stock--low {
+  background-color: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+/* === Botón de estado vacío === */
+.productos-table__empty-button {
+  margin-top: 1rem;
+}
+
+/* === Responsividad === */
+@media (max-width: 768px) {
+  .productos {
+    padding: 1rem;
+  }
+
+  .productos-header__search {
+    padding: 0 1rem 1rem;
+  }
+}

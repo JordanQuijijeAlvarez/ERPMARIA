@@ -1,78 +1,75 @@
 <form [formGroup]="frmCategoria" (ngSubmit)="guardarCategoria()">
-  <div class="min-h-screen p-6">
-    <div class="max-w-4xl mx-auto">
-      <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-        
-        <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
-          <h2 class="text-3xl font-bold text-center text-gray-800 mb-2">
-            {{ eventoUpdate ? 'ACTUALIZAR CATEGORÍA' : 'REGISTRO DE CATEGORÍA' }}
-          </h2>
-          <p class="text-center text-gray-500 text-sm">
-            {{ eventoUpdate ? 'Modifique la información de la CATEGORÍA según sea necesario' : 'Complete la información para registrar una nueva CATEGORÍA' }}
-          </p>
-        </div>
+  <div class="categoria-form">
+    <!-- Form Content -->
+    <div class="card">
+      <div class="card__header">
+        <h2 class="card__title">
+          {{ eventoUpdate ? 'ACTUALIZAR CATEGORÍA' : 'REGISTRO DE CATEGORÍA' }}
+        </h2>
+        <p class="card__subtitle">
+          {{ eventoUpdate ? 'Modifique la información de la CATEGORÍA según sea necesario' : 'Complete la información para registrar una nueva CATEGORÍA' }}
+        </p>
+      </div>
 
-        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-          <h3 class="text-lg font-semibold text-gray-800 flex items-center">
-            <i class="fas fa-layer-group text-gray-600 mr-2"></i>
-            Información General
-          </h3>
-        </div>
+      <!-- Section Header -->
+      <div class="categoria-form__section-header">
+     </div>
 
-        <div class="p-6">
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            
-            <div class="lg:col-span-2">
-              <label class="block text-sm font-semibold text-gray-700 mb-2">
-                <i class="fas fa-tag text-gray-500 mr-1"></i>
-                Nombre de la Categoría *
-              </label>
-              <input
-                formControlName="txtNombre"
-                placeholder="Ej. Bebidas, Lácteos, Limpieza..."
-                type="text"
-                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
-              />
-              <app-validators [control]="frmCategoria.get('txtNombre')!"></app-validators>
-            </div>
-
-            <div class="lg:col-span-2">
-              <label class="block text-sm font-semibold text-gray-700 mb-2">
-                <i class="fas fa-align-left text-gray-500 mr-1"></i>
-                Descripción
-              </label>
-              <textarea
-                formControlName="txtDescripcion"
-                placeholder="Ingrese una breve descripción de lo que contiene esta categoría"
-                rows="4"
-                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm resize-vertical"
-              ></textarea>
-              <app-validators [control]="frmCategoria.get('txtDescripcion')!"></app-validators>
-            </div>
+      <!-- Form Fields -->
+      <div class="card__body">
+        <div class="categoria-form__fields">
           
+          <!-- Nombre -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-tag"></i>
+              Nombre de la Categoría *
+            </label>
+            <input
+              formControlName="txtNombre"
+              placeholder="Ej. Bebidas, Lácteos, Limpieza..."
+              type="text"
+              class="form-input"
+            />
+            <app-validators [control]="frmCategoria.get('txtNombre')!"></app-validators>
           </div>
+
+          <!-- Descripción -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-align-left"></i>
+              Descripción
+            </label>
+            <textarea
+              formControlName="txtDescripcion"
+              placeholder="Ingrese una breve descripción de lo que contiene esta categoría"
+              rows="4"
+              class="form-textarea"
+            ></textarea>
+            <app-validators [control]="frmCategoria.get('txtDescripcion')!"></app-validators>
+          </div>
+        
         </div>
       </div>
+    </div>
 
-      <div class="flex items-center justify-end gap-4 mt-6">
-        <a>
-            <button
-            type="button"
-            (click)="salirSinGuardar()"
-            class="px-6 py-3 bg-white text-gray-800 font-semibold rounded-lg shadow-md border border-gray-300 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 cursor-pointer"
-          >
-            <i class="fas fa-times mr-2"></i>
-            Cancelar
-          </button>
-        </a>
-        <button
-          type="submit"
-          class="px-8 py-3 bg-white text-gray-800 font-semibold rounded-lg shadow-md border border-gray-300 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 cursor-pointer"
-        >
-          <i class="fas fa-save mr-2"></i>
-          {{ eventoUpdate ? 'Actualizar categoría' : 'Guardar categoría' }}
-        </button>
-      </div>
+    <!-- Action Buttons -->
+    <div class="categoria-form__actions">
+      <button
+        type="button"
+        (click)="salirSinGuardar()"
+        class="btn btn--outline"
+      >
+        <i class="fas fa-times"></i>
+        Cancelar
+      </button>
+      <button
+        type="submit"
+        class="btn btn--primary"
+      >
+        <i class="fas fa-save"></i>
+        {{ eventoUpdate ? 'Actualizar categoría' : 'Guardar categoría' }}
+      </button>
     </div>
   </div>
 </form>
