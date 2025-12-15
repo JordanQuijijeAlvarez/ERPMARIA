@@ -11,7 +11,7 @@ router.post('/reenviar-otp',
     controladorVerificacion.reenviarOTP);
 
 router.get('/listar', authenticateToken,
-    controladorUsuarios.getUsuarios);
+    controladorUsuarios.getUsuariosEstado);
 
 router.get('/:id', authenticateToken,
     controladorUsuarios.getUsuarioId);
