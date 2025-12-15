@@ -6,10 +6,10 @@
   /* ===== COLORES PRIMARIOS ===== */
 
   /* ROJO PELIRROJO */
-  /* --color-primary: #e50914;
+  --color-primary: #e50914;
   --color-primary-hover: #b00710;
   --color-primary-light: #ffebee;
-  --color-primary-dark: #8b0000; */
+  --color-primary-dark: #8b0000;
 
   /* AZUL */
   /* --color-primary: #1976d2;
@@ -24,10 +24,10 @@
   --color-primary-dark: #2e7d32; */
 
   /* MORADO */
-  --color-primary: #9c27b0;
+  /* --color-primary: #9c27b0;
   --color-primary-hover: #7b1fa2;
   --color-primary-light: #f3e5f5;
-  --color-primary-dark: #6a1b9a;
+  --color-primary-dark: #6a1b9a; */
 
   /* NARANJA */
   /* --color-primary: #ff9800;
