@@ -10,10 +10,7 @@ import { InCompraCompleto } from '../modelos/modeloCompras/InCompras';
 })
 
 export class compraService {
-  confirmarRecepcionCompra(id: number): Observable<any> {
-
-    return this.http.post(`${this.urlServidor}/ventas/Registrar`, id);
-  }
+  
 
   
 
@@ -53,6 +50,11 @@ CrearCompra(venta: InCompraCompleto): Observable<any> {
   AnularCompra(id:number):Observable<any>{
     return this.http.delete(`${this.urlServidor}/compras/Eliminar/${id}`);
 
+  }
+
+  confirmarRecepcionCompra(id: number,iduser: number): Observable<any> {
+
+    return this.http.post(`${this.urlServidor}/compras/Confirmar/${id}`,   { user_id: iduser } );
   }
 
 }

@@ -133,9 +133,14 @@
                   <div class="compra-form__product-code">{{ item.codigo }}</div>
                 </td>
 
-                <td class="compra-form__product-price">
-                  ${{ item.precioCompra | number : "1.2-2" }}
-                </td>
+                <td class="px-6 py-4 text-center">
+                <input type="number" 
+                      [(ngModel)]="item.precioCompra" 
+                      [ngModelOptions]="{standalone: true}"
+                      (change)="calcularTotales()" 
+                      class="w-20 border rounded p-1 text-center" 
+                      min="0" step="0.01">
+              </td>
 
                 <td>
                   <div class="compra-form__quantity-controls">

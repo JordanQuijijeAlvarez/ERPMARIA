@@ -51,7 +51,10 @@ export const routes: Routes = [
     component: PanelprincipalComponent,
     canActivate: [AuthService], // Protege todas las rutas dentro de 'home'
     children: [
-      { path: 'dashboard', component: DashboardComponent },
+      { path: 'dashboard', component: DashboardComponent ,canActivate: [RoleGuard],
+        data: { roles: ['ADMINISTRADOR'] }
+
+      },
       { path: 'setup-2fa', component: Setup2faComponent },
 
       // Clientes (Ejemplo: solo rol "admin" puede crear/actualizar)

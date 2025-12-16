@@ -281,3 +281,66 @@ exports.eliminarcompra = async (req, res) => {
         if (connection) await connection.close();
     }
 };
+
+
+exports.ConfirmarRegistroCompra = async (req, res) => {
+    // 1. Obtenemos el ID de la compra de la URL (ej: /compras/confirmar/:id)
+    const { id } = req.params; 
+    
+    // 2. Obtenemos el usuario del body (quién está haciendo la recepción)
+    const { user_id } = req.body;
+
+    let connection;
+
+    try {
+        connection = await getConnection();
+
+        // 3. Llamamos al procedimiento de CONFIRMACIÓN (No al de registro)
+        const query = `
+            BEGIN 
+                CONFIRMAR_RECEPCION_COMPRA(
+                    :p_compra_id, 
+                    :p_user_id, 
+                    :p_respuesta
+                ); 
+            END;
+        `;
+
+        const values = {
+            p_compra_id: id,
+            p_user_id: user_id || 1, // Usuario por defecto si no viene
+            p_respuesta: { dir: oracledb.BIND_OUT, type: oracledb.CLOB }
+        };
+
+        const result = await connection.execute(query, values, { autoCommit: true });
+        
+        // 4. Procesar respuesta del CLOB (Misma lógica que usas en los otros métodos)
+        const lob = result.outBinds.p_respuesta;
+        let jsonRespuesta;
+        
+        // Verificamos si oracledb lo devolvió como string o como objeto LOB
+        if (typeof lob === 'string') {
+             jsonRespuesta = JSON.parse(lob);
+        } else {
+             const lobData = await lob.getData();
+             jsonRespuesta = JSON.parse(lobData);
+        }
+
+        // 5. Responder al Frontend
+        if (jsonRespuesta.status === 'OK') {
+            res.status(200).json(jsonRespuesta);
+        } else {
+            // Si el procedimiento dice ERROR (ej: "Ya estaba recibida"), devolvemos 400
+            res.status(400).json({ error: jsonRespuesta.message });
+        }
+
+    } catch (error) {
+        console.error("Error en ConfirmarRegistroCompra:", error);
+        res.status(500).json({ 
+            error: "Error interno al confirmar la recepción", 
+            details: error.message 
+        });
+    } finally {
+        if (connection) await connection.close();
+    }
+};

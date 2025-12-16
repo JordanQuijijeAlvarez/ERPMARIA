@@ -1062,3 +1062,131 @@ EXCEPTION
         ROLLBACK;
         p_respuesta := JSON_OBJECT('status' VALUE 'ERROR', 'message' VALUE SQLERRM);
 END;
+
+
+CREATE OR REPLACE PROCEDURE CONFIRMAR_RECEPCION_COMPRA (
+    p_compra_id  IN NUMBER,
+    p_user_id    IN NUMBER,
+    p_respuesta  OUT CLOB
+) AS
+    v_estado_actual       CHAR(1);
+    
+    -- Variables nuevas para el cálculo del promedio
+    v_stock_actual        NUMBER;
+    v_costo_actual        NUMBER;
+    v_nuevo_costo         NUMBER;
+    v_total_valor_antiguo NUMBER;
+    v_total_valor_nuevo   NUMBER;
+BEGIN
+    -- Verificar que la compra esté en estado Pendiente 'P'
+    SELECT compra_estadoregistro INTO v_estado_actual 
+    FROM COMPRA WHERE compra_id = p_compra_id;
+
+    IF v_estado_actual != 'P' THEN
+        p_respuesta := JSON_OBJECT('status' VALUE 'ERROR', 'message' VALUE 'La compra ya fue recibida o anulada anteriormente.');
+        RETURN;
+    END IF;
+
+    -- Recorrer los detalles para actualizar stock y costos
+    FOR r IN (
+        SELECT prod_id, detc_cantidad, detc_preciouni 
+        FROM DETALLE_COMPRA 
+        WHERE compra_id = p_compra_id
+    ) LOOP
+        
+        -- 1. OBTENER DATOS ACTUALES DEL PRODUCTO (Antes de sumar el stock)
+        SELECT NVL(prod_stock, 0), NVL(prod_preciocompra, 0)
+        INTO v_stock_actual, v_costo_actual
+        FROM PRODUCTO
+        WHERE prod_id = r.prod_id;
+
+        -- 2. CALCULAR COSTO PROMEDIO PONDERADO
+        IF v_stock_actual <= 0 THEN
+            -- Si no hay stock (o es negativo), el nuevo costo es simplemente el precio de esta compra
+            v_nuevo_costo := r.detc_preciouni;
+        ELSE
+            -- Fórmula: (Valor Total Viejo + Valor Total Nuevo) / (Cantidad Total Nueva)
+            v_total_valor_antiguo := v_stock_actual * v_costo_actual;
+            v_total_valor_nuevo   := r.detc_cantidad * r.detc_preciouni;
+            
+            v_nuevo_costo := (v_total_valor_antiguo + v_total_valor_nuevo) / (v_stock_actual + r.detc_cantidad);
+        END IF;
+-- ... (código de cálculo de v_nuevo_costo) ...
+
+    -- Validar Rentabilidad (Asumiendo que tienes prod_precioventa en la tabla PRODUCTO)
+    DECLARE
+        v_precio_venta NUMBER;
+    BEGIN
+        SELECT prod_precioventa INTO v_precio_venta FROM PRODUCTO WHERE prod_id = r.prod_id;
+        
+        -- Si el nuevo costo es mayor que el precio de venta, esto es una alerta crítica
+        IF v_nuevo_costo >= v_precio_venta THEN
+            -- Aquí podrías insertar en una tabla de NOTIFICACIONES o concatenar al mensaje de salida
+            -- Por simplicidad, solo lo detectamos. En un sistema real, insertarías en una tabla de "Cambios de Precio Pendientes"
+            NULL; 
+        END IF;
+    END;
+
+    -- ... (sigue el UPDATE PRODUCTO) ...
+        -- 3. ACTUALIZAR PRODUCTO (Stock + Nuevo Costo Promedio)
+        UPDATE PRODUCTO 
+        SET prod_stock = prod_stock + r.detc_cantidad,
+            prod_preciocompra = ROUND(v_nuevo_costo, 4) -- Redondeamos a 4 decimales para precisión
+        WHERE prod_id = r.prod_id;
+
+        -- 4. REGISTRAR MOVIMIENTO KARDEX
+        INSERT INTO MOVIMIENTO_STOCK (
+            movi_stock_tipomov, movi_stock_cantidad, prod_id, 
+            user_id, movi_stock_referenciadoc, movi_stock_fechregistro
+        ) VALUES (
+            'ENTRADA_COMPRA', r.detc_cantidad, r.prod_id, 
+            p_user_id, 'COMPRA-' || p_compra_id, SYSDATE
+        );
+    END LOOP;
+
+
+
+    -- Cambiar estado a 'R' (Recibido)
+    UPDATE COMPRA SET compra_estadoregistro = 'R' WHERE compra_id = p_compra_id;
+
+    p_respuesta := JSON_OBJECT('status' VALUE 'OK', 'message' VALUE 'Mercadería recibida. Stock y Costo Promedio actualizados.');
+    COMMIT;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        p_respuesta := JSON_OBJECT('status' VALUE 'ERROR', 'message' VALUE SQLERRM);
+END;
+/
+
+
+CREATE OR REPLACE VIEW VW_ALERTAS_PRECIOS AS
+SELECT 
+    prod_id,
+    prod_nombre,
+    prod_codbarra,
+    prod_stock,
+    prod_preciocompra, -- Costo Promedio
+    prod_precioventa,  -- Precio Venta Actual
+    
+    -- Mostramos el margen configurado (Si es nulo, asumimos 30% por defecto)
+    NVL(PROD_MARGENPG, 30) as margen_configurado,
+
+    -- CÁLCULO DINÁMICO DEL PRECIO SUGERIDO
+    -- Fórmula: Costo * (1 + (Margen / 100))
+    -- Ejemplo: $10 * (1 + 0.30) = $13.00
+    ROUND(prod_preciocompra * (1 + (NVL(PROD_MARGENPG, 30) / 100)), 2) as precio_sugerido,
+    
+    -- Diferencia monetaria actual
+    ROUND(prod_preciocompra - prod_precioventa, 2) as perdida_unitaria
+
+FROM PRODUCTO
+-- LA CONDICIÓN DE ALERTA AHORA ES MÁS EXACTA:
+-- 1. Si estamos perdiendo dinero (Precio Venta < Costo)
+-- 2. O si el Precio de Venta actual es MENOR al Precio Sugerido por su propio margen
+WHERE prod_preciocompra >= prod_precioventa 
+   OR prod_precioventa < (prod_preciocompra * (1 + (NVL(PROD_MARGENPG, 30) / 100)));
+   
+
+
+--ALERTA se agrego el campo prod_margenpg a la tabla producto para guardar el margen de ganancia por producto

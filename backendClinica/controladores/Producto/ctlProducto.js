@@ -60,6 +60,27 @@ exports.getProductosCodigoBarrasEstado = async (req, res) => {
     }
 };
 
+exports.getProductosPrecioAlert = async (req, res) => {
+    let connection;
+
+    try {
+        connection = await getConnection();
+
+        const result = await connection.execute(
+            `SELECT * FROM VW_ALERTAS_PRECIOS`,
+            [],
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        res.json(formatearSalida(result.rows));
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: error.message });
+    } finally {
+        if (connection) await connection.close();
+    }
+};
 
 
 exports.getProductos = async (req, res) => {
@@ -90,7 +111,6 @@ exports.getProductoId = async (req, res) => {
 
     try {
         connection = await getConnection();
-
         const result = await connection.execute(
             `SELECT * FROM producto WHERE prod_id = :id`,
             { id },
@@ -181,3 +201,27 @@ exports.eliminarproducto = async (req, res) => {
         if (connection) await connection.close();
     }
 };
+
+
+// 2. ACTUALIZACIÓN RÁPIDA DE PRECIO (Para el Modal)
+exports.actualizarPrecioVenta = async (req, res) => {
+    const { prod_id, nuevo_precio } = req.body;
+    let connection;
+    try {
+        connection = await getConnection();
+        const query = `UPDATE PRODUCTO SET prod_precioventa = :p_precio WHERE prod_id = :p_id`;
+        
+        await connection.execute(query, {
+            p_precio: nuevo_precio,
+            p_id: prod_id
+        }, { autoCommit: true });
+
+        res.status(200).json({ message: 'Precio actualizado correctamente' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    } finally {
+        if (connection) await connection.close();
+    }
+};
+
+

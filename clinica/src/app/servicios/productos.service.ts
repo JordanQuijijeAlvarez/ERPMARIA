@@ -54,4 +54,14 @@ export class productosService {
   }
 
 
+  
+    LproductosPrecioNovedad (): Observable<any[]> {
+      return this.http.get<any[]>(`${this.urlServidor}/productos/alerta`);
+    }
+
+    ActualizarPrecio (precio :any)  {
+      return this.http.put(`${this.urlServidor}/productos/actualizar/precioprod`, precio);
+    }
+  
+
 }

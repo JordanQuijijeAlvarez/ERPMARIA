@@ -45,6 +45,9 @@ export class ListaComprasComponent implements OnInit {
   // Estado del Tab (1 = Activas, 0 = Anuladas)
   estadoActual: number = 1;
 
+
+  usuarioId: number = 1; // Reemplaza con la lógica para obtener el ID del usuario actual
+
   constructor(
     private router: Router,
     private ServicioAlertas: AlertService,
@@ -138,7 +141,7 @@ export class ListaComprasComponent implements OnInit {
     ).then((result) => {
       if (result.isConfirmed) {
         // Asumiendo que tienes este método en tu servicio
-        this.ServicioCompras.confirmarRecepcionCompra(id).subscribe({
+        this.ServicioCompras.confirmarRecepcionCompra(id, this.usuarioId).subscribe({
           next: (res) => {
             this.ServicioAlertas.success('Mercadería recibida', 'El inventario ha sido actualizado.');
             
@@ -157,6 +160,7 @@ export class ListaComprasComponent implements OnInit {
       }
     });
   }
+
 
   ActualizarCompra(id: number): void {
     this.router.navigate(['home/actualizarCompra', id]);

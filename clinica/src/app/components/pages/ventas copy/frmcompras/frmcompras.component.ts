@@ -335,4 +335,26 @@ export class FrmComprasComponent implements OnInit {
       if (control) control.markAsTouched();
     });
   }
+
+
+  // Función auxiliar para calcular sugerencia
+calcularPrecioVentaSugerido(costoActual: number, costoNuevo: number, stockActual: number, cantidadNueva: number, margenPorcentaje: number = 30): number {
+    
+    // 1. Calcular Costo Promedio Proyectado
+    const valorTotalViejo = stockActual * costoActual;
+    const valorTotalNuevo = cantidadNueva * costoNuevo;
+    const nuevoCostoPromedio = (valorTotalViejo + valorTotalNuevo) / (stockActual + cantidadNueva);
+
+    // 2. Calcular Precio de Venta Sugerido basado en margen
+    // Fórmula: Costo / (1 - Margen) o Costo * (1 + Margen). Usualmente es Costo * (1.30)
+    const precioSugerido = nuevoCostoPromedio * (1 + (margenPorcentaje / 100));
+
+    return this.redondear(precioSugerido);
 }
+
+// Función auxiliar para redondear a 2 decimales
+  redondear(numero: number): number {
+    return Math.round(numero * 100) / 100;
+  }
+}
+

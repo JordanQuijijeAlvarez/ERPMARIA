@@ -15,6 +15,7 @@ const rutasProveedor = require('./rutas/rutasProveedor');
 const rutasUsuarios = require('./rutas/rutasUsuarios');
 const rutasRoles = require('./rutas/rutasRoles');
 
+
 const login = require('./controladores/Login/ctlLogin');
 const verificacion = require('./controladores/Verificacion-otp/ctlVerificacion');
 const ctl2FA = require('./controladores/2FA/ctl2FA');
@@ -26,6 +27,7 @@ app.use(express.json());
 app.use(cors());
 
 // Rutas
+
 app.use('/clientes', rutasCliente);
 app.use('/productos', rutasProductos);
 app.use('/categorias', rutasCategoria);

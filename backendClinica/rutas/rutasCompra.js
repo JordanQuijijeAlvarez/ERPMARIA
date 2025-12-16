@@ -18,6 +18,8 @@ router.delete('/Eliminar/:id', authenticateToken,
 
 router.post('/Registrar', authenticateToken,
     ctlCompras.Registrarcompra);
+router.post('/Confirmar/:id', authenticateToken,
+    ctlCompras.ConfirmarRegistroCompra);
 
 router.put('/Actualizar', authenticateToken,
     ctlCompras.Actualizarcompra);

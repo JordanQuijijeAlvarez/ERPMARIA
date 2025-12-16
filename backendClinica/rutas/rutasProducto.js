@@ -11,8 +11,6 @@ router.get('/listar/:estado', authenticateToken,
 router.get('/listar', authenticateToken,
     controladorProducto.getProductos);
 
-router.get('/:id', authenticateToken,
-    controladorProducto.getProductoId);
 router.get('/:codbarra/:estado', authenticateToken,
     controladorProducto.getProductosCodigoBarrasEstado);
 
@@ -25,5 +23,13 @@ router.post('/Registrar', authenticateToken,
 router.put('/Actualizar', authenticateToken,
     controladorProducto.Actualizarproducto);
 
+router.get('/alerta', authenticateToken,
+    controladorProducto.getProductosPrecioAlert);
 
-module.exports = router; 
+router.put('/actualizar/precioprod', authenticateToken,
+    controladorProducto.actualizarPrecioVenta);
+
+router.get('/:id', authenticateToken,
+    controladorProducto.getProductoId);
+
+    module.exports = router; 
