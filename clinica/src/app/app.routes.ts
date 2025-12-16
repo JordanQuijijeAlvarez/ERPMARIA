@@ -15,6 +15,7 @@ import { reporteHistorialComponent } from './components/pages/reportes/historial
 import { pagina404Component } from './components/ui/404/pagina404.component';
 import { RecuperarContraseniaComponent } from './components/pages/login/recuperarcontrasena/recuperarcontrasena.component';
 import { VerificacionOtpComponent } from './components/pages/verificacion-otp/verificacion-otp.component';
+import { Setup2faComponent } from './components/pages/setup-2fa/setup-2fa.component';
 import { ListaclientesComponent } from './components/pages/clientes/listaclientes/listaclientes.component';
 import { frmClientesComponent } from './components/pages/clientes/frmclientes/frmclientes.component';
 import { ListaproductosComponent } from './components/pages/productos/listaproductos/listaproductos.component';
@@ -51,7 +52,7 @@ export const routes: Routes = [
     canActivate: [AuthService], // Protege todas las rutas dentro de 'home'
     children: [
       { path: 'dashboard', component: DashboardComponent },
-
+      { path: 'setup-2fa', component: Setup2faComponent },
 
       // Clientes (Ejemplo: solo rol "admin" puede crear/actualizar)
       {

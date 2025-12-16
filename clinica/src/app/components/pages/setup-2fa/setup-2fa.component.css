@@ -1,0 +1,425 @@
+.setup-2fa {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem;
+}
+
+.setup-2fa__container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.setup-2fa__header {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.setup-2fa__back-btn {
+  background: transparent;
+  border: none;
+  color: #667eea;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: all 0.3s;
+  float: left;
+}
+
+.setup-2fa__back-btn:hover {
+  background: #f0f0f0;
+}
+
+.setup-2fa__title {
+  font-size: 2rem;
+  color: #333;
+  margin: 1rem 0;
+  clear: both;
+}
+
+.setup-2fa__title i {
+  color: #667eea;
+  margin-right: 0.5rem;
+}
+
+.setup-2fa__description {
+  color: #666;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+.setup-2fa__message {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+}
+
+.setup-2fa__message--success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.setup-2fa__message--error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.setup-2fa__status {
+  margin-bottom: 2rem;
+}
+
+.setup-2fa__status-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.setup-2fa__status-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #666;
+}
+
+.setup-2fa__status-icon.active {
+  background: #4caf50;
+  color: white;
+}
+
+.setup-2fa__status-info h3 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+}
+
+.setup-2fa__status-info p {
+  margin: 0;
+  color: #666;
+}
+
+.setup-2fa__content {
+  margin-bottom: 2rem;
+}
+
+.setup-2fa__card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.setup-2fa__card--success {
+  border: 2px solid #4caf50;
+  text-align: center;
+}
+
+.setup-2fa__card-title {
+  font-size: 1.5rem;
+  color: #333;
+  margin: 0 0 1.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.setup-2fa__card-title i {
+  color: #667eea;
+}
+
+.setup-2fa__steps {
+  text-align: left;
+  padding-left: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.setup-2fa__steps li {
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.setup-2fa__steps strong {
+  color: #333;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.setup-2fa__steps p {
+  color: #666;
+  margin: 0;
+}
+
+.setup-2fa__button {
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.setup-2fa__button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.setup-2fa__button--primary {
+  background: #667eea;
+  color: white;
+}
+
+.setup-2fa__button--primary:hover:not(:disabled) {
+  background: #5568d3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+}
+
+.setup-2fa__button--secondary {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.setup-2fa__button--secondary:hover:not(:disabled) {
+  background: #d0d0d0;
+}
+
+.setup-2fa__button--danger {
+  background: #f44336;
+  color: white;
+}
+
+.setup-2fa__button--danger:hover:not(:disabled) {
+  background: #d32f2f;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(244, 67, 54, 0.4);
+}
+
+.setup-2fa__qr-section {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.setup-2fa__qr-container {
+  text-align: center;
+  padding: 2rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+}
+
+.setup-2fa__qr-image {
+  max-width: 300px;
+  width: 100%;
+  height: auto;
+  border: 4px solid white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.setup-2fa__secret {
+  background: #fffbea;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #ffd700;
+  margin: 1.5rem 0;
+}
+
+.setup-2fa__secret p {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+}
+
+.setup-2fa__secret code {
+  display: block;
+  background: white;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  font-family: 'Courier New', monospace;
+  color: #667eea;
+  margin: 0.5rem 0;
+  word-break: break-all;
+}
+
+.setup-2fa__secret small {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.setup-2fa__form {
+  margin-top: 2rem;
+}
+
+.setup-2fa__form-group {
+  margin-bottom: 1.5rem;
+}
+
+.setup-2fa__form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.setup-2fa__input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1.5rem;
+  text-align: center;
+  letter-spacing: 0.5rem;
+  font-family: 'Courier New', monospace;
+  transition: border-color 0.3s;
+}
+
+.setup-2fa__input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.setup-2fa__input.invalid {
+  border-color: #f44336;
+}
+
+.setup-2fa__error {
+  color: #f44336;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.setup-2fa__form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.setup-2fa__success-icon {
+  font-size: 4rem;
+  color: #4caf50;
+  margin-bottom: 1rem;
+}
+
+.setup-2fa__enabled h2 {
+  margin: 1rem 0;
+  color: #333;
+}
+
+.setup-2fa__enabled p {
+  color: #666;
+  margin: 0.5rem 0;
+}
+
+.setup-2fa__warning {
+  background: #fff3cd;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #ffc107;
+  margin: 1.5rem 0 !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.setup-2fa__warning i {
+  color: #ffc107;
+}
+
+.setup-2fa__apps {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.setup-2fa__apps h3 {
+  margin: 0 0 1rem 0;
+  color: #333;
+}
+
+.setup-2fa__apps-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.setup-2fa__app {
+  background: #f5f5f5;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.setup-2fa__app:hover {
+  background: #e0e0e0;
+  transform: translateY(-2px);
+}
+
+.setup-2fa__app i {
+  font-size: 2rem;
+  color: #667eea;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .setup-2fa {
+    padding: 1rem;
+  }
+
+  .setup-2fa__title {
+    font-size: 1.5rem;
+  }
+
+  .setup-2fa__card {
+    padding: 1.5rem;
+  }
+
+  .setup-2fa__form-actions {
+    flex-direction: column;
+  }
+
+  .setup-2fa__button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .setup-2fa__status-card {
+    flex-direction: column;
+    text-align: center;
+  }
+}

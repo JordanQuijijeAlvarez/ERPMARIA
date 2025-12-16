@@ -135,4 +135,21 @@ export class AuthService {
    return this.http.post('http://localhost:3000/recuperacion/cambiarcontrasenia', { 'nombreUsuario':username, 'codigoIngresado':codigo, 'nuevoPassword':nuevaContrasenia });
   }
 
+  // Métodos para autenticación 2FA
+  setup2FA(userId: number): Observable<any> {
+    return this.http.post('http://localhost:3000/2fa/setup', { userId });
+  }
+
+  verify2FA(userId: number, token: string): Observable<any> {
+    return this.http.post('http://localhost:3000/2fa/verify', { userId, token });
+  }
+
+  disable2FA(userId: number): Observable<any> {
+    return this.http.post('http://localhost:3000/2fa/disable', { userId });
+  }
+
+  check2FAStatus(userId: number): Observable<any> {
+    return this.http.get(`http://localhost:3000/2fa/status?userId=${userId}`);
+  }
+
 }
