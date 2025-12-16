@@ -17,7 +17,7 @@ exports.getUsuariosEstado = async (req, res) => {
     connection = await getConnection();
 
     const result = await connection.execute(
-      `SELECT * FROM usuario WHERE user_estado = :estado`,
+      `SELECT * FROM VW_USUARIO_ROL WHERE user_estado = :estado`,
       { estado: 1 },
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );

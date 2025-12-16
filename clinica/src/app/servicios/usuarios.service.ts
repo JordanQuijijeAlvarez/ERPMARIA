@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
-import { InUsuario, InUsuarioVista } from '../modelos/modeloUsuarios/InUsuarios';
+import { InUsuarioVista, InUsuario} from '../modelos/modeloUsuarios/InUsuarios';
 
 @Injectable({
   providedIn: 'root'
@@ -13,11 +13,13 @@ export class UsuariosService {
 
   constructor(private http: HttpClient) { }
   
-
   LUsuarios (): Observable<InUsuarioVista[]> {
-
     return this.http.get<InUsuarioVista[]>(`${this.urlServidor}/usuarios/listar`);
   }
+  // LUsuarios (): Observable<InUsuarioVista[]> {
+
+  //   return this.http.get<InUsuarioVista[]>(`${this.urlServidor}/usuarios/listar`);
+  // }
 
   LUsuariosId(id: number): Observable<InUsuario> {
   
