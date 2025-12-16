@@ -51,7 +51,7 @@ CrearCompra(venta: InCompraCompleto): Observable<any> {
 
   
   AnularCompra(id:number):Observable<any>{
-    return this.http.delete(`${this.urlServidor}/compras/Anular/${id}`);
+    return this.http.delete(`${this.urlServidor}/compras/Eliminar/${id}`);
 
   }
 

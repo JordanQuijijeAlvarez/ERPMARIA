@@ -306,7 +306,7 @@
             <tr *ngFor="let det of detalleCompra">
               <td>{{ det.prod_nombre }}</td>
               <td>{{ det.detc_cantidad }}</td>
-              <td>{{ det.prod_preciocompra | currency:'USD' }}</td>
+              <td>{{ det.detc_preciouni | currency:'USD' }}</td>
               <td>{{ det.detc_subtotal | currency:'USD' }}</td>
             </tr>
           </tbody>

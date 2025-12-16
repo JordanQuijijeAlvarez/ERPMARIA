@@ -105,6 +105,7 @@ export class FrmComprasComponent implements OnInit {
         this.limpiarProveedor();
       },
     });
+   
   }
 
   limpiarProveedor() {
@@ -206,6 +207,7 @@ export class FrmComprasComponent implements OnInit {
         detc_id: 0, // Generalmente se manda 0 y el backend decide si borra e inserta de nuevo o actualiza
         compra_id: this.eventoUpdate ? this.codigoCompra : 0, // <--- AQUÍ EL CAMBIO IMPORTANTE
         prod_id: item.id_producto,
+        detc_preciouni: item.precioCompra,
         detc_cantidad: item.cantidad,
         detc_subtotal: item.subtotal
      }));
@@ -246,11 +248,11 @@ export class FrmComprasComponent implements OnInit {
 
     if (this.eventoUpdate) {
       // ACTUALIZAR (Solo si está permitido editar compras)
-      console.log(this.proveedorId);
+      console.log("codigo de provedor:"+ this.proveedorId);
       this.servicioCompras.ActualizarCompra( compraObjeto).subscribe({
         next: (res) => {
           this.alertaServ.success('Actualizado', 'Orden de compra modificada correctamente');
-          this.router.navigate(['home/listacompras']);
+          this.router.navigate(['home/listarCompras']);
         },
         error: (err) => {
           this.alertaServ.error('Error', 'No se pudo actualizar la compra');
@@ -262,7 +264,7 @@ export class FrmComprasComponent implements OnInit {
       this.servicioCompras.CrearCompra(compraObjeto).subscribe({
         next: (res) => {
           this.alertaServ.success('Éxito', 'Orden de compra registrada (Pendiente de recepción)');
-          this.router.navigate(['home/listacompras']);
+          this.router.navigate(['home/listarCompras']);
         },
         error: (err) => {
           this.alertaServ.error('Error', 'No se pudo registrar la compra');
@@ -279,7 +281,7 @@ export class FrmComprasComponent implements OnInit {
     this.servicioCompras.ObtenerCompraPorId(idCompra).subscribe({
       next: (res: any) => {
         // 1. Cargar Cabecera
-        this.proveedorId = res.prove_id;
+        this.proveedorId = parseInt(res.prove_id);
         this.getRucProveedor.setValue(res.prove_ruc);
         this.getNombreProveedor.setValue(res.prove_nombre);
         this.getDatosAdicionales.setValue(res.prove_direccion);
@@ -291,11 +293,12 @@ export class FrmComprasComponent implements OnInit {
           this.listaDetalles = res.detalle_compra.map((item: any) => ({
             id_producto: item.prod_id,
             codigo: item.prod_codbarra || 'N/A',
-            nombreProducto: item.prod_nombre,
-            precioCompra: parseFloat(item.detc_preciounitario), // Costo histórico
+            nombreProducto: item.prod_nombre, 
+            precioCompra: parseFloat(item.detc_preciouni), // Costo histórico
             cantidad: item.detc_cantidad,
             subtotal: parseFloat(item.detc_subtotal)
           }));
+
           
           this.calcularTotales();
         }
@@ -303,7 +306,7 @@ export class FrmComprasComponent implements OnInit {
       error: (err: any) => {
         console.error(err);
         this.alertaServ.error('Error', 'No se pudo cargar la información de la compra');
-        this.router.navigate(['home/listacompras']);
+        this.router.navigate(['home/listarCompras']);
       }
     });
   }
@@ -313,7 +316,7 @@ export class FrmComprasComponent implements OnInit {
     this.formCompras.reset();
     this.calcularTotales();
     this.stockActual = 0;
-    this.router.navigate(['home/listacompras']);
+    this.router.navigate(['home/listarCompras']);
   }
 
   // ==========================================
@@ -323,6 +326,8 @@ export class FrmComprasComponent implements OnInit {
   get getNombreProveedor() { return this.formCompras.controls['txtNombreProveedor']; }
   get getDatosAdicionales() { return this.formCompras.controls['txtDatosAdicionales']; }
   get getCodBarra() { return this.formCompras.controls['txtCodBarra']; }
+
+    get getPrecioCompra() { return this.formCompras.controls['txtPrecioCompra']; }
 
   marcarCamposComoTocados(): void {
     Object.keys(this.formCompras.controls).forEach((campo) => {
