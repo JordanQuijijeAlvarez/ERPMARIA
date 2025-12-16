@@ -134,10 +134,10 @@ listaMedicoSinUsuario: any;
           console.log(usuario);
   
           this.frmUsuario.patchValue({
-            txtNombreUsuario: usuario.nombre_usuario,
-            txtContrasenia: usuario.contrasenia,
-            cbxRoles: usuario.codigo_rol,
-            txtCorreoUsuario: usuario.email
+            txtNombreUsuario: usuario.user_username,
+            txtContrasenia: usuario.user_contrasenia,
+            // cbxRoles: usuario.codigo_rol,
+            txtCorreoUsuario: usuario.user_correo,
 
           });
         },
