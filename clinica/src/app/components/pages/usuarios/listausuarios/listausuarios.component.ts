@@ -24,6 +24,9 @@ export class ListausuariosComponent {
   searchTerm: string = '';
   isSearching: boolean = false;
   
+  // Propiedades de estado (activo/inactivo)
+  estadoActual: number = 1; // 1 = Activos, 0 = Inactivos
+  
   // Propiedades de paginación
   currentPage: number = 1;
   itemsPerPage: number = 10;
@@ -45,10 +48,7 @@ export class ListausuariosComponent {
     this.usuarioServ.LUsuarios().subscribe({
       next: (res) => {
         this.listaUsuarios = res;
-        this.filteredUsuarios = [...res]; // Inicializar lista filtrada
-        this.totalItems = this.filteredUsuarios.length;
-        this.calculatePagination();
-        this.updatePaginatedData();
+        this.applyFilters(); // Aplicar filtros de estado y búsqueda
         console.log(res);
       },
       error: (err) => {
@@ -79,13 +79,8 @@ export class ListausuariosComponent {
           
               {
                 next: res => {
-                  this.listaUsuarios = this.listaUsuarios.filter(usuario => parseInt(usuario.codigo_usuario) !== id);
-                  
-                  // Actualizar listas filtradas y paginación
-                  this.filteredUsuarios = this.filteredUsuarios.filter(usuario => parseInt(usuario.codigo_usuario) !== id);
-                  this.totalItems = this.filteredUsuarios.length;
-                  this.calculatePagination();
-                  this.updatePaginatedData();
+                  // Recargar la lista completa de usuarios
+                  this.listarUsuarios();
     
                   Swal.fire({
                     title: "Eliminado!",
@@ -112,6 +107,39 @@ export class ListausuariosComponent {
   
   ActualizarUsuario(id: any): void {
     this.router.navigate(['home/actualizarUsuarios', id]);
+  }
+
+  /**
+   * Cambia entre tabs de activos e inactivos
+   */
+  cambiarTab(estado: number): void {
+    this.estadoActual = estado;
+    this.currentPage = 1; // Reset a la primera página
+    this.applyFilters();
+  }
+
+  /**
+   * Aplica todos los filtros (estado y búsqueda)
+   */
+  applyFilters(): void {
+    let filtered = [...this.listaUsuarios];
+    
+    // Filtrar por estado (activo/inactivo)
+    filtered = filtered.filter(usuario => parseInt(usuario.user_estado) === this.estadoActual);
+    
+    // Filtrar por búsqueda si existe
+    if (this.isSearching && this.searchTerm.length > 0) {
+      const searchLower = this.searchTerm.toLowerCase();
+      filtered = filtered.filter(usuario => 
+        usuario.user_username.toLowerCase().includes(searchLower) ||
+        usuario.rol_nombre.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    this.filteredUsuarios = filtered;
+    this.totalItems = this.filteredUsuarios.length;
+    this.calculatePagination();
+    this.updatePaginatedData();
   }
 
   /**
@@ -186,22 +214,8 @@ export class ListausuariosComponent {
   onSearch(searchValue: string): void {
     this.searchTerm = searchValue.toLowerCase().trim();
     this.isSearching = this.searchTerm.length > 0;
-    
-    if (this.isSearching) {
-      this.filteredUsuarios = this.listaUsuarios.filter(usuario => 
-        usuario.nombre_usuario.toLowerCase().includes(this.searchTerm) ||
-        usuario.rol_nombre.toLowerCase().includes(this.searchTerm) ||
-        usuario.rol_descripcion.toLowerCase().includes(this.searchTerm)
-      );
-    } else {
-      this.filteredUsuarios = [...this.listaUsuarios];
-    }
-    
-    // Actualizar paginación después de filtrar
-    this.totalItems = this.filteredUsuarios.length;
     this.currentPage = 1; // Reset a la primera página
-    this.calculatePagination();
-    this.updatePaginatedData();
+    this.applyFilters();
   }
 
   /**
@@ -210,11 +224,8 @@ export class ListausuariosComponent {
   clearSearch(): void {
     this.searchTerm = '';
     this.isSearching = false;
-    this.filteredUsuarios = [...this.listaUsuarios];
-    this.totalItems = this.filteredUsuarios.length;
     this.currentPage = 1;
-    this.calculatePagination();
-    this.updatePaginatedData();
+    this.applyFilters();
   }
 
   /**

@@ -1,260 +1,284 @@
-<<!-- Header Section -->
-<div class="min-h-screen p-6">
-  <div class="max-w-7xl mx-auto">
-    <!-- Title and Actions Bar -->
-    <div class="mb-8">
-      <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h2 class="text-3xl font-bold text-gray-800 mb-2">
-              GESTIÓN DE USUARIOS
-            </h2>
-            <p class="text-gray-500 text-sm">Administre los usuarios y roles registrados en el sistema</p>
-          </div>
-          
-          <!-- Search and Actions -->
-          <div class="flex items-center gap-4 w-full sm:w-auto">
-            <!-- Search Input -->
-            <div class="relative flex-1 sm:w-80">
-              <input
-                type="text"
-                [(ngModel)]="searchTerm"
-                (input)="onSearch($any($event.target).value)"
-                class="w-full px-4 py-3 pl-12 pr-10 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
-                placeholder="Buscar usuario por nombre, rol o descripción..."
-              />
-              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <i class="fas fa-search text-gray-400"></i>
-              </div>
-              
-              <!-- Clear search button -->
-              <button
-                *ngIf="isSearching"
-                type="button"
-                (click)="clearSearch()"
-                class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors duration-200"
-                title="Limpiar búsqueda"
-              >
-                <i class="fas fa-times"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+<!-- Header Section -->
+<div class="usuarios-container">
+  <!-- Title and Actions Bar -->
+  <div class="card usuarios-header">
+    <div class="card__header">
+      <h2 class="card__title">
+        GESTIÓN DE USUARIOS
+      </h2>
+      <p class="card__subtitle">Administre los usuarios y roles registrados en el sistema</p>
     </div>
-
-    <!-- Users Table -->
-    <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-      <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-        <div class="flex items-center gap-4">
-          <h3 class="text-lg font-semibold text-gray-800 flex items-center">
-            <i class="fas fa-users text-gray-600 mr-2"></i>
-            Usuarios Registrados
-          </h3>
-          
-          <!-- Search indicator -->
-          <div *ngIf="isSearching" class="flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
-            <i class="fas fa-search text-xs"></i>
-            <span>{{ filteredUsuarios.length }} resultado(s) para "{{ searchTerm }}"</span>
-            <button 
-              (click)="clearSearch()"
-              class="ml-1 text-blue-600 hover:text-blue-800 transition-colors duration-200"
-              title="Limpiar búsqueda"
-            >
-              <i class="fas fa-times text-xs"></i>
-            </button>
-          </div>
+    
+    <!-- Search and Actions -->
+    <div class="usuarios-header__search">
+      <!-- Search Input -->
+      <div class="search-box">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="onSearch($any($event.target).value)"
+          placeholder="Buscar usuario por nombre o rol..."
+          class="search-box__input"
+        />
+        <div class="search-box__icon">
+          <i class="fas fa-search"></i>
         </div>
         
-        <!-- New User Button -->
-        <a routerLink="../crearUsuarios">
-          <button
-            type="button"
-            class="px-6 py-3 bg-gray-800 text-white font-semibold rounded-lg shadow-md hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 cursor-pointer flex items-center gap-2"
+        <!-- Clear search button -->
+        <button
+          *ngIf="isSearching"
+          type="button"
+          (click)="clearSearch()"
+          title="Limpiar búsqueda"
+          class="search-box__clear"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Users Table -->
+  <div class="table-container usuarios-table">
+    <div class="table-header">
+      <div class="usuarios-table__header">
+        <h3 class="table-header__title">
+          <i class="fas fa-users"></i>
+          Usuarios Registrados
+        </h3>
+        
+        <!-- Search indicator -->
+        <div *ngIf="isSearching" class="badge badge--info">
+          <i class="fas fa-search"></i>
+          <span>{{ filteredUsuarios.length }} resultado(s) para "{{ searchTerm }}"</span>
+          <button 
+            (click)="clearSearch()"
+            title="Limpiar búsqueda"
+            class="search-box__clear usuarios-search-badge"
           >
-            <i class="fas fa-user-plus"></i>
-            <span>Nuevo Usuario</span>
+            <i class="fas fa-times"></i>
           </button>
-        </a>
+        </div>
       </div>
       
-      <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-gray-50 border-b border-gray-200">
+      <!-- New User Button -->
+      <a routerLink="../crearUsuarios">
+        <button type="button" class="btn btn--primary">
+          <i class="fas fa-user-plus"></i>
+          <span>Nuevo Usuario</span>
+        </button>
+      </a>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button
+        (click)="cambiarTab(1)"
+        [class.active]="estadoActual === 1"
+        class="tabs__button"
+      >
+        <i class="fas fa-check-circle"></i> Activos
+      </button>
+      <button
+        (click)="cambiarTab(0)"
+        [class.active]="estadoActual === 0"
+        class="tabs__button"
+      >
+        <i class="fas fa-ban"></i> Inactivos
+      </button>
+    </div>
+
+    
+    <div>
+      <table class="table">
+          <thead>
             <tr>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                <div class="flex items-center gap-1">
-                  <i class="fas fa-user text-gray-400 text-xs"></i>
+              <th>
+                <div class="usuarios-table__col-icon">
+                  <i class="fas fa-user"></i>
                   Usuario
                 </div>
               </th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                <div class="flex items-center gap-1">
-                  <i class="fas fa-shield-alt text-gray-400 text-xs"></i>
+              <th>
+                <div class="usuarios-table__col-icon">
+                  <i class="fas fa-shield-alt"></i>
                   Rol
                 </div>
               </th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                <div class="flex items-center gap-1">
-                  <i class="fas fa-file-alt text-gray-400 text-xs"></i>
-                  Descripción
-                </div>
-              </th>
-              <th class="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider w-24">
-                <div class="flex items-center justify-center gap-1">
-                  <i class="fas fa-cogs text-gray-400 text-xs"></i>
+              <th class="usuarios-table__header-center">
+                <div class="usuarios-table__col-icon usuarios-table__col-icon--center">
+                  <i class="fas fa-cogs"></i>
                   Acciones
                 </div>
               </th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
+          <tbody>
             <!-- No results message -->
-            <tr *ngIf="filteredUsuarios.length === 0" class="border-b border-gray-200">
-              <td colspan="4" class="px-6 py-8 text-center">
-                <div class="flex flex-col items-center justify-center space-y-3">
-                  <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-search text-gray-400 text-2xl" *ngIf="isSearching"></i>
-                    <i class="fas fa-users text-gray-400 text-2xl" *ngIf="!isSearching"></i>
+            <tr *ngIf="paginatedUsuarios.length === 0">
+              <td colspan="3">
+                <div class="table__empty">
+                  <div class="table__empty-icon">
+                    <i class="fas fa-inbox" *ngIf="!isSearching"></i>
+                    <i class="fas fa-search" *ngIf="isSearching"></i>
                   </div>
-                  <div class="text-gray-500">
-                    <p class="text-lg font-medium" *ngIf="isSearching">No se encontraron usuarios</p>
-                    <p class="text-lg font-medium" *ngIf="!isSearching">No hay usuarios registrados</p>
-                    <p class="text-sm mt-1" *ngIf="isSearching">
-                      No hay usuarios que coincidan con "{{ searchTerm }}"
-                    </p>
-                    <p class="text-sm mt-1" *ngIf="!isSearching">
-                      Comience agregando un nuevo usuario al sistema
+                  <div>
+                    <p *ngIf="isSearching"><strong>No se encontraron usuarios</strong></p>
+                    <p *ngIf="!isSearching"><strong>No hay usuarios registrados</strong></p>
+                    <p>
+                      {{ estadoActual === 1 ? 'No hay usuarios activos en el sistema' : 'No hay usuarios inactivos' }}
                     </p>
                   </div>
-                  <button 
-                    *ngIf="isSearching"
-                    (click)="clearSearch()"
-                    class="px-4 py-2 text-sm text-blue-600 hover:text-blue-800 transition-colors duration-200"
-                  >
-                    <i class="fas fa-times mr-1"></i>
-                    Limpiar búsqueda
-                  </button>
                 </div>
               </td>
             </tr>
-            
+
             <!-- User rows -->
-            <tr *ngFor="let usuarios of paginatedUsuarios" class="hover:bg-gray-50 transition-colors duration-200">
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
-                  <div class="h-10 w-10 flex-shrink-0">
-                    <div class="h-10 w-10 rounded-full bg-gradient-to-r from-indigo-400 to-indigo-600 flex items-center justify-center">
-                      <span class="text-white text-sm font-medium">{{ getUserInitials(usuarios.nombre_usuario) }}</span>
+            <tr *ngFor="let usuarios of paginatedUsuarios">
+              <td>
+                <div class="usuarios-user">
+                  <div class="usuarios-user__avatar-wrapper">
+                    <div class="usuarios-user__avatar">
+                      <span class="usuarios-user__avatar-text">{{
+                        getUserInitials(usuarios.user_username)
+                      }}</span>
                     </div>
                   </div>
-                  <div class="ml-4">
-                    <div class="text-sm font-medium text-gray-900">{{ usuarios.nombre_usuario }}</div>
+                  <div>
+                    <div class="usuarios-user__name">
+                      {{ usuarios.user_username }}
+                    </div>
                   </div>
                 </div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium" [class]="getRoleBadgeColor(usuarios.rol_nombre)">
+              <td>
+                <span class="badge" [class]="getRoleBadgeColor(usuarios.rol_nombre)">
                   <ng-container [ngSwitch]="usuarios.rol_nombre">
-                    <i *ngSwitchCase="'administrador'" class="fas fa-shield-alt mr-1 text-xs"></i>
-                    <i *ngSwitchCase="'medico'" class="fas fa-user-md mr-1 text-xs"></i>
-                    <i *ngSwitchCase="'recepcionista'" class="fas fa-concierge-bell mr-1 text-xs"></i>
-                    <i *ngSwitchDefault class="fas fa-user mr-1 text-xs"></i>
+                    <i
+                      *ngSwitchCase="'administrador'"
+                      class="fas fa-shield-alt"
+                    ></i>
+                    <i
+                      *ngSwitchCase="'medico'"
+                      class="fas fa-user-md"
+                    ></i>
+                    <i
+                      *ngSwitchCase="'recepcionista'"
+                      class="fas fa-concierge-bell"
+                    ></i>
+                    <i *ngSwitchDefault class="fas fa-user"></i>
                   </ng-container>
-                  {{ usuarios.rol_nombre }}
+                  {{ usuarios.rol_nombre}}
                 </span>
               </td>
-              <td class="px-6 py-4">
-                <div class="text-sm text-gray-900">{{ usuarios.rol_descripcion }}</div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-center">
-                <div class="flex items-center justify-center space-x-2">
-               
-                  
-                  <!-- Delete Button -->
-                  <button
-                    (click)="eliminarUsuario(usuarios.codigo_usuario, usuarios.nombre_usuario)"
-                    type="button"
-                    class="inline-flex items-center justify-center w-8 h-8 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200"
-                    title="Eliminar usuario"
-                  >
-                    <i class="fas fa-trash text-xs"></i>
-                  </button>
+              <td>
+                <div class="table__actions">
+                  <ng-container *ngIf="estadoActual === 1">
+                    <!-- Delete Button -->
+                    <button
+                      (click)="
+                        eliminarUsuario(usuarios.user_id, usuarios.user_username)
+                      "
+                      type="button"
+                      class="btn btn--danger btn--icon"
+                      title="Eliminar usuario"
+                    >
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </ng-container>
+
+                  <!-- Inactive indicator -->
+                  <span *ngIf="estadoActual === 0" class="badge badge--danger">
+                    Inactivo
+                  </span>
                 </div>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-      
+
       <!-- Pagination Section -->
-      <div class="px-6 py-4 bg-gray-50 border-t border-gray-200" *ngIf="totalItems > 0">
-        <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
+      <div class="pagination" *ngIf="totalItems > 0">
+        <div class="pagination__info">
           <!-- Results info y selector de items por página -->
-          <div class="flex flex-col sm:flex-row items-center gap-4">
-            <div class="text-sm text-gray-600">
-              Mostrando <span class="font-medium">{{ getItemRange().start }}-{{ getItemRange().end }}</span> de <span class="font-medium">{{ totalItems }}</span> usuarios
-            </div>
-            
-            <!-- Selector de items por página -->
-            <div class="flex items-center gap-2 text-sm text-gray-600">
-              <label for="itemsPerPage" class="text-gray-600">Mostrar:</label>
-              <select 
-                id="itemsPerPage"
-                (change)="changeItemsPerPage(+$any($event.target).value)"
-                [value]="itemsPerPage"
-                class="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 cursor-pointer"
-              >
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
-              <span>por página</span>
-            </div>
+          <div class="pagination__text">
+            Mostrando
+            <span class="pagination__info-highlight">{{ getItemRange().start }}-{{ getItemRange().end }}</span>
+            de <span class="pagination__info-highlight">{{ totalItems }}</span> usuarios
           </div>
-          
-          <!-- Pagination controls -->
-          <div class="flex items-center gap-2">
-            <button
-              type="button"
-              (click)="previousPage()"
-              [disabled]="currentPage === 1"
-              class="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+
+          <!-- Selector de items por página -->
+          <div class="pagination__select-wrapper">
+            <label for="itemsPerPage">Mostrar:</label>
+            <select
+              id="itemsPerPage"
+              (change)="changeItemsPerPage(+$any($event.target).value)"
+              [value]="itemsPerPage"
+              class="pagination__select"
             >
-              <i class="fas fa-chevron-left mr-1"></i>
-              Anterior
-            </button>
-            
-            <div class="flex items-center gap-1">
-              <button
-                *ngFor="let page of getPageNumbers()"
-                type="button"
-                (click)="goToPage(page)"
-                [class]="page === currentPage 
-                  ? 'w-8 h-8 text-sm font-medium text-white bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 cursor-pointer'
-                  : 'w-8 h-8 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 cursor-pointer'"
-              >
-                {{ page }}
-              </button>
-              
-              <!-- Ellipsis for large page counts -->
-              <span *ngIf="totalPages > 5 && currentPage < totalPages - 2" class="px-2 text-gray-500">...</span>
-            </div>
-            
-            <button
-              type="button"
-              (click)="nextPage()"
-              [disabled]="currentPage === totalPages"
-              class="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-            >
-              Siguiente
-              <i class="fas fa-chevron-right ml-1"></i>
-            </button>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+            <span>por página</span>
           </div>
+        </div>
+
+        <!-- Pagination controls -->
+        <div class="pagination__controls">
+          <button
+            type="button"
+            (click)="previousPage()"
+            [disabled]="currentPage === 1"
+            class="pagination__button"
+          >
+            <i class="fas fa-chevron-left"></i>
+            Anterior
+          </button>
+
+          <div class="pagination__numbers">
+            <button
+              *ngFor="let page of getPageNumbers()"
+              type="button"
+              (click)="goToPage(page)"
+              [class]="
+                page === currentPage
+                  ? 'pagination__number pagination__number--active'
+                  : 'pagination__number'
+              "
+            >
+              {{ page }}
+            </button>
+
+            <!-- Ellipsis for large page counts -->
+            <span *ngIf="totalPages > 5 && currentPage < totalPages - 2" class="pagination__ellipsis">...</span>
+          </div>
+
+          <button
+            type="button"
+            (click)="nextPage()"
+            [disabled]="currentPage === totalPages"
+            class="pagination__button"
+          >
+            Siguiente
+            <i class="fas fa-chevron-right"></i>
+          </button>
         </div>
       </div>
     </div>
   </div>
-</div>
+
+<!-- Modal comentado para referencia futura -->
+<!-- 
+<div data-dialog-backdrop="dialog" data-dialog-backdrop-close="true">
+  <div data-dialog="dialog">
+    <div>
+      <h4>Edit Member Details</h4>
+      <p>Enter or reset each information for the member access.</p>
+    </div>
+  </div>
+</div> 
+-->
