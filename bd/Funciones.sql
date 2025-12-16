@@ -979,3 +979,86 @@ BEGIN
     RETURN v_cursor;
 END;
 /
+
+
+
+--------------------------- COMPRAS ------------------------------------
+
+CREATE OR REPLACE VIEW VW_COMPRAS  as
+  SELECT
+    c.compra_id,
+    c.compra_horafecha,
+    c.compra_montototal,
+    c.compra_iva,
+    c.compra_subiva,
+    c.compra_estado,          -- 1 Activo, 0 Anulado
+    c.compra_estadoregistro,  -- 'P' Pendiente, 'R' Recibido
+    l.local_nombre,
+    p.prove_ruc,
+    p.prove_id,
+    p.prove_nombre,
+    u.user_nombres || ' ' || u.user_apellidos as usuarionombre
+FROM COMPRA c
+JOIN PROVEEDOR p ON c.prove_id = p.prove_id
+JOIN USUARIO u ON c.user_id = u.user_id
+JOIN LOCAL l ON c.local_id = l.local_id
+/
+
+create or replace PROCEDURE ACTUALIZAR_COMPRA_COMPLETA (
+    p_compra_id       IN NUMBER,
+    p_local_id        IN NUMBER,
+    p_prove_id        IN NUMBER,
+    p_user_id         IN NUMBER,
+    p_monto           IN NUMBER,
+    p_iva             IN NUMBER,
+    p_subiva             IN NUMBER,
+    p_detalles_json   IN CLOB,
+    p_respuesta       OUT CLOB
+) AS
+    v_estado CHAR(1);
+BEGIN
+    -- Validar estado
+    SELECT compra_estadoregistro INTO v_estado FROM COMPRA WHERE compra_id = p_compra_id;
+
+    IF v_estado = 'R' THEN
+        p_respuesta := JSON_OBJECT('status' VALUE 'ERROR', 'message' VALUE 'No se puede editar una compra ya recibida.');
+        RETURN;
+    END IF;
+
+    -- 1. Actualizar Cabecera
+    UPDATE COMPRA SET
+        local_id = p_local_id,
+        prove_id = p_prove_id,
+        user_id = p_user_id,
+        compra_montototal = p_monto,
+        compra_iva = p_iva,
+        compra_subiva=p_subiva,
+        compra_horafecha = SYSDATE
+    WHERE compra_id = p_compra_id;
+
+    -- 2. Borrar detalles viejos (Como es pendiente, no hay reversa de stock)
+    DELETE FROM DETALLE_COMPRA WHERE compra_id = p_compra_id;
+
+    -- 3. Insertar nuevos detalles
+    FOR r IN (
+        SELECT * FROM JSON_TABLE(p_detalles_json, '$[*]' COLUMNS (
+            prod_id      NUMBER PATH '$.prod_id',
+            cantidad     NUMBER PATH '$.detc_cantidad',
+            precio_unit  NUMBER PATH '$.detc_preciouni',
+            subtotal     NUMBER PATH '$.detc_subtotal'
+        ))
+    ) LOOP
+        INSERT INTO DETALLE_COMPRA (
+            compra_id, prod_id, detc_cantidad, detc_preciouni, detc_subtotal,detc_estado
+        ) VALUES (
+            p_compra_id, r.prod_id, r.cantidad, r.precio_unit, r.subtotal,'1'
+        );
+    END LOOP;
+
+    p_respuesta := JSON_OBJECT('status' VALUE 'OK', 'message' VALUE 'Orden de compra actualizada.');
+    COMMIT;
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        p_respuesta := JSON_OBJECT('status' VALUE 'ERROR', 'message' VALUE SQLERRM);
+END;
