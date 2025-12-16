@@ -57,7 +57,8 @@ export class FrmComprasComponent implements OnInit {
     // Inyección de servicios
     private servicioCompras: compraService,
     private servicioProveedor: ProveedorService,
-    private servicioProductos: productosService,
+    private servicioProductos: productosService
+    
   ) {
     this.formCompras = this.formBuilder.group({
       txtRucProveedor: ['', Validators.required],
@@ -65,6 +66,15 @@ export class FrmComprasComponent implements OnInit {
       txtDatosAdicionales: [''], // Dirección/Teléfono
       txtCodBarra: [''], // Buscador productos
     });
+
+    const navegacion = this.router.getCurrentNavigation();
+    
+    if (navegacion?.extras?.state) {
+      const itemsRecibidos = navegacion.extras.state['productosReabastecer'];
+      if (itemsRecibidos) {
+        this.cargarItemsDesdeDashboard(itemsRecibidos);
+      }
+    }
   }
 
   ngOnInit(): void {
@@ -355,6 +365,35 @@ calcularPrecioVentaSugerido(costoActual: number, costoNuevo: number, stockActual
 // Función auxiliar para redondear a 2 decimales
   redondear(numero: number): number {
     return Math.round(numero * 100) / 100;
+  }
+
+
+  // Método para convertir esos items "sueltos" en filas de tu tabla de compra
+  cargarItemsDesdeDashboard(items: any[]) {
+    items.forEach(item => {
+      // Creamos el objeto con la estructura que usa tu tabla de compras
+      const nuevoDetalle = {
+        id_producto: item.prod_id,
+        codigo: item.prod_codbarra,
+        nombreProducto: item.prod_nombre,
+        precioCompra: item.prod_preciocompra, // Precio sugerido base
+        cantidad: item.cantidad_sugerida,     // Cantidad sugerida por la Vista
+        subtotal: item.prod_preciocompra * item.cantidad_sugerida,
+        
+        // Datos para alertas de precio (lo que vimos antes)
+        stockPrevio: item.prod_stock,
+        costoPrevio: item.prod_preciocompra,
+        precioVentaActual: 0, // Ojo: Aquí la vista de stock bajo quizás no traía precio venta, agrégalo a la vista si quieres
+        precioSugerido: 0
+      };
+      
+      this.listaDetalles.push(nuevoDetalle);
+    });
+
+    this.calcularTotales(); // Actualizamos totales visuales
+    
+    // Opcional: Mostrar una alerta bonita
+    this.alertaServ.info('Reabastecimiento', `Se cargaron ${items.length} productos con stock bajo.`);
   }
 }
 

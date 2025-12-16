@@ -6,6 +6,7 @@ import { productosService } from '../../../servicios/productos.service';
 import { AlertService } from '../../../servicios/Alertas/alertas.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router'; // Asegúrate de inyectarlo en el constructor
 
 @Component({
     selector: 'app-dashboard',
@@ -19,12 +20,50 @@ listaAlertas: any[] = [];
 
   constructor(
     private productoService: productosService,
-    private alertaServ: AlertService
+    private alertaServ: AlertService,
+        private router: Router,
+
   ) {}
+
+  listaStockBajo: any[] = [];
+  mostrarModalStock: boolean = false;
+  seleccionadosStock: any[] = []; // Nuestro "carrito" temporal
+
 
   ngOnInit(): void {
     this.cargarAlertas();
+    this.cargarStockBajo();
   }
+
+  cargarStockBajo() {
+    this.productoService.obtenerStockBajo().subscribe({
+      next: (res: any) => {
+        // Agregamos propiedad 'selected' para los checkboxes del modal
+        this.listaStockBajo = res.map((item: any) => ({ ...item, selected: false }));
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  irACompraConItems() {
+    // 1. Filtramos los que el usuario marcó con el checkbox
+    const itemsParaComprar = this.listaStockBajo.filter(x => x.selected);
+
+    if (itemsParaComprar.length === 0) {
+      this.alertaServ.info('Vacío', 'Seleccione al menos un producto para reponer.');
+      return;
+    }
+
+    // 2. Navegamos a la ruta de "Crear Compra" pasando los datos en el 'state'
+    this.router.navigate(['home/crearCompra'], { 
+      state: { productosReabastecer: itemsParaComprar } 
+    });
+  }
+
+
+
+
+
 
   cargarAlertas() {
     this.productoService.LproductosPrecioNovedad().subscribe({

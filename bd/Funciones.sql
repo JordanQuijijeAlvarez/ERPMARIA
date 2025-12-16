@@ -1190,3 +1190,21 @@ WHERE prod_preciocompra >= prod_precioventa
 
 
 --ALERTA se agrego el campo prod_margenpg a la tabla producto para guardar el margen de ganancia por producto
+
+
+
+
+  
+  CREATE OR REPLACE VIEW VW_STOCK_BAJO AS
+SELECT 
+    prod_id,
+    prod_nombre,
+    prod_codbarra,
+    prod_stock,
+    prod_stock_minimo,
+    prod_preciocompra,
+    -- Sugerencia: Comprar lo que falta para llegar al mínimo + un margen (ej: 10 unidades extra)
+    (prod_stock_minimo - prod_stock) + 10 AS cantidad_sugerida
+FROM PRODUCTO
+WHERE prod_stock <= prod_stock_minimo
+  AND prod_estado = '1'; -- Solo productos activos

@@ -224,4 +224,20 @@ exports.actualizarPrecioVenta = async (req, res) => {
     }
 };
 
+exports.getProductosBajoStock = async (req, res) => {
+    let connection;
+    try {
+        connection = await getConnection();
+        const result = await connection.execute(
+            `SELECT * FROM VW_STOCK_BAJO ORDER BY prod_stock ASC`,
+            [],
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+        res.json(formatearSalida(result.rows)); 
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    } finally {
+        if (connection) await connection.close();
+    }
+};
 

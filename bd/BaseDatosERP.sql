@@ -303,3 +303,8 @@ COMMIT;
 ALTER TABLE COMPRA DROP CONSTRAINT SYS_C007828;
 ALTER TABLE COMPRA ADD CONSTRAINT CK_COMPRA_ESTADOREGISTRO 
 CHECK (compra_estadoregistro IN ('P', 'R', '0', '1'));
+
+  ALTER TABLE PRODUCTO ADD prod_stock_minimo NUMBER DEFAULT 5;
+
+
+  --ALERTA se agrego el campo prod_margenpg a la tabla producto para guardar el margen de ganancia por producto
