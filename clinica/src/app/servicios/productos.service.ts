@@ -58,10 +58,30 @@ export class productosService {
     LproductosPrecioNovedad (): Observable<any[]> {
       return this.http.get<any[]>(`${this.urlServidor}/productos/alerta`);
     }
+    obtenerSinMovimiento (): Observable<any[]> {
+      return this.http.get<any[]>(`${this.urlServidor}/productos/alerta/prodsinmov`);
+    }
 
+    obtenerKPIVentas (): Observable<any[]> {
+      return this.http.get<any[]>(`${this.urlServidor}/productos/alerta/kpiventas`);
+    }
       obtenerStockBajo (): Observable<any[]> {
       return this.http.get<any[]>(`${this.urlServidor}/productos/alerta/stock`);
     }
+
+
+    obtenerGraficoVentas (dia:number): Observable<any[]> {
+      return this.http.get<any[]>(`${this.urlServidor}/productos/info/ventas/${dia}`);
+    }
+    obtenerGraficoTop (): Observable<any[]> {
+      return this.http.get<any[]>(`${this.urlServidor}/productos/info/top`);
+    }
+    obtenerGraficoFinanzas (): Observable<any[]> {
+      return this.http.get<any[]>(`${this.urlServidor}/productos/info/finanzas`);
+    }
+
+
+
 
     ActualizarPrecio (precio :any)  {
       return this.http.put(`${this.urlServidor}/productos/actualizar/precioprod`, precio);

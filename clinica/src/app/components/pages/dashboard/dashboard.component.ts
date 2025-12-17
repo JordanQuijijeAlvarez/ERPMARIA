@@ -7,10 +7,11 @@ import { AlertService } from '../../../servicios/Alertas/alertas.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router'; // Asegúrate de inyectarlo en el constructor
-
+import { BaseChartDirective } from 'ng2-charts';
+import { Chart, ChartConfiguration, ChartOptions, registerables } from 'chart.js';
 @Component({
     selector: 'app-dashboard',
-    imports: [CommonModule, RouterModule, DirectivasModule, FormsModule],
+    imports: [CommonModule, RouterModule, DirectivasModule, FormsModule,BaseChartDirective],
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.css'
 })
@@ -18,12 +19,21 @@ export class DashboardComponent implements OnInit {
 listaAlertas: any[] = [];
   mostrarModalPrecios: boolean = false;
 
+  // Variables Nuevas
+kpiVentas: any = { venta_hoy: 0, venta_ayer: 0, transacciones_hoy: 0 };
+listaSinMovimiento: any[] = [];
+mostrarModalSinMovimiento: boolean = false;
+
   constructor(
+    
     private productoService: productosService,
     private alertaServ: AlertService,
         private router: Router,
 
-  ) {}
+  ) {
+
+    Chart.register(...registerables);
+  }
 
   listaStockBajo: any[] = [];
   mostrarModalStock: boolean = false;
@@ -33,6 +43,18 @@ listaAlertas: any[] = [];
   ngOnInit(): void {
     this.cargarAlertas();
     this.cargarStockBajo();
+     this.cargarAlertas();     // Precios (Ya tenías)
+    this.cargarStockBajo();   // Stock (Ya tenías)
+    
+    // NUEVOS
+    this.cargarKPIVentas();
+    this.cargarSinMovimiento();
+
+        this.cargarGraficos();
+
+            this.cargarDatosGrafico(7); // Carga inicial
+
+
   }
 
   cargarStockBajo() {
@@ -125,4 +147,129 @@ listaAlertas: any[] = [];
       }
     });
   }
+
+
+
+
+
+cargarKPIVentas() {
+    this.productoService.obtenerKPIVentas().subscribe({
+        next: (res) => this.kpiVentas = res,
+        error: (err) => console.error(err)
+    });
 }
+
+cargarSinMovimiento() {
+    this.productoService.obtenerSinMovimiento().subscribe({
+        next: (res: any) => this.listaSinMovimiento = res,
+        error: (err) => console.error(err)
+    });
+}
+
+
+
+// ==========================================
+  // CONFIGURACIÓN GRÁFICO 1: VENTAS (Líneas)
+  // ==========================================
+  public lineChartData: ChartConfiguration<'line'>['data'] = {
+    labels: [], // Se llenará con los días (Lunes, Martes...)
+    datasets: [
+      {
+        data: [], // Se llenará con los montos
+        label: 'Ventas ($)',
+        fill: true,
+        tension: 0.4, // Curvatura de la línea
+        borderColor: '#2563EB', // Azul
+        backgroundColor: 'rgba(37, 99, 235, 0.1)'
+      }
+    ]
+  };
+  public lineChartOptions: ChartOptions<'line'> = { responsive: true };
+
+  // ==========================================
+  // CONFIGURACIÓN GRÁFICO 2: TOP PRODUCTOS (Barras)
+  // ==========================================
+  public barChartData: ChartConfiguration<'bar'>['data'] = {
+    labels: [], // Nombres de productos
+    datasets: [
+      { 
+        data: [], 
+        label: 'Unidades Vendidas',
+        backgroundColor: ['#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6'] // Colores variados
+      }
+    ]
+  };
+  public barChartOptions: ChartOptions<'bar'> = { responsive: true };
+
+  // ==========================================
+  // CONFIGURACIÓN GRÁFICO 3: FINANZAS (Donut)
+  // ==========================================
+  public doughnutChartData: ChartConfiguration<'doughnut'>['data'] = {
+    labels: ['Ingresos (Ventas)', 'Gastos (Compras)'],
+    datasets: [
+      { 
+        data: [0, 0], 
+        backgroundColor: ['#10B981', '#EF4444'], // Verde vs Rojo
+        hoverOffset: 4
+      }
+    ]
+  };
+
+
+
+  
+
+  cargarGraficos() {
+    // 1. Cargar Ventas
+    this.productoService.obtenerGraficoVentas(7).subscribe((res: any) => {
+      this.lineChartData.labels = res.map((x: any) => x.dia_nombre); // eje X
+      this.lineChartData.datasets[0].data = res.map((x: any) => x.total_vendido); // eje Y
+      // Truco para refrescar el gráfico en Angular
+      this.lineChartData = { ...this.lineChartData }; 
+    });
+
+    // 2. Cargar Top Productos
+    this.productoService.obtenerGraficoTop().subscribe((res: any) => {
+      this.barChartData.labels = res.map((x: any) => x.prod_nombre);
+      this.barChartData.datasets[0].data = res.map((x: any) => x.cantidad_total);
+      this.barChartData = { ...this.barChartData };
+    });
+
+    // 3. Cargar Finanzas
+    this.productoService.obtenerGraficoFinanzas().subscribe((res: any) => {
+      this.doughnutChartData.datasets[0].data = [res.total_ingresos, res.total_gastos];
+      this.doughnutChartData = { ...this.doughnutChartData };
+    });
+  }
+
+  // Variable para saber qué botón pintar de azul (UX)
+  rangoSeleccionado: number = 7; 
+
+ 
+
+  // Método que llama el botón
+  cambiarRango(dias: number) {
+    this.rangoSeleccionado = dias;
+    this.cargarDatosGrafico(dias);
+  }
+
+  cargarDatosGrafico(dias: number) {
+    this.productoService.obtenerGraficoVentas(dias).subscribe((res: any) => {
+      
+      // Actualizamos etiquetas y datos
+      this.lineChartData.labels = res.map((x: any) => x.dia_nombre);
+      this.lineChartData.datasets[0].data = res.map((x: any) => x.total_vendido);
+      
+      // Cambiamos el texto de la etiqueta para que se vea pro
+      this.lineChartData.datasets[0].label = `Ventas (Últimos ${dias} días)`;
+
+      // IMPORTANTE: Forzamos la actualización visual del gráfico
+      this.lineChartData = { ...this.lineChartData };
+    });
+  }
+}
+
+
+
+
+

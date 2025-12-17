@@ -7,6 +7,21 @@ const authenticateToken = require('../middleware/auth');
 router.get('/alerta/stock', authenticateToken,
     controladorProducto.getProductosBajoStock);
 
+router.get('/alerta/prodsinmov', authenticateToken,
+    controladorProducto.getProductosSinMovimiento);
+
+router.get('/alerta/kpiventas', authenticateToken,
+    controladorProducto.getKpiVentas);
+
+router.get('/info/top', authenticateToken,
+    controladorProducto.getGraficoTop);
+
+    router.get('/info/ventas/:dias?', authenticateToken,
+    controladorProducto.getGraficoVentas);
+
+    router.get('/info/finanzas', authenticateToken,
+    controladorProducto.getGraficoFinanzas);
+
 router.get('/listar', authenticateToken,
     controladorProducto.getProductos);
 

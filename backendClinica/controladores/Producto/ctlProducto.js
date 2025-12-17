@@ -241,3 +241,98 @@ exports.getProductosBajoStock = async (req, res) => {
     }
 };
 
+// ctlDashboard.js
+
+// Productos Hueso
+exports.getProductosSinMovimiento = async (req, res) => {
+ let connection;
+    try {
+        connection = await getConnection();    
+        const result = await connection.execute(
+        `SELECT * FROM VW_PRODUCTOS_SIN_MOVIMIENTO ORDER BY dinero_congelado DESC`, // Los más caros primero
+        [], { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+    res.json(formatearSalida(result.rows));
+ } catch (error) {
+        res.status(500).json({ error: error.message });
+    } finally {
+        if (connection) await connection.close();
+    }
+};
+
+// KPI Ventas
+exports.getKpiVentas = async (req, res) => {
+ let connection;
+    try {
+        connection = await getConnection();    
+        const result = await connection.execute(    
+        `SELECT * FROM VW_KPI_VENTAS_DIA`,
+        [], { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+    res.json(formatearSalida(result.rows)[0]); // Retornamos solo el objeto
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    } finally {
+        if (connection) await connection.close();
+    }
+};
+
+
+exports.getGraficoVentas = async (req, res) => {
+    // Leemos el parámetro de la URL (ej: /grafico/ventas/30)
+    const dias = req.params.dias || 7; 
+
+    let connection;
+    try {
+        connection = await getConnection();
+        
+        // Consultamos la vista GENERAL pero filtramos AQUÍ con el parámetro
+        const query = `
+            SELECT * FROM VW_VENTAS_DIARIAS_GENERAL 
+            WHERE fecha >= TRUNC(SYSDATE) - :p_dias
+            ORDER BY fecha ASC
+        `;
+
+        const result = await connection.execute(
+            query, 
+            [dias], // Pasamos el número de días a Oracle
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+        
+        res.json(formatearSalida(result.rows));
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    } finally {
+        if (connection) await connection.close();
+    }
+};
+
+
+// 2. Datos para Gráfico de Barras
+exports.getGraficoTop = async (req, res) => {
+    let connection;
+    try {
+        connection = await getConnection();
+        const result = await connection.execute(
+            `SELECT * FROM VW_GRAFICO_TOP_PRODUCTOS`, [], { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+        res.json(formatearSalida(result.rows));
+    } catch (error) { res.status(500).json({ error: error.message }); }
+    finally { if (connection) await connection.close(); }
+};
+
+// 3. Datos para Gráfico Financiero
+exports.getGraficoFinanzas = async (req, res) => {
+    let connection;
+    try {
+        connection = await getConnection();
+        const result = await connection.execute(
+            `SELECT * FROM VW_GRAFICO_FINANZAS`, [], { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+        res.json(formatearSalida(result.rows)[0]);
+    } catch (error) { res.status(500).json({ error: error.message }); }
+    finally { if (connection) await connection.close(); }
+};
+
+
