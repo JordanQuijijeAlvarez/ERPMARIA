@@ -78,29 +78,11 @@
                 class="form-select"
               >
                 <option value="" disabled>Seleccione un rol</option>
-                <option *ngFor="let rol of listaRoles" [value]="rol.codigo">
-                  {{ rol.nombre }}
+                <option *ngFor="let rol of listaRoles" [value]="rol.rol_id">
+                  {{ rol.rol_nombre }}
                 </option>
               </select>
               <app-validators [control]="frmUsuario.get('cbxRoles')!"></app-validators>
-            </div>
-
-            <!-- Médico (Solo si el rol es médico) -->
-            <div class="form-group" *ngIf="isMedicoSelected">
-              <label class="form-label">
-                <i class="fas fa-user-md label-icon"></i>
-                Médico Asignado *
-              </label>
-              <select 
-                formControlName="cbxMedicos"
-                class="form-select"
-              >
-                <option value="" disabled>Seleccione un médico</option>
-                <option *ngFor="let medico of listaMedicoSinUsuario" [value]="medico.codigo">
-                  Dr. {{ medico.nombre }} {{ medico.apellido }}
-                </option>
-              </select>
-              <app-validators [control]="frmUsuario.get('cbxMedicos')!"></app-validators>
             </div>
 
             <!-- Información adicional -->
@@ -113,32 +95,7 @@
                     <ul class="info-box__list">
                       <li>El nombre de usuario debe ser único en el sistema</li>
                       <li>La contraseña debe tener al menos 6 caracteres</li>
-                      <li *ngIf="isMedicoSelected" class="info-box__list-item--warning">
-                        <i class="fas fa-arrow-right info-box__list-icon"></i>
-                        Al seleccionar "Médico" debe asignar un médico específico
-                      </li>
                     </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-
-
-
-
-            <!-- Mensaje dinámico para rol médico -->
-            <div class="form-grid__full" *ngIf="isMedicoSelected">
-              <div class="badge--success success-box">
-                <div class="success-box__content">
-                  <div>
-                    <i class="fas fa-stethoscope success-box__icon"></i>
-                  </div>
-                  <div>
-                    <p class="success-box__text">
-                      <span class="success-box__text-bold">Rol Médico Seleccionado:</span> 
-                      Ahora debe seleccionar el médico que será asociado a este usuario.
-                    </p>
                   </div>
                 </div>
               </div>
@@ -146,10 +103,6 @@
           </div>
         </div>
       </div>
-
-
-
-     
 
       <!-- Action Buttons -->
       <div class="actions-container">

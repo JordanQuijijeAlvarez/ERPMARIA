@@ -25,15 +25,12 @@ throw new Error('Method not implemented.');
     frmUsuario: FormGroup;
     eventoUpdate: boolean = false;
     codigo: number | null = null;
-    codigo_medico: number | null = null;
     estado: boolean = true;
-    isMedicoSelected = false;
 
     listaRoles: InRoles[] = [];
 
   
     @ViewChild('datepickerElement') datepickerElement!: ElementRef;
-listaMedicoSinUsuario: any;
   
     constructor(
       private formBuilder: FormBuilder,
@@ -48,12 +45,11 @@ listaMedicoSinUsuario: any;
         txtNombreUsuario: ['', Validators.required],
         txtCorreoUsuario: ['', [Validators.required, Validators.email]],
         txtContrasenia: ['', Validators.required],
-        cbxMedicos: ['', Validators.required],
         cbxRoles: ['', Validators.required]
       });
     }
     ngOnInit(): void {
-      // this.listarRoles();
+      this.listarRoles();
 
       this.route.paramMap.subscribe((parametros) => {
         const id = parametros.get('id');
@@ -68,61 +64,27 @@ listaMedicoSinUsuario: any;
       });
     }
 
-    // listarMedicos(): void {
-    //   this.medicoServ.LMedicoSinUsuario().subscribe({
-    //     next: (res) => {
-    //       this.listaMedicoSinUsuario = res;
-  
-    //       console.log(res);
-    //     },
-    //     error: (err) => {
-    //       alert('NO EXISTEN REGISTROS');
-    //     },
-    //   });
-    // }
-
-    // listarRoles(): void {
-    //   this.rolServ.LRoles().subscribe({
-    //     next: (res) => {
-    //       this.listaRoles = res;
-    //       console.log(res);
-    //     },
-    //     error: (err) => {
-    //       alert('NO EXISTEN REGISTROS');
-    //     },
-    //   });
-    // }
+    listarRoles(): void {
+      this.rolServ.LRoles().subscribe({
+        next: (res) => {
+          this.listaRoles = res;
+          console.log('Roles cargados:', res);
+        },
+        error: (err) => {
+          console.error('Error al cargar roles:', err);
+          Swal.fire({
+            title: 'Error',
+            text: 'No se pudieron cargar los roles del sistema',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          });
+        },
+      });
+    }
 
     onRoleChange(event: any): void {
       const selectedRoleId = parseInt(event.target.value, 10); 
       console.log('ID del rol seleccionado:', selectedRoleId);
-  
-      this.rolServ.LRolesId(selectedRoleId).subscribe({
-        next: (selectedRole) => {
-          if (selectedRole) {
-            console.log('Rol seleccionado:', selectedRole.nombre, selectedRole.codigo);
-      
-            this.isMedicoSelected = selectedRole.nombre.toLowerCase() === 'medico';
-            
-            // Actualizar validaciones dinámicamente
-            const medicoControl = this.frmUsuario.get('cbxMedicos');
-            if (this.isMedicoSelected) {
-              medicoControl?.setValidators([Validators.required]);
-              medicoControl?.updateValueAndValidity();
-            } else {
-              medicoControl?.clearValidators();
-              medicoControl?.setValue('');
-              medicoControl?.updateValueAndValidity();
-            }
-          } else {
-            this.isMedicoSelected = false; 
-          }
-        },
-        error: (err) => {
-          console.error('Error al obtener el rol:', err);
-          this.isMedicoSelected = false; 
-        }
-      });
     }
       
 
@@ -137,13 +99,12 @@ listaMedicoSinUsuario: any;
             txtNombreUsuario: usuario.user_username,
             txtContrasenia: usuario.user_contrasenia,
             // cbxRoles: usuario.codigo_rol,
-            txtCorreoUsuario: usuario.user_correo,
-
+            txtCorreoUsuario: usuario.user_correo
           });
         },
         error: (err) => {
-          console.log('Error al cargar medico:', err);
-          alert('No se pudo cargar la información del medico');
+          console.log('Error al cargar usuario:', err);
+          alert('No se pudo cargar la información del usuario');
         },
       });
     }
