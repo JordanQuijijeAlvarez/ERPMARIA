@@ -4,9 +4,7 @@
       <div>
         <div class="compra-form__header">
           <h2 class="compra-form__title">
-            {{
-              eventoUpdate ? "EDITAR ORDEN DE COMPRA" : "NUEVA ORDEN DE COMPRA"
-            }}
+            {{ eventoUpdate ? "EDITAR ORDEN DE COMPRA" : "NUEVA ORDEN DE COMPRA" }}
           </h2>
           <p class="compra-form__subtitle">
             Busque el proveedor y agregue los productos a la orden de compra
@@ -15,72 +13,71 @@
 
         <div class="compra-form__section-header">
           <h3 class="compra-form__section-title">
-            <i class="fas fa-truck"></i>
-            Información del Proveedor
+            <i class="fas fa-truck"></i> Información del Proveedor
           </h3>
         </div>
 
         <div class="compra-form__fields">
+          
           <div class="compra-form__field">
-            <label> <i class="fas fa-id-card"></i> RUC Proveedor * </label>
-            <div class="compra-form__search-group">
+            <label> <i class="fas fa-id-card"></i> Buscar Proveedor (RUC o Nombre) * </label>
+            
+            <div class="compra-form__search-group" style="position: relative;">
               <input
                 formControlName="txtRucProveedor"
-                placeholder="Buscar RUC..."
+                placeholder="Escriba para buscar..."
                 type="text"
+                autocomplete="off"
+                (input)="filtrarProveedores($any($event.target).value); validarLimpiezaProveedor($any($event.target).value)"
+                (blur)="cerrarDropdown()"
+                (focus)="filtrarProveedores(getRucProveedor.value)" 
                 (keydown.enter)="$event.preventDefault(); buscarProveedor()"
               />
-              <button
-                type="button"
-                class="compra-form__search-btn"
-                (click)="buscarProveedor()"
-                title="Buscar Proveedor"
-              >
-                <i class="fas fa-search"></i>
+              
+              <button type="button" class="compra-form__search-btn" title="Validar / Buscar" (click)="buscarProveedor()">
+                 <i class="fas fa-search"></i>
               </button>
+          
+              <div *ngIf="mostrarDropdownProveedor" class="dropdown-proveedores shadow-lg">
+                <ul>
+                  <li *ngFor="let prov of listaProveedoresFiltrados" (mousedown)="seleccionarProveedor(prov)">
+                    <div class="flex justify-between items-center w-full">
+                      <span class="prov-nombre">{{ prov.prove_nombre }}</span>
+                      <span class="prov-ruc badge">{{ prov.prove_ruc }}</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
 
           <div class="compra-form__field">
-            <label>
-              <i class="fas fa-building"></i> Razón Social / Nombre
-            </label>
-            <input
-              readonly
-              formControlName="txtNombreProveedor"
-              placeholder="Nombre del proveedor..."
-            />
+            <label> <i class="fas fa-building"></i> Razón Social </label>
+            <input readonly formControlName="txtNombreProveedor" placeholder="Nombre del proveedor..." />
           </div>
 
           <div class="compra-form__field">
-            <label>
-              <i class="fas fa-map-marker-alt"></i> Dirección / Teléfono
-            </label>
-            <input
-              readonly
-              formControlName="txtDatosAdicionales"
-              placeholder="Información de contacto..."
-            />
+            <label> <i class="fas fa-map-marker-alt"></i> Datos Adicionales </label>
+            <input readonly formControlName="txtDatosAdicionales" placeholder="Contacto..." />
           </div>
         </div>
 
         <div class="compra-form__section-header">
           <h3 class="compra-form__section-title">
-            <i class="fas fa-boxes"></i>
-            Agregar Productos a la Orden
+            <i class="fas fa-boxes"></i> Agregar Productos
           </h3>
         </div>
 
         <div class="compra-form__product-search">
           <div class="compra-form__field">
-            <label> Buscar Producto (Catálogo) </label>
+            <label> Buscar Producto </label>
             <div class="compra-form__search-input-wrapper">
               <i class="fas fa-search"></i>
               <input
                 type="text"
                 formControlName="txtCodBarra"
                 (keydown.enter)="$event.preventDefault(); agregarProducto()"
-                placeholder="Escriba código de barras o nombre del producto..."
+                placeholder="Código de barras o nombre..."
               />
             </div>
           </div>
@@ -104,26 +101,11 @@
           <table class="compra-form__table">
             <thead>
               <tr>
-                <th>
-                  <i class="fas fa-box"></i>
-                  Producto
-                </th>
-                <th>
-                  <i class="fas fa-dollar-sign"></i>
-                  Costo Unit.
-                </th>
-                <th>
-                  <i class="fas fa-sort-numeric-up"></i>
-                  Cantidad
-                </th>
-                <th>
-                  <i class="fas fa-calculator"></i>
-                  Subtotal
-                </th>
-                <th>
-                  <i class="fas fa-cogs"></i>
-                  Acción
-                </th>
+                <th>Producto</th>
+                <th>Costo Unit.</th>
+                <th>Cantidad</th>
+                <th>Subtotal</th>
+                <th>Acción</th>
               </tr>
             </thead>
             <tbody>
@@ -133,14 +115,14 @@
                   <div class="compra-form__product-code">{{ item.codigo }}</div>
                 </td>
 
-                <td class="px-6 py-4 text-center">
-                <input type="number" 
-                      [(ngModel)]="item.precioCompra" 
-                      [ngModelOptions]="{standalone: true}"
-                      (change)="calcularTotales()" 
-                      class="w-20 border rounded p-1 text-center" 
-                      min="0" step="0.01">
-              </td>
+                <td class="text-center">
+                  <input type="number" 
+                         [(ngModel)]="item.precioCompra" 
+                         [ngModelOptions]="{standalone: true}"
+                         (input)="actualizarPrecioUnitario(i)"
+                         class="w-24 border rounded p-1 text-center font-bold" 
+                         min="0" step="0.01">
+                </td>
 
                 <td>
                   <div class="compra-form__quantity-controls">
@@ -152,7 +134,7 @@
                       class="compra-form__quantity-input"
                       [(ngModel)]="item.cantidad"
                       [ngModelOptions]="{ standalone: true }"
-                      (change)="calcularTotales()"
+                      (change)="actualizarPrecioUnitario(i)"
                     />
                     <button type="button" class="compra-form__quantity-btn" (click)="aumentarCantidad(i)">
                       <i class="fas fa-plus"></i>
@@ -161,7 +143,7 @@
                 </td>
 
                 <td>
-                  ${{ item.cantidad * item.precioCompra | number : "1.2-2" }}
+                  ${{ item.subtotal | number : "1.2-2" }}
                 </td>
 
                 <td>
@@ -174,10 +156,8 @@
               <tr *ngIf="listaDetalles.length === 0">
                 <td colspan="5">
                   <div class="compra-form__empty-state">
-                    <div class="compra-form__empty-icon">
-                      <i class="fas fa-clipboard-list"></i>
-                    </div>
-                    <div class="compra-form__empty-text">No hay productos agregados a la orden de compra</div>
+                    <div class="compra-form__empty-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <div class="compra-form__empty-text">No hay productos agregados.</div>
                   </div>
                 </td>
               </tr>
@@ -193,12 +173,12 @@
                 <span>${{ subtotal | number : "1.2-2" }}</span>
               </div>
               <div class="compra-form__total-row">
-                <span>IVA (15%):</span>
+                <span>IVA ({{ ivaPorcentaje }}%):</span>
                 <span>${{ iva | number : "1.2-2" }}</span>
               </div>
               <div class="compra-form__total-divider"></div>
               <div class="compra-form__total-row compra-form__total-row--final">
-                <span>TOTAL A PAGAR:</span>
+                <span>TOTAL:</span>
                 <span>${{ total | number : "1.2-2" }}</span>
               </div>
             </div>
@@ -208,13 +188,11 @@
 
       <div class="compra-form__actions">
         <button type="button" class="compra-form__btn compra-form__btn--cancel" (click)="cancelarCompra()">
-          <i class="fas fa-times"></i>
-          Cancelar
+          <i class="fas fa-times"></i> Cancelar
         </button>
 
         <button type="submit" class="compra-form__btn compra-form__btn--submit" [disabled]="listaDetalles.length === 0">
-          <i class="fas fa-save"></i>
-          Registrar Orden de Compra
+          <i class="fas fa-save"></i> Registrar Orden
         </button>
       </div>
     </div>

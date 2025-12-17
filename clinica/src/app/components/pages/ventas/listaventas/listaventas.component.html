@@ -165,6 +165,16 @@
                   >
                     <i class="fas fa-eye"></i>
                   </button>
+
+                  <button
+          (click)="descargarFactura(venta)"
+          type="button"
+          title="Descargar Factura PDF"
+          class="btn btn--secondary btn--sm btn--icon"
+          style="background-color: #6c757d; color: white;" 
+        >
+          <i class="fas fa-file-pdf"></i>
+        </button>
                   
                   <ng-container *ngIf="estadoActual === 1">
                     <!-- Edit Button -->

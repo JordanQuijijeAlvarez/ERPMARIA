@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
-  FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
@@ -12,41 +11,48 @@ import { CommonModule } from '@angular/common';
 
 // SERVICIOS
 import { AlertService } from '../../../../servicios/Alertas/alertas.service';
-import { ProveedorService } from '../../../../servicios/proveedores.service'; // Tu servicio de proveedores
+import { ProveedorService } from '../../../../servicios/proveedores.service';
+import { compraService } from '../../../../servicios/compras.service';
+import { productosService } from '../../../../servicios/productos.service';
 
 // MODELOS
 import { InProducto } from '../../../../modelos/modeloProductos/InProducto';
-import { compraService } from '../../../../servicios/compras.service';
-import { productosService } from '../../../../servicios/productos.service';
 import { InCompraCompleto, InDetalleCompra } from '../../../../modelos/modeloCompras/InCompras';
 
 @Component({
   selector: 'app-frmcompras',
-  standalone: true, // Si es standalone
+  standalone: true,
   imports: [ReactiveFormsModule, RouterModule, CommonModule, FormsModule],
-  templateUrl: './frmcompras.component.html', // Verifica nombre de archivo
-  styleUrl: './frmcompras.component.css'      // Verifica nombre de archivo
+  templateUrl: './frmcompras.component.html',
+  styleUrl: './frmcompras.component.css'
 })
 export class FrmComprasComponent implements OnInit {
 
-  // Variables de control visual
+  // ==========================================
+  // VARIABLES DE ESTADO
+  // ==========================================
+  
+  // Proveedores
+  listaProveedores: any[] = [];          // Todos los datos (Carga inicial)
+  listaProveedoresFiltrados: any[] = []; // Resultados de búsqueda
+  mostrarDropdownProveedor: boolean = false;
+  proveedorId: number = 0;
+
+  // Productos y Detalles
   stockActual: number = 0;
   listaDetalles: any[] = [];
-  
+  productoSeleccionado: InProducto | undefined;
+
   // Totales
-  ivaPorcentaje: number = 15; // Ajustable
-  iva: number = 15;
+  ivaPorcentaje: number = 15;
+  iva: number = 0;
   subiva: number = 0;
   subtotal: number = 0;
   total: number = 0;
 
-  // Formulario
+  // Formulario y Control
   formCompras: FormGroup;
   eventoUpdate = false;
-  
-  // IDs Relacionados
-  proveedorId: number = 0;
-  productoSeleccionado: InProducto | undefined;
   codigoCompra: number = 0;
 
   constructor(
@@ -54,21 +60,19 @@ export class FrmComprasComponent implements OnInit {
     private route: ActivatedRoute,
     private formBuilder: FormBuilder,
     private alertaServ: AlertService,
-    // Inyección de servicios
     private servicioCompras: compraService,
     private servicioProveedor: ProveedorService,
     private servicioProductos: productosService
-    
   ) {
     this.formCompras = this.formBuilder.group({
       txtRucProveedor: ['', Validators.required],
-      txtNombreProveedor: ['', Validators.required], // Solo lectura
-      txtDatosAdicionales: [''], // Dirección/Teléfono
-      txtCodBarra: [''], // Buscador productos
+      txtNombreProveedor: ['', Validators.required],
+      txtDatosAdicionales: [''], 
+      txtCodBarra: [''], 
     });
 
+    // Verificar si venimos desde el Dashboard (Stock Bajo)
     const navegacion = this.router.getCurrentNavigation();
-    
     if (navegacion?.extras?.state) {
       const itemsRecibidos = navegacion.extras.state['productosReabastecer'];
       if (itemsRecibidos) {
@@ -78,105 +82,177 @@ export class FrmComprasComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // 1. Cargar lista maestra de proveedores
+    this.cargarTodosLosProveedores();
+
+    // 2. Verificar si es edición
     this.route.paramMap.subscribe((parametros) => {
       const id = parametros.get('id');
       if (id) {
         this.eventoUpdate = true;
         this.codigoCompra = parseInt(id);
         this.cargarCompraParaEditar(this.codigoCompra); 
-      } else {
-        this.eventoUpdate = false;
       }
     });
   }
 
   // ==========================================
-  // LÓGICA DE PROVEEDOR
+  // 1. LÓGICA DE PROVEEDOR (EN MEMORIA)
   // ==========================================
-  buscarProveedor(): void {
-    const ruc = this.getRucProveedor.value;
-    if (!ruc) return;
 
-    // Usamos el método que busca por RUC y estado '1' (activo)
-    this.servicioProveedor.LproveedorRucEstado(ruc, '1').subscribe({
+  cargarTodosLosProveedores() {
+    // Traemos todos los proveedores activos (estado 1)
+    this.servicioProveedor.LproveedorEstado(1).subscribe({
       next: (res: any) => {
-        const proveedor = Array.isArray(res) ? (res[0] || null) : res;
-        if (proveedor) {
-          this.proveedorId = proveedor.prove_id;
-          this.getNombreProveedor.setValue(proveedor.PROVE_NOMBRE || proveedor.prove_nombre);
-          this.getDatosAdicionales.setValue((proveedor.PROVE_DIRECCION || proveedor.prove_direccion) + ' - ' + (proveedor.PROVE_TELEFONO || proveedor.prove_telefono));
-        } else {
-          this.alertaServ.info('No encontrado', 'No existe un proveedor activo con ese RUC.');
-          this.limpiarProveedor();
-        }
+        const todos = Array.isArray(res) ? res : [res];
+        this.listaProveedores = todos;
       },
-      error: (err) => {
-        this.alertaServ.error('Error', 'No se encontró el proveedor o hubo un error de conexión.');
-        this.limpiarProveedor();
-      },
+      error: (err) => console.error('Error cargando proveedores', err)
     });
-   
+  }
+
+  // Se ejecuta mientras el usuario escribe
+  filtrarProveedores(termino: string) {
+    if (!termino) {
+      this.listaProveedoresFiltrados = [];
+      this.mostrarDropdownProveedor = false;
+      return;
+    }
+
+    const term = termino.toLowerCase();
+    
+    this.listaProveedoresFiltrados = this.listaProveedores.filter(prov => 
+      (prov.prove_ruc && prov.prove_ruc.toLowerCase().includes(term)) || 
+      (prov.prove_nombre && prov.prove_nombre.toLowerCase().includes(term))
+    );
+
+    this.mostrarDropdownProveedor = this.listaProveedoresFiltrados.length > 0;
+  }
+
+  // Se ejecuta al dar Enter o Click en la lupa
+  buscarProveedor(): void {
+    const termino = this.getRucProveedor.value;
+    
+    if (!termino) {
+      this.alertaServ.info('Atención', 'Ingrese RUC o Nombre para buscar.');
+      return;
+    }
+
+    // Buscamos coincidencia exacta primero
+    const exacto = this.listaProveedores.find(p => 
+      p.prove_ruc === termino || p.prove_nombre.toLowerCase() === termino.toLowerCase()
+    );
+
+    if (exacto) {
+      this.seleccionarProveedor(exacto);
+    } else {
+      // Si no es exacto, verificamos si hay filtrados
+      if (this.listaProveedoresFiltrados.length === 1) {
+        this.seleccionarProveedor(this.listaProveedoresFiltrados[0]);
+      } else if (this.listaProveedoresFiltrados.length > 1) {
+        this.mostrarDropdownProveedor = true;
+        this.alertaServ.info('Varias opciones', 'Seleccione un proveedor de la lista.');
+      } else {
+        this.alertaServ.error('No encontrado', 'No existe proveedor con esos datos.');
+        this.limpiarProveedor();
+      }
+    }
+  }
+
+  seleccionarProveedor(proveedor: any) {
+    this.proveedorId = proveedor.prove_id;
+    
+    this.getRucProveedor.setValue(proveedor.prove_ruc); 
+    this.getNombreProveedor.setValue(proveedor.prove_nombre);
+    
+    const direccion = proveedor.prove_direccion || '';
+    const telefono = proveedor.prove_telefono || '';
+    this.getDatosAdicionales.setValue(`${direccion} - ${telefono}`);
+    
+    this.mostrarDropdownProveedor = false;
+    this.listaProveedoresFiltrados = [];
+  }
+
+  cerrarDropdown() {
+    // Delay para permitir el click en la lista antes de que desaparezca
+    setTimeout(() => {
+      this.mostrarDropdownProveedor = false;
+    }, 200);
+  }
+
+  validarLimpiezaProveedor(valor: string) {
+    if (valor === '') {
+      this.limpiarProveedor();
+    }
   }
 
   limpiarProveedor() {
     this.proveedorId = 0;
     this.getNombreProveedor.setValue('');
     this.getDatosAdicionales.setValue('');
+    this.listaProveedoresFiltrados = [];
+    this.mostrarDropdownProveedor = false;
   }
 
   // ==========================================
-  // LÓGICA DE PRODUCTOS
+  // 2. LÓGICA DE PRODUCTOS (CARRITO)
   // ==========================================
+
   agregarProducto() {
     const codBarra = this.getCodBarra.value;
     if (!codBarra) return;
 
     this.servicioProductos.BuscarprodCodBarras(codBarra, 1).subscribe({
       next: (res: any) => {
-        // Validación de existencia
         if (!res || (Array.isArray(res) && res.length === 0)) {
-          this.alertaServ.info('Producto no encontrado', 'Verifique el código de barras.');
+          this.alertaServ.info('No encontrado', 'Verifique el código de barras.');
           this.getCodBarra.setValue('');
           return;
         }
 
-        // Si el servicio devuelve un array, tomamos el primero
         const producto = Array.isArray(res) ? res[0] : res;
-        this.productoSeleccionado = producto;
-        this.stockActual = producto.prod_stock; // Solo referencia visual
+        this.stockActual = producto.prod_stock; // Referencia visual
 
-        // Buscar si ya existe en la lista para sumar cantidad
-        const indiceExistente = this.listaDetalles.findIndex(item => item.id_producto === producto.prod_id);
+        // Verificar si ya está en la lista
+        const index = this.listaDetalles.findIndex(item => item.id_producto === producto.prod_id);
 
-        if (indiceExistente !== -1) {
-          this.aumentarCantidad(indiceExistente);
+        if (index !== -1) {
+          this.aumentarCantidad(index);
         } else {
-          // Agregar nuevo item a la lista
+          // Nuevo item
           const nuevoDetalle = {
             id_producto: producto.prod_id,
             codigo: producto.prod_codbarra,
             nombreProducto: producto.prod_nombre,
-            // IMPORTANTE: En compras usamos el PRECIO DE COMPRA (Costos)
-            // Si tu producto no tiene precio_compra, usa 0 o habilita edición
-            precioCompra: producto.prod_preciocompra || 0, 
+            // Usamos precio compra si existe, sino 0
+            precioCompra: parseFloat(producto.prod_preciocompra) || 0, 
             cantidad: 1,
-            subtotal: producto.prod_preciocompra || 0
+            subtotal: parseFloat(producto.prod_preciocompra) || 0
           };
 
           this.listaDetalles.push(nuevoDetalle);
           this.calcularTotales();
         }
 
-        // Limpiar buscador
         this.getCodBarra.setValue('');
-        this.productoSeleccionado = undefined;
-        this.stockActual = 0;
       },
       error: (err) => {
         console.error(err);
-        this.alertaServ.error('Error', 'Problema al consultar producto.');
+        this.alertaServ.error('Error', 'Problema al buscar el producto.');
       }
     });
+  }
+
+  // CAMBIO DE PRECIO MANUAL
+  actualizarPrecioUnitario(index: number) {
+    const item = this.listaDetalles[index];
+    let nuevoPrecio = parseFloat(item.precioCompra);
+    
+    if (isNaN(nuevoPrecio) || nuevoPrecio < 0) nuevoPrecio = 0;
+    
+    item.precioCompra = nuevoPrecio;
+    item.subtotal = item.cantidad * item.precioCompra;
+    this.calcularTotales();
   }
 
   aumentarCantidad(index: number) {
@@ -204,80 +280,75 @@ export class FrmComprasComponent implements OnInit {
 
   calcularTotales() {
     this.subtotal = this.listaDetalles.reduce((acc, item) => acc + item.subtotal, 0);
-    this.subiva = this.subtotal * (this.iva / 100);
+    this.subiva = this.subtotal * (this.ivaPorcentaje / 100);
     this.total = this.subtotal + this.subiva;
+    this.iva = this.subiva; // Para guardar en BD
   }
 
   // ==========================================
-  // GUARDAR COMPRA
+  // 3. GUARDAR COMPRA
   // ==========================================
+
   crearObjetoCompra(): InCompraCompleto {
-    // Mapeo de detalles para el backend
     const detalles: InDetalleCompra[] = this.listaDetalles.map(item => ({
-        detc_id: 0, // Generalmente se manda 0 y el backend decide si borra e inserta de nuevo o actualiza
-        compra_id: this.eventoUpdate ? this.codigoCompra : 0, // <--- AQUÍ EL CAMBIO IMPORTANTE
+        detc_id: 0,
+        compra_id: this.eventoUpdate ? this.codigoCompra : 0,
         prod_id: item.id_producto,
         detc_preciouni: item.precioCompra,
         detc_cantidad: item.cantidad,
         detc_subtotal: item.subtotal
      }));
 
-    const objCompra: InCompraCompleto = {
+    return {
       compra_id: this.eventoUpdate ? this.codigoCompra : 0,
       prove_id: this.proveedorId,
-      local_id: 1, // ID fijo o del usuario logueado
-      user_id: 1, // ID del usuario logueado
+      local_id: 1, // Ajustar según auth
+      user_id: 1,  // Ajustar según auth
       compra_total: this.total,
       compra_iva: this.iva,
-      compra_subiva: this.subiva,
-      compra_horafecha: new Date().toISOString(), // Fecha actual
+      compra_subiva: this.subiva, // En algunos sistemas esto es el subtotal base 0
+      compra_horafecha: new Date().toISOString(),
       detalle_compra: detalles,
       compra_descripcion: ''
     };
-
-    return objCompra;
   }
 
   guardarCompra() {
-    // Validaciones básicas
     if (this.formCompras.invalid) {
-      this.alertaServ.info('Datos incompletos', 'Complete la información del proveedor.');
-      this.marcarCamposComoTocados();
+      this.alertaServ.info('Datos incompletos', 'Verifique el proveedor.');
+      this.formCompras.markAllAsTouched();
       return;
     }
     if (this.proveedorId === 0) {
-      this.alertaServ.info('Proveedor requerido', 'Busque y seleccione un proveedor válido.');
+      this.alertaServ.info('Proveedor requerido', 'Seleccione un proveedor válido.');
       return;
     }
     if (this.listaDetalles.length === 0) {
-      this.alertaServ.info('Carrito vacío', 'Agregue al menos un producto a la orden.');
+      this.alertaServ.info('Carrito vacío', 'Agregue productos.');
       return;
     }
 
     const compraObjeto = this.crearObjetoCompra();
 
     if (this.eventoUpdate) {
-      // ACTUALIZAR (Solo si está permitido editar compras)
-      console.log("codigo de provedor:"+ this.proveedorId);
-      this.servicioCompras.ActualizarCompra( compraObjeto).subscribe({
-        next: (res) => {
-          this.alertaServ.success('Actualizado', 'Orden de compra modificada correctamente');
+      this.servicioCompras.ActualizarCompra(compraObjeto).subscribe({
+        next: () => {
+          this.alertaServ.success('Actualizado', 'Orden modificada correctamente');
           this.router.navigate(['home/listarCompras']);
         },
         error: (err) => {
-          this.alertaServ.error('Error', 'No se pudo actualizar la compra');
+          this.alertaServ.error('Error', 'No se pudo actualizar.');
           console.error(err);
         }
       });
     } else {
-      // REGISTRAR NUEVA
       this.servicioCompras.CrearCompra(compraObjeto).subscribe({
-        next: (res) => {
-          this.alertaServ.success('Éxito', 'Orden de compra registrada (Pendiente de recepción)');
+        next: () => {
+          this.alertaServ.success('Éxito', 'Orden registrada correctamente');
           this.router.navigate(['home/listarCompras']);
         },
         error: (err) => {
-          this.alertaServ.error('Error', 'No se pudo registrar la compra');
+          this.alertaServ.error('Error', 'No se pudo registrar.');
           console.error(err);
         }
       });
@@ -285,115 +356,58 @@ export class FrmComprasComponent implements OnInit {
   }
 
   // ==========================================
-  // CARGAR PARA EDICIÓN
+  // 4. MÉTODOS AUXILIARES
   // ==========================================
+
   cargarCompraParaEditar(idCompra: number) {
     this.servicioCompras.ObtenerCompraPorId(idCompra).subscribe({
       next: (res: any) => {
-        // 1. Cargar Cabecera
         this.proveedorId = parseInt(res.prove_id);
         this.getRucProveedor.setValue(res.prove_ruc);
         this.getNombreProveedor.setValue(res.prove_nombre);
         this.getDatosAdicionales.setValue(res.prove_direccion);
-        // Si tienes el RUC, podrías disparar buscarProveedor() para asegurar datos frescos, 
-        // pero con setear los valores basta visualmente.
 
-        // 2. Cargar Detalles
         if (res.detalle_compra) {
           this.listaDetalles = res.detalle_compra.map((item: any) => ({
             id_producto: item.prod_id,
             codigo: item.prod_codbarra || 'N/A',
             nombreProducto: item.prod_nombre, 
-            precioCompra: parseFloat(item.detc_preciouni), // Costo histórico
+            precioCompra: parseFloat(item.detc_preciouni),
             cantidad: item.detc_cantidad,
             subtotal: parseFloat(item.detc_subtotal)
           }));
-
-          
           this.calcularTotales();
         }
       },
-      error: (err: any) => {
-        console.error(err);
-        this.alertaServ.error('Error', 'No se pudo cargar la información de la compra');
+      error: () => {
+        this.alertaServ.error('Error', 'No se pudo cargar la compra.');
         this.router.navigate(['home/listarCompras']);
       }
     });
   }
 
-  cancelarCompra() {
-    this.listaDetalles = [];
-    this.formCompras.reset();
+  cargarItemsDesdeDashboard(items: any[]) {
+    items.forEach(item => {
+      this.listaDetalles.push({
+        id_producto: item.prod_id,
+        codigo: item.prod_codbarra,
+        nombreProducto: item.prod_nombre,
+        precioCompra: parseFloat(item.prod_preciocompra) || 0,
+        cantidad: item.cantidad_sugerida,
+        subtotal: (parseFloat(item.prod_preciocompra) || 0) * item.cantidad_sugerida
+      });
+    });
     this.calcularTotales();
-    this.stockActual = 0;
+    this.alertaServ.info('Carga Automática', `Se añadieron ${items.length} productos del inventario.`);
+  }
+
+  cancelarCompra() {
     this.router.navigate(['home/listarCompras']);
   }
 
-  // ==========================================
-  // GETTERS DE FORMULARIO
-  // ==========================================
+  // Getters
   get getRucProveedor() { return this.formCompras.controls['txtRucProveedor']; }
   get getNombreProveedor() { return this.formCompras.controls['txtNombreProveedor']; }
   get getDatosAdicionales() { return this.formCompras.controls['txtDatosAdicionales']; }
   get getCodBarra() { return this.formCompras.controls['txtCodBarra']; }
-
-    get getPrecioCompra() { return this.formCompras.controls['txtPrecioCompra']; }
-
-  marcarCamposComoTocados(): void {
-    Object.keys(this.formCompras.controls).forEach((campo) => {
-      const control = this.formCompras.get(campo);
-      if (control) control.markAsTouched();
-    });
-  }
-
-
-  // Función auxiliar para calcular sugerencia
-calcularPrecioVentaSugerido(costoActual: number, costoNuevo: number, stockActual: number, cantidadNueva: number, margenPorcentaje: number = 30): number {
-    
-    // 1. Calcular Costo Promedio Proyectado
-    const valorTotalViejo = stockActual * costoActual;
-    const valorTotalNuevo = cantidadNueva * costoNuevo;
-    const nuevoCostoPromedio = (valorTotalViejo + valorTotalNuevo) / (stockActual + cantidadNueva);
-
-    // 2. Calcular Precio de Venta Sugerido basado en margen
-    // Fórmula: Costo / (1 - Margen) o Costo * (1 + Margen). Usualmente es Costo * (1.30)
-    const precioSugerido = nuevoCostoPromedio * (1 + (margenPorcentaje / 100));
-
-    return this.redondear(precioSugerido);
 }
-
-// Función auxiliar para redondear a 2 decimales
-  redondear(numero: number): number {
-    return Math.round(numero * 100) / 100;
-  }
-
-
-  // Método para convertir esos items "sueltos" en filas de tu tabla de compra
-  cargarItemsDesdeDashboard(items: any[]) {
-    items.forEach(item => {
-      // Creamos el objeto con la estructura que usa tu tabla de compras
-      const nuevoDetalle = {
-        id_producto: item.prod_id,
-        codigo: item.prod_codbarra,
-        nombreProducto: item.prod_nombre,
-        precioCompra: item.prod_preciocompra, // Precio sugerido base
-        cantidad: item.cantidad_sugerida,     // Cantidad sugerida por la Vista
-        subtotal: item.prod_preciocompra * item.cantidad_sugerida,
-        
-        // Datos para alertas de precio (lo que vimos antes)
-        stockPrevio: item.prod_stock,
-        costoPrevio: item.prod_preciocompra,
-        precioVentaActual: 0, // Ojo: Aquí la vista de stock bajo quizás no traía precio venta, agrégalo a la vista si quieres
-        precioSugerido: 0
-      };
-      
-      this.listaDetalles.push(nuevoDetalle);
-    });
-
-    this.calcularTotales(); // Actualizamos totales visuales
-    
-    // Opcional: Mostrar una alerta bonita
-    this.alertaServ.info('Reabastecimiento', `Se cargaron ${items.length} productos con stock bajo.`);
-  }
-}
-

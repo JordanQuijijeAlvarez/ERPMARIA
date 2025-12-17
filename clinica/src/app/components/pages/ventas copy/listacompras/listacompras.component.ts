@@ -311,6 +311,8 @@ export class ListaComprasComponent implements OnInit {
       this.filteredCompras = [...this.Compras];
       this.resetPaginationAfterFilter();
     }
+                this.listarComprasActivas(1);
+
   }
 
   private resetPaginationAfterFilter(): void {
