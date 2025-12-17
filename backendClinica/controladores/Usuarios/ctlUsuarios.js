@@ -183,3 +183,28 @@ exports.eliminarUsuario = async (req, res) => {
     if (connection) await connection.close();
   }
 };
+
+exports.activarUsuario = async (req, res) => {
+  let connection;
+
+  try {
+    connection = await getConnection();
+
+    await connection.execute(
+      `
+      BEGIN
+        activar_usuario(:user_id);
+      END;
+      `,
+      { user_id: req.params.id }
+    );
+
+    res.json({ message: "Usuario activado correctamente" });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  } finally {
+    if (connection) await connection.close();
+  }
+};
