@@ -77,14 +77,14 @@
         [class.active]="estadoActual === 1"
         class="tabs__button"
       >
-        <i class="fas fa-check-circle"></i> Activos
+        <i class="fas fa-check-circle"></i> Habilitados
       </button>
       <button
         (click)="cambiarTab(0)"
         [class.active]="estadoActual === 0"
         class="tabs__button"
       >
-        <i class="fas fa-ban"></i> Inactivos
+        <i class="fas fa-ban"></i> Deshabilitados
       </button>
     </div>
 
@@ -107,6 +107,12 @@
               </th>
               <th class="usuarios-table__header-center">
                 <div class="usuarios-table__col-icon usuarios-table__col-icon--center">
+                  <i class="fas fa-toggle-on"></i>
+                  Estado
+                </div>
+              </th>
+              <th class="usuarios-table__header-center">
+                <div class="usuarios-table__col-icon usuarios-table__col-icon--center">
                   <i class="fas fa-cogs"></i>
                   Acciones
                 </div>
@@ -116,7 +122,7 @@
           <tbody>
             <!-- No results message -->
             <tr *ngIf="paginatedUsuarios.length === 0">
-              <td colspan="3">
+              <td colspan="4">
                 <div class="table__empty">
                   <div class="table__empty-icon">
                     <i class="fas fa-inbox" *ngIf="!isSearching"></i>
@@ -126,7 +132,7 @@
                     <p *ngIf="isSearching"><strong>No se encontraron usuarios</strong></p>
                     <p *ngIf="!isSearching"><strong>No hay usuarios registrados</strong></p>
                     <p>
-                      {{ estadoActual === 1 ? 'No hay usuarios activos en el sistema' : 'No hay usuarios inactivos' }}
+                      {{ estadoActual === 1 ? 'No hay usuarios habilitados en el sistema' : 'No hay usuarios deshabilitados' }}
                     </p>
                   </div>
                 </div>
@@ -171,26 +177,48 @@
                   {{ usuarios.rol_nombre}}
                 </span>
               </td>
+              <td class="usuarios-table__header-center">
+                <span *ngIf="estadoActual === 1" class="badge badge--success">Habilitado</span>
+                <span *ngIf="estadoActual === 0" class="badge badge--danger">Deshabilitado</span>
+              </td>
               <td>
                 <div class="table__actions">
                   <ng-container *ngIf="estadoActual === 1">
-                    <!-- Delete Button -->
+                    <!-- Edit Button -->
+                    <button
+                      (click)="editarUsuario(usuarios.user_id)"
+                      type="button"
+                      class="btn btn--update btn--icon"
+                      title="Editar usuario"
+                    >
+                      <i class="fas fa-pen"></i>
+                    </button>
+                    
+                    <!-- Deactivate Button -->
                     <button
                       (click)="
-                        eliminarUsuario(usuarios.user_id, usuarios.user_username)
+                        desactivarUsuario(usuarios.user_id, usuarios.user_username)
                       "
                       type="button"
                       class="btn btn--danger btn--icon"
-                      title="Eliminar usuario"
+                      [disabled]="!canDisableUser(usuarios)"
+                      [title]="!canDisableUser(usuarios) ? 'Acción no permitida' : 'Deshabilitar usuario'"
                     >
-                      <i class="fas fa-trash"></i>
+                      <i class="fas fa-ban"></i>
                     </button>
                   </ng-container>
 
-                  <!-- Inactive indicator -->
-                  <span *ngIf="estadoActual === 0" class="badge badge--danger">
-                    Inactivo
-                  </span>
+                  <ng-container *ngIf="estadoActual === 0">
+                    <!-- Enable Button -->
+                    <button
+                      (click)="habilitarUsuario(usuarios.user_id, usuarios.user_username)"
+                      type="button"
+                      class="btn btn--enable btn--icon"
+                      [title]="'Habilitar usuario'"
+                    >
+                      <i class="fas fa-check"></i>
+                    </button>
+                  </ng-container>
                 </div>
               </td>
             </tr>

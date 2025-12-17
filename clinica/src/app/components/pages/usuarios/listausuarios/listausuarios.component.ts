@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AlertService } from '../../../../servicios/Alertas/alertas.service';
 import { UsuariosService } from '../../../../servicios/usuarios.service'; 
+import { AuthService } from '../../../../servicios/authservicio.service';
 import { InUsuarioVista } from '../../../../modelos/modeloUsuarios/InUsuarios';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -37,6 +38,7 @@ export class ListausuariosComponent {
       private http: HttpClient,
       private router: Router,
       private usuarioServ: UsuariosService,
+      private authServ: AuthService,
       private ServicioAlertas: AlertService
     ) {}
   
@@ -61,20 +63,53 @@ export class ListausuariosComponent {
         );
       },
     });
-  }    eliminarUsuario(id: any, nombre : string): void {
+  }
+
+  editarUsuario(id: any): void {
+    this.router.navigate(['home/actualizarUsuario', id]);
+  }
+
+  private isAdminRole(roleName: string | undefined | null): boolean {
+    const role = (roleName ?? '').toLowerCase();
+    return role.includes('admin') || role.includes('administrador');
+  }
+
+  private isSelf(username: string | undefined | null): boolean {
+    const current = (this.authServ.obtenerNombreUsuario() ?? '').toLowerCase();
+    return current.length > 0 && (username ?? '').toLowerCase() === current;
+  }
+
+  /**
+   * Reglas UI: no permitir DESHABILITAR el propio usuario ni cuentas administrador.
+   * Nota: sí se permite HABILITAR (reactivar) cualquier usuario.
+   */
+  canDisableUser(usuario: Pick<InUsuarioVista, 'user_username' | 'rol_nombre'>): boolean {
+    return !(this.isSelf(usuario.user_username) || this.isAdminRole(usuario.rol_nombre));
+  }
+
+  canEnableUser(_usuario: Pick<InUsuarioVista, 'user_username' | 'rol_nombre'>): boolean {
+    return true;
+  }
+
+  desactivarUsuario(id: any, nombre : string): void {
+        // Guardia extra (por si se dispara desde otro lugar)
+        const usuarioFila = this.listaUsuarios.find(u => u.user_id === id);
+        if (usuarioFila && !this.canDisableUser(usuarioFila)) {
+          Swal.fire('Acción no permitida', 'No puedes deshabilitar tu propio usuario ni un administrador.', 'info');
+          return;
+        }
     
         Swal.fire({
-          title: "¿Está seguro que desea eliminar el registro de "+ nombre+ " ?",
-          text: "¡No podrás revertir esto! A menos que sea adminitrador",
+          title: "¿Está seguro que desea desactivar el usuario "+ nombre+ "?",
+          text: "El usuario no podrá acceder al sistema. Puede habilitarlo desde la pestaña 'Deshabilitados'",
           icon: "warning",
           showDenyButton: true,
           confirmButtonColor: "#3085d6",
           cancelButtonColor: "#d33",
-          confirmButtonText: "Si, Eliminar Registro!",
-          denyButtonText:"Cancelar Acción"
+          confirmButtonText: "Sí, Desactivar Usuario",
+          denyButtonText:"Cancelar"
         }).then((result) => {
           if (result.isConfirmed) {
-            console.log(id +" XDDDD");
             this.usuarioServ.EliminarUsuario(id).subscribe(
           
               {
@@ -83,15 +118,15 @@ export class ListausuariosComponent {
                   this.listarUsuarios();
     
                   Swal.fire({
-                    title: "Eliminado!",
-                    text: "Registro Eliminado con éxito ",
+                    title: "¡Desactivado!",
+                    text: "El usuario ha sido desactivado exitosamente",
                     icon: "success"
                   });
                 },
                 error: err =>{
                  
-                  Swal.fire("El registro no se pudo eliminar", "", "error");
-                  console.log('ERROR  '+ err.error.error);
+                  Swal.fire("Error", "No se pudo desactivar el usuario", "error");
+                  console.log('ERROR: '+ err.error.error);
                 }
       
               });
@@ -99,11 +134,43 @@ export class ListausuariosComponent {
     
             
           }else if (result.isDenied) {
-            Swal.fire("El registro no se elimino", "", "error");
+            Swal.fire("Acción cancelada", "El usuario sigue activo", "info");
     
           }
         });
       }
+
+  habilitarUsuario(id: any, nombre: string): void {
+    Swal.fire({
+      title: `¿Desea habilitar el usuario ${nombre}?`,
+      text: 'El usuario podrá volver a acceder al sistema.',
+      icon: 'question',
+      showDenyButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: 'Sí, Habilitar Usuario',
+      denyButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.usuarioServ.ActivarUsuario(id).subscribe({
+          next: () => {
+            this.listarUsuarios();
+            Swal.fire({
+              title: '¡Habilitado!',
+              text: 'El usuario ha sido habilitado exitosamente',
+              icon: 'success'
+            });
+          },
+          error: (err) => {
+            Swal.fire('Error', 'No se pudo habilitar el usuario', 'error');
+            console.log('ERROR: ' + (err?.error?.error ?? err?.message ?? err));
+          }
+        });
+      } else if (result.isDenied) {
+        Swal.fire('Acción cancelada', 'El usuario sigue deshabilitado', 'info');
+      }
+    });
+  }
   
   ActualizarUsuario(id: any): void {
     this.router.navigate(['home/actualizarUsuarios', id]);
