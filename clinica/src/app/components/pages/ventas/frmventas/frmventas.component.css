@@ -372,3 +372,31 @@
 .btn:disabled:hover {
   transform: none;
 }
+/* Estilos para el Autocomplete (Agrega esto al final de tu CSS de ventas) */
+.dropdown-proveedores {
+  position: absolute;
+  background-color: white;
+  border: 1px solid var(--color-border);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  max-height: 250px;
+  overflow-y: auto;
+  box-shadow: var(--shadow-md);
+  /* z-index e inline-styles ya están en el HTML para forzar la posición */
+}
+
+.dropdown-proveedores ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dropdown-proveedores li {
+  padding: 10px 15px;
+  border-bottom: 1px solid var(--color-border-light);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dropdown-proveedores li:hover {
+  background-color: var(--color-bg-hover);
+}

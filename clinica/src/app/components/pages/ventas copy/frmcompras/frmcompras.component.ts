@@ -16,7 +16,6 @@ import { compraService } from '../../../../servicios/compras.service';
 import { productosService } from '../../../../servicios/productos.service';
 
 // MODELOS
-import { InProducto } from '../../../../modelos/modeloProductos/InProducto';
 import { InCompraCompleto, InDetalleCompra } from '../../../../modelos/modeloCompras/InCompras';
 
 @Component({
@@ -32,16 +31,20 @@ export class FrmComprasComponent implements OnInit {
   // VARIABLES DE ESTADO
   // ==========================================
   
-  // Proveedores
-  listaProveedores: any[] = [];          // Todos los datos (Carga inicial)
-  listaProveedoresFiltrados: any[] = []; // Resultados de búsqueda
+  // Proveedores (Buscador)
+  listaProveedores: any[] = [];
+  listaProveedoresFiltrados: any[] = [];
   mostrarDropdownProveedor: boolean = false;
   proveedorId: number = 0;
 
-  // Productos y Detalles
+  // Productos (Buscador Inteligente)
+  listaProductos: any[] = [];           // Todos los productos cargados
+  listaProductosFiltrados: any[] = [];  // Resultados del filtro
+  mostrarDropdownProducto: boolean = false;
   stockActual: number = 0;
+
+  // Detalle de Compra
   listaDetalles: any[] = [];
-  productoSeleccionado: InProducto | undefined;
 
   // Totales
   ivaPorcentaje: number = 15;
@@ -68,10 +71,9 @@ export class FrmComprasComponent implements OnInit {
       txtRucProveedor: ['', Validators.required],
       txtNombreProveedor: ['', Validators.required],
       txtDatosAdicionales: [''], 
-      txtCodBarra: [''], 
+      txtCodBarra: [''], // Input del buscador de productos
     });
 
-    // Verificar si venimos desde el Dashboard (Stock Bajo)
     const navegacion = this.router.getCurrentNavigation();
     if (navegacion?.extras?.state) {
       const itemsRecibidos = navegacion.extras.state['productosReabastecer'];
@@ -82,10 +84,11 @@ export class FrmComprasComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // 1. Cargar lista maestra de proveedores
+    // 1. Cargar Catálogos en Memoria (Optimización)
     this.cargarTodosLosProveedores();
+    this.cargarTodosLosProductos();
 
-    // 2. Verificar si es edición
+    // 2. Verificar Edición
     this.route.paramMap.subscribe((parametros) => {
       const id = parametros.get('id');
       if (id) {
@@ -97,159 +100,182 @@ export class FrmComprasComponent implements OnInit {
   }
 
   // ==========================================
-  // 1. LÓGICA DE PROVEEDOR (EN MEMORIA)
+  // 1. LÓGICA DE PROVEEDOR
   // ==========================================
-
   cargarTodosLosProveedores() {
-    // Traemos todos los proveedores activos (estado 1)
     this.servicioProveedor.LproveedorEstado(1).subscribe({
       next: (res: any) => {
-        const todos = Array.isArray(res) ? res : [res];
-        this.listaProveedores = todos;
+        this.listaProveedores = Array.isArray(res) ? res : [res];
       },
-      error: (err) => console.error('Error cargando proveedores', err)
+      error: (err) => console.error(err)
     });
   }
 
-  // Se ejecuta mientras el usuario escribe
   filtrarProveedores(termino: string) {
     if (!termino) {
       this.listaProveedoresFiltrados = [];
       this.mostrarDropdownProveedor = false;
       return;
     }
-
     const term = termino.toLowerCase();
-    
     this.listaProveedoresFiltrados = this.listaProveedores.filter(prov => 
       (prov.prove_ruc && prov.prove_ruc.toLowerCase().includes(term)) || 
       (prov.prove_nombre && prov.prove_nombre.toLowerCase().includes(term))
     );
-
     this.mostrarDropdownProveedor = this.listaProveedoresFiltrados.length > 0;
-  }
-
-  // Se ejecuta al dar Enter o Click en la lupa
-  buscarProveedor(): void {
-    const termino = this.getRucProveedor.value;
-    
-    if (!termino) {
-      this.alertaServ.info('Atención', 'Ingrese RUC o Nombre para buscar.');
-      return;
-    }
-
-    // Buscamos coincidencia exacta primero
-    const exacto = this.listaProveedores.find(p => 
-      p.prove_ruc === termino || p.prove_nombre.toLowerCase() === termino.toLowerCase()
-    );
-
-    if (exacto) {
-      this.seleccionarProveedor(exacto);
-    } else {
-      // Si no es exacto, verificamos si hay filtrados
-      if (this.listaProveedoresFiltrados.length === 1) {
-        this.seleccionarProveedor(this.listaProveedoresFiltrados[0]);
-      } else if (this.listaProveedoresFiltrados.length > 1) {
-        this.mostrarDropdownProveedor = true;
-        this.alertaServ.info('Varias opciones', 'Seleccione un proveedor de la lista.');
-      } else {
-        this.alertaServ.error('No encontrado', 'No existe proveedor con esos datos.');
-        this.limpiarProveedor();
-      }
-    }
   }
 
   seleccionarProveedor(proveedor: any) {
     this.proveedorId = proveedor.prove_id;
-    
     this.getRucProveedor.setValue(proveedor.prove_ruc); 
     this.getNombreProveedor.setValue(proveedor.prove_nombre);
-    
-    const direccion = proveedor.prove_direccion || '';
-    const telefono = proveedor.prove_telefono || '';
-    this.getDatosAdicionales.setValue(`${direccion} - ${telefono}`);
-    
+    const dir = proveedor.prove_direccion || '';
+    const tel = proveedor.prove_telefono || '';
+    this.getDatosAdicionales.setValue(`${dir} - ${tel}`);
     this.mostrarDropdownProveedor = false;
     this.listaProveedoresFiltrados = [];
   }
 
-  cerrarDropdown() {
-    // Delay para permitir el click en la lista antes de que desaparezca
-    setTimeout(() => {
-      this.mostrarDropdownProveedor = false;
-    }, 200);
+  buscarProveedorManual() {
+    // Busca exacto al dar enter
+    const termino = this.getRucProveedor.value;
+    if (!termino) return;
+    
+    const exacto = this.listaProveedores.find(p => p.prove_ruc === termino);
+    if (exacto) {
+        this.seleccionarProveedor(exacto);
+    } else {
+        this.alertaServ.info('No encontrado', 'Seleccione un proveedor de la lista.');
+    }
+  }
+
+  cerrarDropdownProveedor() {
+    setTimeout(() => { this.mostrarDropdownProveedor = false; }, 200);
   }
 
   validarLimpiezaProveedor(valor: string) {
     if (valor === '') {
-      this.limpiarProveedor();
+      this.proveedorId = 0;
+      this.getNombreProveedor.setValue('');
+      this.getDatosAdicionales.setValue('');
     }
   }
 
-  limpiarProveedor() {
-    this.proveedorId = 0;
-    this.getNombreProveedor.setValue('');
-    this.getDatosAdicionales.setValue('');
-    this.listaProveedoresFiltrados = [];
-    this.mostrarDropdownProveedor = false;
-  }
-
-  // ==========================================
-  // 2. LÓGICA DE PRODUCTOS (CARRITO)
+// ==========================================
+  // 2. LÓGICA DE PRODUCTOS (CORREGIDA)
   // ==========================================
 
-  agregarProducto() {
-    const codBarra = this.getCodBarra.value;
-    if (!codBarra) return;
-
-    this.servicioProductos.BuscarprodCodBarras(codBarra, 1).subscribe({
+  cargarTodosLosProductos() {
+    // Cargamos productos activos (estado 1)
+    this.servicioProductos.LproductosEstado(1).subscribe({
       next: (res: any) => {
-        if (!res || (Array.isArray(res) && res.length === 0)) {
-          this.alertaServ.info('No encontrado', 'Verifique el código de barras.');
-          this.getCodBarra.setValue('');
-          return;
-        }
+        const todos = Array.isArray(res) ? res : [res];
 
-        const producto = Array.isArray(res) ? res[0] : res;
-        this.stockActual = producto.prod_stock; // Referencia visual
+        // --- FILTRO ANTI-DUPLICADOS ---
+        // Usamos un Map para dejar solo un registro por cada 'prod_id' único.
+        // Esto elimina cualquier producto repetido que venga del servidor.
+        const productosUnicos = [
+          ...new Map(todos.map((item: any) => [item.prod_id, item])).values()
+        ];
 
-        // Verificar si ya está en la lista
-        const index = this.listaDetalles.findIndex(item => item.id_producto === producto.prod_id);
-
-        if (index !== -1) {
-          this.aumentarCantidad(index);
-        } else {
-          // Nuevo item
-          const nuevoDetalle = {
-            id_producto: producto.prod_id,
-            codigo: producto.prod_codbarra,
-            nombreProducto: producto.prod_nombre,
-            // Usamos precio compra si existe, sino 0
-            precioCompra: parseFloat(producto.prod_preciocompra) || 0, 
-            cantidad: 1,
-            subtotal: parseFloat(producto.prod_preciocompra) || 0
-          };
-
-          this.listaDetalles.push(nuevoDetalle);
-          this.calcularTotales();
-        }
-
-        this.getCodBarra.setValue('');
+        this.listaProductos = productosUnicos;
       },
-      error: (err) => {
-        console.error(err);
-        this.alertaServ.error('Error', 'Problema al buscar el producto.');
-      }
+      error: (err) => console.error('Error cargando productos', err)
     });
   }
 
-  // CAMBIO DE PRECIO MANUAL
+  // Filtra mientras escribes (Nombre o Código)
+  filtrarProductos(termino: string) {
+    if (!termino) {
+      this.listaProductosFiltrados = [];
+      this.mostrarDropdownProducto = false;
+      return;
+    }
+
+    const term = termino.toLowerCase();
+    
+    this.listaProductosFiltrados = this.listaProductos.filter(prod => 
+      (prod.prod_nombre && prod.prod_nombre.toLowerCase().includes(term)) || 
+      (prod.prod_codbarra && prod.prod_codbarra.toLowerCase().includes(term))
+    );
+
+    // Limitamos a 10 resultados para no saturar la vista
+    this.listaProductosFiltrados = this.listaProductosFiltrados.slice(0, 10);
+    this.mostrarDropdownProducto = this.listaProductosFiltrados.length > 0;
+  }
+
+  // Se ejecuta al hacer CLICK en el dropdown
+  seleccionarProducto(producto: any) {
+    this.procesarAgregadoProducto(producto);
+    this.limpiarBuscadorProducto();
+  }
+
+  // Se ejecuta al dar ENTER o click en botón "Agregar"
+  agregarProductoManual() {
+    const termino = this.getCodBarra.value;
+    if (!termino) return;
+
+    // 1. Buscamos coincidencia exacta de código de barras (Prioridad para lector de barras)
+    let producto = this.listaProductos.find(p => p.prod_codbarra === termino);
+
+    // 2. Si no es código exacto, miramos si hay uno solo en la lista filtrada (por nombre)
+    if (!producto && this.listaProductosFiltrados.length === 1) {
+      producto = this.listaProductosFiltrados[0];
+    }
+
+    if (producto) {
+      this.procesarAgregadoProducto(producto);
+      this.limpiarBuscadorProducto();
+    } else {
+      this.alertaServ.error('No encontrado', 'Verifique el código o seleccione de la lista.');
+    }
+  }
+
+  // Método común para añadir al carrito
+  procesarAgregadoProducto(producto: any) {
+    this.stockActual = producto.prod_stock; // Referencia visual momentánea
+
+    // Verificar si ya existe en la tabla
+    const index = this.listaDetalles.findIndex(item => item.id_producto === producto.prod_id);
+
+    if (index !== -1) {
+      // Si existe, aumentamos cantidad
+      this.aumentarCantidad(index);
+      this.alertaServ.success('Agregado', `+1 ${producto.prod_nombre}`);
+    } else {
+      // Nuevo item
+      const nuevoDetalle = {
+        id_producto: producto.prod_id,
+        codigo: producto.prod_codbarra,
+        nombreProducto: producto.prod_nombre,
+        precioCompra: parseFloat(producto.prod_preciocompra) || 0,
+        cantidad: 1,
+        subtotal: parseFloat(producto.prod_preciocompra) || 0
+      };
+
+      this.listaDetalles.push(nuevoDetalle);
+      this.calcularTotales();
+    }
+  }
+
+  limpiarBuscadorProducto() {
+    this.getCodBarra.setValue('');
+    this.listaProductosFiltrados = [];
+    this.mostrarDropdownProducto = false;
+    // Opcional: devolver foco al input si se requiere escanear seguido
+  }
+
+  cerrarDropdownProducto() {
+    setTimeout(() => { this.mostrarDropdownProducto = false; }, 200);
+  }
+
+  // ... (Resto de métodos: actualizarPrecioUnitario, aumentarCantidad, guardarCompra, etc.) ...
+  // ... (MANTENER IGUAL QUE EN TU VERSIÓN ANTERIOR) ...
+
   actualizarPrecioUnitario(index: number) {
     const item = this.listaDetalles[index];
     let nuevoPrecio = parseFloat(item.precioCompra);
-    
     if (isNaN(nuevoPrecio) || nuevoPrecio < 0) nuevoPrecio = 0;
-    
     item.precioCompra = nuevoPrecio;
     item.subtotal = item.cantidad * item.precioCompra;
     this.calcularTotales();
@@ -282,12 +308,8 @@ export class FrmComprasComponent implements OnInit {
     this.subtotal = this.listaDetalles.reduce((acc, item) => acc + item.subtotal, 0);
     this.subiva = this.subtotal * (this.ivaPorcentaje / 100);
     this.total = this.subtotal + this.subiva;
-    this.iva = this.subiva; // Para guardar en BD
+    this.iva = this.subiva;
   }
-
-  // ==========================================
-  // 3. GUARDAR COMPRA
-  // ==========================================
 
   crearObjetoCompra(): InCompraCompleto {
     const detalles: InDetalleCompra[] = this.listaDetalles.map(item => ({
@@ -302,11 +324,11 @@ export class FrmComprasComponent implements OnInit {
     return {
       compra_id: this.eventoUpdate ? this.codigoCompra : 0,
       prove_id: this.proveedorId,
-      local_id: 1, // Ajustar según auth
-      user_id: 1,  // Ajustar según auth
+      local_id: 1,
+      user_id: 1,
       compra_total: this.total,
       compra_iva: this.iva,
-      compra_subiva: this.subiva, // En algunos sistemas esto es el subtotal base 0
+      compra_subiva: this.subiva,
       compra_horafecha: new Date().toISOString(),
       detalle_compra: detalles,
       compra_descripcion: ''
@@ -314,17 +336,12 @@ export class FrmComprasComponent implements OnInit {
   }
 
   guardarCompra() {
-    if (this.formCompras.invalid) {
-      this.alertaServ.info('Datos incompletos', 'Verifique el proveedor.');
-      this.formCompras.markAllAsTouched();
-      return;
-    }
-    if (this.proveedorId === 0) {
-      this.alertaServ.info('Proveedor requerido', 'Seleccione un proveedor válido.');
+    if (this.formCompras.invalid || this.proveedorId === 0) {
+      this.alertaServ.info('Faltan datos', 'Revise proveedor o campos obligatorios.');
       return;
     }
     if (this.listaDetalles.length === 0) {
-      this.alertaServ.info('Carrito vacío', 'Agregue productos.');
+      this.alertaServ.info('Vacío', 'Agregue productos.');
       return;
     }
 
@@ -336,28 +353,18 @@ export class FrmComprasComponent implements OnInit {
           this.alertaServ.success('Actualizado', 'Orden modificada correctamente');
           this.router.navigate(['home/listarCompras']);
         },
-        error: (err) => {
-          this.alertaServ.error('Error', 'No se pudo actualizar.');
-          console.error(err);
-        }
+        error: (err) => this.alertaServ.error('Error', 'No se pudo actualizar.')
       });
     } else {
       this.servicioCompras.CrearCompra(compraObjeto).subscribe({
         next: () => {
-          this.alertaServ.success('Éxito', 'Orden registrada correctamente');
+          this.alertaServ.success('Registrado', 'Orden creada exitosamente');
           this.router.navigate(['home/listarCompras']);
         },
-        error: (err) => {
-          this.alertaServ.error('Error', 'No se pudo registrar.');
-          console.error(err);
-        }
+        error: (err) => this.alertaServ.error('Error', 'No se pudo registrar.')
       });
     }
   }
-
-  // ==========================================
-  // 4. MÉTODOS AUXILIARES
-  // ==========================================
 
   cargarCompraParaEditar(idCompra: number) {
     this.servicioCompras.ObtenerCompraPorId(idCompra).subscribe({
@@ -379,33 +386,31 @@ export class FrmComprasComponent implements OnInit {
           this.calcularTotales();
         }
       },
-      error: () => {
-        this.alertaServ.error('Error', 'No se pudo cargar la compra.');
-        this.router.navigate(['home/listarCompras']);
-      }
+      error: () => this.router.navigate(['home/listarCompras'])
     });
   }
 
   cargarItemsDesdeDashboard(items: any[]) {
     items.forEach(item => {
-      this.listaDetalles.push({
-        id_producto: item.prod_id,
-        codigo: item.prod_codbarra,
-        nombreProducto: item.prod_nombre,
-        precioCompra: parseFloat(item.prod_preciocompra) || 0,
-        cantidad: item.cantidad_sugerida,
-        subtotal: (parseFloat(item.prod_preciocompra) || 0) * item.cantidad_sugerida
+      this.procesarAgregadoProducto({
+        prod_id: item.prod_id,
+        prod_codbarra: item.prod_codbarra,
+        prod_nombre: item.prod_nombre,
+        prod_preciocompra: item.prod_preciocompra,
+        prod_stock: item.prod_stock
       });
+      // Ajuste cantidad si viene sugerida
+      const ultimo = this.listaDetalles[this.listaDetalles.length -1];
+      ultimo.cantidad = item.cantidad_sugerida || 1;
+      ultimo.subtotal = ultimo.cantidad * ultimo.precioCompra;
     });
     this.calcularTotales();
-    this.alertaServ.info('Carga Automática', `Se añadieron ${items.length} productos del inventario.`);
   }
 
   cancelarCompra() {
     this.router.navigate(['home/listarCompras']);
   }
 
-  // Getters
   get getRucProveedor() { return this.formCompras.controls['txtRucProveedor']; }
   get getNombreProveedor() { return this.formCompras.controls['txtNombreProveedor']; }
   get getDatosAdicionales() { return this.formCompras.controls['txtDatosAdicionales']; }

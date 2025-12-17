@@ -2,42 +2,59 @@
   <div class="venta-form__container">
     <div class="card">
       <div class="card__body">
+        
         <div class="card__header">
-          <h2 class="card__title">NUEVA VENTA</h2>
+          <h2 class="card__title">{{ eventoUpdate ? "EDITAR VENTA" : "NUEVA VENTA" }}</h2>
           <p class="card__subtitle">
-            Complete la información del cliente y agregue los productos a la
-            factura
+            Complete la información del cliente y agregue los productos a la factura
           </p>
         </div>
 
         <div class="section-header">
           <h3 class="section-header__title">
-            <i class="fas fa-user-check"></i>
-            Información del Cliente
+            <i class="fas fa-user-check"></i> Información del Cliente
           </h3>
         </div>
 
         <div class="client-section">
           <div class="client-section__grid">
+            
             <div class="form-group">
               <label class="form-label">
-                <i class="fas fa-id-card"></i> Cédula / RUC *
+                <i class="fas fa-id-card"></i> Buscar Cliente (Cédula o Nombre) *
               </label>
-              <div class="search-input-group">
+              
+              <div class="search-input-group" style="position: relative;">
                 <input
                   formControlName="txtCedulaCliente"
                   class="form-input"
-                  placeholder="Buscar cédula..."
+                  placeholder="Escriba cédula o nombre..."
                   type="text"
-                  (keydown.enter)="$event.preventDefault(); buscarCliente()"
+                  autocomplete="off"
+                  (input)="filtrarClientes($any($event.target).value); validarLimpiezaCliente($any($event.target).value)"
+                  (blur)="cerrarDropdownCliente()"
+                  (focus)="filtrarClientes(getCedulaCliente.value)"
+                  (keydown.enter)="$event.preventDefault(); buscarClienteManual()"
                 />
+                
                 <button
                   type="button"
                   class="btn btn--primary"
-                  (click)="buscarCliente()"
+                  (click)="buscarClienteManual()"
                 >
                   <i class="fas fa-search"></i>
                 </button>
+
+                <div *ngIf="mostrarDropdownCliente" class="dropdown-proveedores shadow-lg" style="top: 100%; left: 0; width: 100%; z-index: 100;">
+                  <ul>
+                    <li *ngFor="let cli of listaClientesFiltrados" (mousedown)="seleccionarCliente(cli)">
+                      <div class="flex justify-between items-center w-full" style="display: flex; justify-content: space-between; width: 100%;">
+                        <span class="prov-nombre" style="font-weight: 600;">{{ cli.client_nombres }}</span>
+                        <span class="prov-ruc badge" style="font-size: 0.8rem; background: #e0e7ff; padding: 2px 6px; border-radius: 4px;">{{ cli.client_cedula }}</span>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
 
@@ -69,16 +86,17 @@
 
         <div class="section-header">
           <h3 class="section-header__title">
-            <i class="fas fa-box-open"></i>
-            Agregar Productos
+            <i class="fas fa-box-open"></i> Agregar Productos
           </h3>
         </div>
 
         <div class="product-search">
           <div class="product-search__grid">
+            
             <div class="form-group">
-              <label class="form-label"> Buscar Producto </label>
-              <div class="search-box">
+              <label class="form-label"> Buscar Producto (Código o Nombre) </label>
+              
+              <div class="search-box" style="position: relative;">
                 <div class="search-box__icon">
                   <i class="fas fa-search"></i>
                 </div>
@@ -86,9 +104,26 @@
                   type="text"
                   formControlName="txtCodBarra"
                   class="form-input search-box__input--with-icon"
-                  (keydown.enter)="$event.preventDefault(); agregarProducto()"
-                  placeholder="Escriba código o nombre del producto..."
+                  placeholder="Escriba código o nombre..."
+                  autocomplete="off"
+                  (input)="filtrarProductos($any($event.target).value)"
+                  (blur)="cerrarDropdownProducto()"
+                  (keydown.enter)="$event.preventDefault(); agregarProductoManual()"
                 />
+
+                <div *ngIf="mostrarDropdownProducto" class="dropdown-proveedores shadow-lg" style="top: 100%; left: 0; width: 100%; z-index: 100;">
+                  <ul>
+                    <li *ngFor="let prod of listaProductosFiltrados" (mousedown)="seleccionarProducto(prod)">
+                      <div style="display: flex; flex-direction: column; width: 100%;">
+                        <span class="prov-nombre" style="font-weight: 600;">{{ prod.prod_nombre }}</span>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #666; margin-top: 4px;">
+                          <span><i class="fas fa-barcode"></i> {{ prod.prod_codbarra }}</span>
+                          <span style="font-weight: bold; color: #2563EB;">Stock: {{ prod.prod_stock }}</span>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
 
@@ -103,7 +138,7 @@
               <button
                 type="button"
                 class="btn btn--primary btn--add-product"
-                (click)="agregarProducto()"
+                (click)="agregarProductoManual()"
               >
                 <i class="fas fa-plus"></i> Agregar
               </button>
@@ -115,26 +150,11 @@
           <table class="table">
             <thead>
               <tr>
-                <th>
-                  <i class="fas fa-box"></i>
-                  Producto
-                </th>
-                <th>
-                  <i class="fas fa-dollar-sign"></i>
-                  Precio Unit.
-                </th>
-                <th>
-                  <i class="fas fa-sort-numeric-up"></i>
-                  Cantidad
-                </th>
-                <th>
-                  <i class="fas fa-calculator"></i>
-                  Subtotal
-                </th>
-                <th>
-                  <i class="fas fa-cogs"></i>
-                  Acción
-                </th>
+                <th><i class="fas fa-box"></i> Producto</th>
+                <th><i class="fas fa-dollar-sign"></i> Precio Unit.</th>
+                <th><i class="fas fa-sort-numeric-up"></i> Cantidad</th>
+                <th><i class="fas fa-calculator"></i> Subtotal</th>
+                <th><i class="fas fa-cogs"></i> Acción</th>
               </tr>
             </thead>
             <tbody>
@@ -148,11 +168,7 @@
                 </td>
                 <td>
                   <div class="quantity-control">
-                    <button
-                      type="button"
-                      class="quantity-control__btn"
-                      (click)="disminuirCantidad(i)"
-                    >
+                    <button type="button" class="quantity-control__btn" (click)="disminuirCantidad(i)">
                       <i class="fas fa-minus"></i>
                     </button>
                     <input
@@ -162,34 +178,27 @@
                       [ngModelOptions]="{ standalone: true }"
                       (change)="calcularTotales()"
                     />
-                    <button
-                      type="button"
-                      class="quantity-control__btn"
-                      (click)="aumentarCantidad(i)"
-                    >
+                    <button type="button" class="quantity-control__btn" (click)="aumentarCantidad(i)">
                       <i class="fas fa-plus"></i>
                     </button>
                   </div>
                 </td>
                 <td class="product-subtotal">
-                  ${{ item.cantidad * item.precioUnitario | number : "1.2-2" }}
+                  ${{ item.subtotal | number : "1.2-2" }}
                 </td>
                 <td>
-                  <button
-                    type="button"
-                    class="btn btn--sm btn--danger btn--icon"
-                    (click)="eliminarProducto(i)"
-                  >
+                  <button type="button" class="btn btn--sm btn--danger btn--icon" (click)="eliminarProducto(i)">
                     <i class="fas fa-trash-alt"></i>
                   </button>
                 </td>
               </tr>
+              
               <tr *ngIf="listaDetalles.length === 0">
-                <td colspan="5" class="table__empty">
-                  <div class="table__empty-icon">
+                <td colspan="5" style="text-align: center; padding: 2rem;">
+                  <div style="color: #ccc; font-size: 2rem; margin-bottom: 0.5rem;">
                     <i class="fas fa-shopping-cart"></i>
                   </div>
-                  <p>No hay productos agregados a la venta</p>
+                  <p style="color: #888;">No hay productos agregados a la venta</p>
                 </td>
               </tr>
             </tbody>
@@ -204,7 +213,7 @@
                 <span>${{ subtotal | number : "1.2-2" }}</span>
               </div>
               <div class="totals-section__row">
-                <span>IVA (15%):</span>
+                <span>IVA ({{ iva }}%):</span>
                 <span>${{ iva | number : "1.2-2" }}</span>
               </div>
               <div class="totals-section__divider"></div>
@@ -218,22 +227,12 @@
       </div>
 
       <div class="card__footer">
-        <button
-          type="button"
-          class="btn btn--outline btn--lg"
-          (click)="cancelarVenta()"
-        >
-          <i class="fas fa-times"></i>
-          Cancelar
+        <button type="button" class="btn btn--outline btn--lg" (click)="cancelarVenta()">
+          <i class="fas fa-times"></i> Cancelar
         </button>
 
-        <button
-          type="submit"
-          class="btn btn--primary btn--lg"
-          [disabled]="listaDetalles.length === 0"
-        >
-          <i class="fas fa-save"></i>
-          Generar Venta
+        <button type="submit" class="btn btn--primary btn--lg" [disabled]="listaDetalles.length === 0">
+          <i class="fas fa-save"></i> Generar Venta
         </button>
       </div>
     </div>
