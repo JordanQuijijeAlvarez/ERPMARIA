@@ -35,7 +35,8 @@ export interface InUsuarioVista{
     user_username: string,
     user_contrasenia: string,
     user_correo: string,
-    user_estado: string
+    user_estado: string,
+    rol_id: string,
     rol_nombre: string,
     // user_rol_descripcion: string //La tabla no tiene esta columna
 }
