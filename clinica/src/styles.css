@@ -84,6 +84,34 @@ body {
   color: #fff;
 }
 
+/* Botón Update (usa el color primario del tema)
+   - Normal: fondo claro
+   - Hover: color más acentuado */
+.btn--update {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+}
+
+.btn--update:hover:not(:disabled) {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* Botón Enable/Rehabilitar (usa el color success del tema)
+   - Normal: fondo claro
+   - Hover: color más acentuado */
+.btn--enable {
+  background: var(--color-success-light);
+  color: var(--color-success);
+  border: 1px solid var(--color-success);
+}
+
+.btn--enable:hover:not(:disabled) {
+  background: var(--color-success);
+  color: #fff;
+}
+
 .btn--danger {
   background: var(--color-danger-light);
   color: var(--color-danger-hover);

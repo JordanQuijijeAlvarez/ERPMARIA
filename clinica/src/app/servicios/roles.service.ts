@@ -16,7 +16,7 @@ export class RolesService {
 
   
   LRoles(): Observable<InRoles[]> {
-    return this.http.get<InRoles[]>(`${this.urlServidor}/roles/listarRoles`);
+    return this.http.get<InRoles[]>(`${this.urlServidor}/roles/listar?estado=1`);
   }
 
   
