@@ -24,6 +24,10 @@ router.post('/Registrar', authenticateToken,
 
 router.put('/Actualizar', authenticateToken,
     controladorUsuarios.actualizarUsuario);
+
+router.put('/activar/:id', authenticateToken,
+    controladorUsuarios.activarUsuario);
+    
 router.post('/recuperar/correo', controladorLogin.obtenerCorreo);
 
 module.exports = router; 

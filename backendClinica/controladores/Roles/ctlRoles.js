@@ -1,32 +1,57 @@
-const pool = require('../../configuracion/db');
+const { getConnection, oracledb } = require("../../configuracion/oraclePool");
 
-exports.getRolesActivos = async (req, res) => {
-    const query = 'SELECT * FROM listarRoles()';
+// helper para convertir llaves a minúsculas
+function formatearSalida(rows) {
+  if (!rows || rows.length === 0) return [];
+  return rows.map((obj) => {
+    const nuevo = {};
+    Object.keys(obj).forEach((k) => (nuevo[k.toLowerCase()] = obj[k]));
+    return nuevo;
+  });
+}
 
-    try {
-        const result = await pool.query(query);
-        res.status(200).json(result.rows);
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: error.message });
-    }
+exports.getRolesEstado = async (req, res) => {
+  let connection;
+
+  try {
+    connection = await getConnection();
+
+    const result = await connection.execute(
+      `SELECT * FROM rol WHERE rol_estado = :estado`,
+      { estado: req.query.estado },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    res.json(formatearSalida(result.rows));
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  } finally {
+    if (connection) await connection.close();
+  }
 };
 
 exports.getRolId = async (req, res) => {
-    const { id } = req.params;  // Obtenemos el ID desde los parámetros de la URL
-  
-    try {
-      const query = 'SELECT * FROM listarrolID($1)';  // Llamada a la función listarrolesID
-      const result = await pool.query(query, [id]); // Ejecutamos la consulta pasándole el ID
-  
-      if (result.rows.length > 0) {
-        res.status(200).json(result.rows[0]);  // Devolvemos los datos encontrados
-      } else {
-        res.status(404).json({ message: 'Rol no encontrado' });
-      }
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: error.message });
+  let connection;
+
+  try {
+    connection = await getConnection();
+
+    const result = await connection.execute(
+      `SELECT * FROM rol WHERE rol_id = :id AND rol_estado = 1`,
+      { id: req.query.id },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Rol no encontrado' });
     }
-  };
-  
+
+    res.json(formatearSalida(result.rows)[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  } finally {
+    if (connection) await connection.close();
+  }
+};

@@ -1,7 +1,6 @@
 export interface InRoles {
-    codigo: string,	
-	nombre: string,
-    descripcion?: string;
-    estado?: string;
+    rol_id: string,	
+	rol_nombre: string,
+    rol_estado: string;
     // fecha_registro:string,
 }

@@ -18,22 +18,17 @@ import Swal from 'sweetalert2';
     styleUrl: './frmusuarios.component.css'
 })
 export class FrmusuariosComponent {
-guardarUsuario() {
-throw new Error('Method not implemented.');
-}
 
     frmUsuario: FormGroup;
     eventoUpdate: boolean = false;
     codigo: number | null = null;
-    codigo_medico: number | null = null;
     estado: boolean = true;
-    isMedicoSelected = false;
+    mostrarContrasenia: boolean = false;
 
     listaRoles: InRoles[] = [];
 
   
     @ViewChild('datepickerElement') datepickerElement!: ElementRef;
-listaMedicoSinUsuario: any;
   
     constructor(
       private formBuilder: FormBuilder,
@@ -45,15 +40,16 @@ listaMedicoSinUsuario: any;
       private alertaServ: AlertService
     ) {
       this.frmUsuario = this.formBuilder.group({
+        txtNombres: ['', Validators.required],
+        txtApellidos: ['', Validators.required],
         txtNombreUsuario: ['', Validators.required],
         txtCorreoUsuario: ['', [Validators.required, Validators.email]],
         txtContrasenia: ['', Validators.required],
-        cbxMedicos: ['', Validators.required],
         cbxRoles: ['', Validators.required]
       });
     }
     ngOnInit(): void {
-      // this.listarRoles();
+      this.listarRoles();
 
       this.route.paramMap.subscribe((parametros) => {
         const id = parametros.get('id');
@@ -68,61 +64,31 @@ listaMedicoSinUsuario: any;
       });
     }
 
-    // listarMedicos(): void {
-    //   this.medicoServ.LMedicoSinUsuario().subscribe({
-    //     next: (res) => {
-    //       this.listaMedicoSinUsuario = res;
-  
-    //       console.log(res);
-    //     },
-    //     error: (err) => {
-    //       alert('NO EXISTEN REGISTROS');
-    //     },
-    //   });
-    // }
-
-    // listarRoles(): void {
-    //   this.rolServ.LRoles().subscribe({
-    //     next: (res) => {
-    //       this.listaRoles = res;
-    //       console.log(res);
-    //     },
-    //     error: (err) => {
-    //       alert('NO EXISTEN REGISTROS');
-    //     },
-    //   });
-    // }
+    listarRoles(): void {
+      this.rolServ.LRoles().subscribe({
+        next: (res) => {
+          this.listaRoles = res;
+          console.log('Roles cargados:', res);
+        },
+        error: (err) => {
+          console.error('Error al cargar roles:', err);
+          Swal.fire({
+            title: 'Error',
+            text: 'No se pudieron cargar los roles del sistema',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          });
+        },
+      });
+    }
 
     onRoleChange(event: any): void {
       const selectedRoleId = parseInt(event.target.value, 10); 
       console.log('ID del rol seleccionado:', selectedRoleId);
-  
-      this.rolServ.LRolesId(selectedRoleId).subscribe({
-        next: (selectedRole) => {
-          if (selectedRole) {
-            console.log('Rol seleccionado:', selectedRole.nombre, selectedRole.codigo);
-      
-            this.isMedicoSelected = selectedRole.nombre.toLowerCase() === 'medico';
-            
-            // Actualizar validaciones dinámicamente
-            const medicoControl = this.frmUsuario.get('cbxMedicos');
-            if (this.isMedicoSelected) {
-              medicoControl?.setValidators([Validators.required]);
-              medicoControl?.updateValueAndValidity();
-            } else {
-              medicoControl?.clearValidators();
-              medicoControl?.setValue('');
-              medicoControl?.updateValueAndValidity();
-            }
-          } else {
-            this.isMedicoSelected = false; 
-          }
-        },
-        error: (err) => {
-          console.error('Error al obtener el rol:', err);
-          this.isMedicoSelected = false; 
-        }
-      });
+    }
+
+    toggleMostrarContrasenia(): void {
+      this.mostrarContrasenia = !this.mostrarContrasenia;
     }
       
 
@@ -134,124 +100,147 @@ listaMedicoSinUsuario: any;
           console.log(usuario);
   
           this.frmUsuario.patchValue({
-            txtNombreUsuario: usuario.nombre_usuario,
-            txtContrasenia: usuario.contrasenia,
-            cbxRoles: usuario.codigo_rol,
-            txtCorreoUsuario: usuario.email
-
+            txtNombres: usuario.user_nombres,
+            txtApellidos: usuario.user_apellidos,
+            txtNombreUsuario: usuario.user_username,
+            txtContrasenia: '', // Dejar vacío por seguridad (contraseña encriptada)
+            txtCorreoUsuario: usuario.user_correo,
           });
+
+          // Hacer opcional la contraseña al editar (solo actualizar si se ingresa una nueva)
+          this.frmUsuario.get('txtContrasenia')?.clearValidators();
+          this.frmUsuario.get('txtContrasenia')?.updateValueAndValidity();
         },
         error: (err) => {
-          console.log('Error al cargar medico:', err);
-          alert('No se pudo cargar la información del medico');
+          console.log('Error al cargar usuario:', err);
+          Swal.fire({
+            title: 'Error',
+            text: 'No se pudo cargar la información del usuario',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          });
         },
       });
     }
   
-// guardarUsuario(): void {
-//   this.marcarCamposComoTocados();
+  guardarUsuario(): void {
+    this.marcarCamposComoTocados();
 
-//   if (this.frmUsuario.invalid) {
-//     const camposConError: string[] = [];
+    if (this.frmUsuario.invalid) {
+      const camposConError: string[] = [];
 
-//     if (this.frmUsuario.get('txtNombreUsuario')?.invalid) {
-//       camposConError.push('Nombre de Usuario');
-//     }
+      if (this.frmUsuario.get('txtNombres')?.invalid) {
+        camposConError.push('Nombres');
+      }
 
-//     if (this.frmUsuario.get('txtCorreoUsuario')?.invalid) {
-//       camposConError.push('Correo de Usuario');
-//     }
+      if (this.frmUsuario.get('txtApellidos')?.invalid) {
+        camposConError.push('Apellidos');
+      }
 
-//     if (this.frmUsuario.get('txtContrasenia')?.invalid) {
-//       camposConError.push('Contraseña');
-//     }
+      if (this.frmUsuario.get('txtNombreUsuario')?.invalid) {
+        camposConError.push('Nombre de Usuario');
+      }
 
-//     if (this.frmUsuario.get('cbxRoles')?.invalid) {
-//       camposConError.push('Rol del Sistema');
-//     }
+      if (this.frmUsuario.get('txtCorreoUsuario')?.invalid) {
+        camposConError.push('Correo de Usuario');
+      }
 
-//     if (this.isMedicoSelected && this.frmUsuario.get('cbxMedicos')?.invalid) {
-//       camposConError.push('Médico Asignado');
-//     }
+      if (this.frmUsuario.get('txtContrasenia')?.invalid) {
+        camposConError.push('Contraseña');
+      }
 
-//     Swal.fire({
-//       title: 'Campos Requeridos',
-//       text: `Ingrese correctamente los siguientes campos: ${camposConError.join(', ')}`,
-//       icon: 'warning',
-//       confirmButtonColor: '#3085d6',
-//       confirmButtonText: 'Entendido'
-//     });
+      if (this.frmUsuario.get('cbxRoles')?.invalid) {
+        camposConError.push('Rol del Sistema');
+      }
 
-//     return;
-//   }
+      Swal.fire({
+        title: 'Campos Requeridos',
+        text: `Ingrese correctamente los siguientes campos: ${camposConError.join(', ')}`,
+        icon: 'warning',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'Entendido'
+      });
 
-//   const usuario: InUsuario = {
-//     nombre_usuario: this.frmUsuario.value.txtNombreUsuario,
-//     contrasenia: this.frmUsuario.value.txtContrasenia,
-//     codigo_rol: this.frmUsuario.value.cbxRoles,
-//     email: this.frmUsuario.value.txtCorreoUsuario,
-//     codigo: this.eventoUpdate ? String(this.codigo) : '',
-//   };
+      return;
+    }
 
-//   const codigoMedico = this.frmUsuario.value.cbxMedicos;
+    if (this.eventoUpdate) {
+      // Validar si se ingresó una nueva contraseña
+      const nuevaContrasenia = this.frmUsuario.value.txtContrasenia;
+      
+      if (!nuevaContrasenia || nuevaContrasenia.trim() === '') {
+        Swal.fire({
+          title: 'Contraseña requerida',
+          text: 'Debe ingresar la nueva contraseña para actualizar el usuario',
+          icon: 'warning',
+          confirmButtonText: 'Entendido'
+        });
+        return;
+      }
 
-//   if (this.eventoUpdate) {
-//     this.usuarioServ.ActualizarUsuario(usuario).subscribe({
-//       next: () => {
-//         Swal.fire({
-//           title: 'Usuario actualizado',
-//           text: 'Los datos del usuario fueron actualizados con éxito.',
-//           icon: 'success',
-//           confirmButtonText: 'Aceptar',
-//         }).then(() => {
-//           this.router.navigate(['home/listausuarios']);
-//         });
-//       },
-//       error: (err) => {
-//         console.error('Error al actualizar usuario:', err);
-//         Swal.fire('Error', 'Hubo un problema al actualizar el usuario.', 'error');
-//       }
-//     });
-//   } else {
-//     this.usuarioServ.CrearUsuario(usuario).subscribe({
-//       next: (res: any) => {
-//         const nuevoIdUsuario = res.codigo_usuario;
+      const usuarioActualizar = {
+        user_id: this.codigo,
+        user_nombres: this.frmUsuario.value.txtNombres,
+        user_apellidos: this.frmUsuario.value.txtApellidos,
+        user_username: this.frmUsuario.value.txtNombreUsuario,
+        user_contrasenia: nuevaContrasenia,
+        user_correo: this.frmUsuario.value.txtCorreoUsuario
+      };
 
-//         if (this.isMedicoSelected && codigoMedico) {
-//           this.medicoServ.AsignarUsuario(codigoMedico, nuevoIdUsuario).subscribe({
-//             next: () => {
-//               Swal.fire({
-//                 title: 'Usuario registrado',
-//                 text: 'El usuario fue registrado y asignado al médico con éxito.',
-//                 icon: 'success',
-//                 confirmButtonText: 'Aceptar',
-//               }).then(() => {
-//                 this.router.navigate(['home/listausuarios']);
-//               });
-//             },
-//             error: (err) => {
-//               console.error('Error al asignar usuario al médico:', err);
-//               Swal.fire('Error', 'Hubo un problema al asignar el usuario al médico.', 'error');
-//             }
-//           });
-//         } else {
-//           Swal.fire({
-//             title: 'Usuario registrado',
-//             text: 'El usuario fue registrado con éxito.',
-//             icon: 'success',
-//             confirmButtonText: 'Aceptar',
-//           }).then(() => {
-//             this.router.navigate(['home/listausuarios']);
-//           });
-//         }
-//       },
-//       error: (err) => {
-//         console.error('Error al crear usuario:', err);
-//         Swal.fire('Error', 'Hubo un problema al registrar el usuario.', 'error');
-//       }
-//     });
-//   }
-// }
+      this.usuarioServ.ActualizarUsuario(usuarioActualizar as any).subscribe({
+        next: () => {
+          Swal.fire({
+            title: 'Usuario actualizado',
+            text: 'Los datos del usuario fueron actualizados con éxito.',
+            icon: 'success',
+            confirmButtonText: 'Aceptar',
+          }).then(() => {
+            this.router.navigate(['home/listausuarios']);
+          });
+        },
+        error: (err) => {
+          console.error('Error al actualizar usuario:', err);
+          Swal.fire({
+            title: 'Error',
+            text: err.error?.message || 'Hubo un problema al actualizar el usuario.',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          });
+        }
+      });
+    } else {
+      const usuarioNuevo = {
+        user_nombres: this.frmUsuario.value.txtNombres,
+        user_apellidos: this.frmUsuario.value.txtApellidos,
+        user_username: this.frmUsuario.value.txtNombreUsuario,
+        user_contrasenia: this.frmUsuario.value.txtContrasenia,
+        user_correo: this.frmUsuario.value.txtCorreoUsuario,
+        rol_id: this.frmUsuario.value.cbxRoles
+      };
+
+      this.usuarioServ.CrearUsuario(usuarioNuevo as any).subscribe({
+        next: () => {
+          Swal.fire({
+            title: 'Usuario registrado',
+            text: 'El usuario fue registrado con éxito.',
+            icon: 'success',
+            confirmButtonText: 'Aceptar',
+          }).then(() => {
+            this.router.navigate(['home/listausuarios']);
+          });
+        },
+        error: (err) => {
+          console.error('Error al crear usuario:', err);
+          Swal.fire({
+            title: 'Error',
+            text: err.error?.message || 'Hubo un problema al registrar el usuario.',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          });
+        }
+      });
+    }
+  }
 
     marcarCamposComoTocados(): void {
       Object.keys(this.frmUsuario.controls).forEach((campo) => {

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
-import { InUsuario, InUsuarioVista } from '../modelos/modeloUsuarios/InUsuarios';
+import { InUsuarioVista, InUsuario} from '../modelos/modeloUsuarios/InUsuarios';
 
 @Injectable({
   providedIn: 'root'
@@ -13,10 +13,12 @@ export class UsuariosService {
 
   constructor(private http: HttpClient) { }
   
-
   LUsuarios (): Observable<InUsuarioVista[]> {
-
     return this.http.get<InUsuarioVista[]>(`${this.urlServidor}/usuarios/listar`);
+  }
+
+  LUsuariosPorEstado(estado: number): Observable<InUsuarioVista[]> {
+    return this.http.get<InUsuarioVista[]>(`${this.urlServidor}/usuarios/listar?estado=${estado}`);
   }
 
   LUsuariosId(id: number): Observable<InUsuario> {
@@ -33,6 +35,10 @@ export class UsuariosService {
   EliminarUsuario(id:number):Observable<any>{
     return this.http.delete(`${this.urlServidor}/usuarios/Eliminar/${id}`);
 
+  }
+
+  ActivarUsuario(id: number): Observable<any> {
+    return this.http.put(`${this.urlServidor}/usuarios/activar/${id}`, {});
   }
   ActualizarUsuario(usuarios: InUsuario): Observable<any> {
 

@@ -3,10 +3,18 @@ import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AlertService } from '../../../../servicios/Alertas/alertas.service';
 import { UsuariosService } from '../../../../servicios/usuarios.service'; 
-import { InUsuarioVista } from '../../../../modelos/modeloUsuarios/InUsuarios';
+import { AuthService } from '../../../../servicios/authservicio.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
+
+type UsuarioFila = {
+  user_id: string;
+  user_username: string;
+  rol_nombre: string;
+  user_estado?: string;
+  [key: string]: any;
+};
 
 @Component({
     selector: 'app-listausuarios',
@@ -16,13 +24,16 @@ import Swal from 'sweetalert2';
 })
 export class ListausuariosComponent {
   
-  listaUsuarios: InUsuarioVista[] = [];
-  filteredUsuarios: InUsuarioVista[] = [];
-  paginatedUsuarios: InUsuarioVista[] = [];
+  listaUsuarios: UsuarioFila[] = [];
+  filteredUsuarios: UsuarioFila[] = [];
+  paginatedUsuarios: UsuarioFila[] = [];
   
   // Propiedades de búsqueda
   searchTerm: string = '';
   isSearching: boolean = false;
+  
+  // Propiedades de estado (activo/inactivo)
+  estadoActual: number = 1; // 1 = Activos, 0 = Inactivos
   
   // Propiedades de paginación
   currentPage: number = 1;
@@ -34,6 +45,7 @@ export class ListausuariosComponent {
       private http: HttpClient,
       private router: Router,
       private usuarioServ: UsuariosService,
+      private authServ: AuthService,
       private ServicioAlertas: AlertService
     ) {}
   
@@ -42,13 +54,10 @@ export class ListausuariosComponent {
     }
   
   listarUsuarios(): void {
-    this.usuarioServ.LUsuarios().subscribe({
+    this.usuarioServ.LUsuariosPorEstado(this.estadoActual).subscribe({
       next: (res) => {
-        this.listaUsuarios = res;
-        this.filteredUsuarios = [...res]; // Inicializar lista filtrada
-        this.totalItems = this.filteredUsuarios.length;
-        this.calculatePagination();
-        this.updatePaginatedData();
+        this.listaUsuarios = res as unknown as UsuarioFila[];
+        this.applyFilters(); // Aplicar filtros de búsqueda
         console.log(res);
       },
       error: (err) => {
@@ -61,42 +70,70 @@ export class ListausuariosComponent {
         );
       },
     });
-  }    eliminarUsuario(id: any, nombre : string): void {
+  }
+
+  editarUsuario(id: any): void {
+    this.router.navigate(['home/actualizarUsuario', id]);
+  }
+
+  private isAdminRole(roleName: string | undefined | null): boolean {
+    const role = (roleName ?? '').toLowerCase();
+    return role.includes('admin') || role.includes('administrador');
+  }
+
+  private isSelf(username: string | undefined | null): boolean {
+    const current = (this.authServ.obtenerNombreUsuario() ?? '').toLowerCase();
+    return current.length > 0 && (username ?? '').toLowerCase() === current;
+  }
+
+  /**
+   * Reglas UI: no permitir DESHABILITAR el propio usuario ni cuentas administrador.
+   * Nota: sí se permite HABILITAR (reactivar) cualquier usuario.
+   */
+  canDisableUser(usuario: Pick<UsuarioFila, 'user_username' | 'rol_nombre'>): boolean {
+    return !(this.isSelf(usuario.user_username) || this.isAdminRole(usuario.rol_nombre)); 
+  }
+
+  canEnableUser(_usuario: Pick<UsuarioFila, 'user_username' | 'rol_nombre'>): boolean {
+    return true;
+  }
+
+  desactivarUsuario(id: any, nombre : string): void {
+        // Guardia extra (por si se dispara desde otro lugar)
+        const usuarioFila = this.listaUsuarios.find(u => String(u.user_id) === String(id));
+        if (usuarioFila && !this.canDisableUser(usuarioFila)) {
+          Swal.fire('Acción no permitida', 'No puedes deshabilitar tu propio usuario ni un administrador.', 'info');
+          return;
+        }
     
         Swal.fire({
-          title: "¿Está seguro que desea eliminar el registro de "+ nombre+ " ?",
-          text: "¡No podrás revertir esto! A menos que sea adminitrador",
+          title: "¿Está seguro que desea desactivar el usuario "+ nombre+ "?",
+          text: "El usuario no podrá acceder al sistema. Puede habilitarlo desde la pestaña 'Deshabilitados'",
           icon: "warning",
           showDenyButton: true,
           confirmButtonColor: "#3085d6",
           cancelButtonColor: "#d33",
-          confirmButtonText: "Si, Eliminar Registro!",
-          denyButtonText:"Cancelar Acción"
+          confirmButtonText: "Sí, Desactivar Usuario",
+          denyButtonText:"Cancelar"
         }).then((result) => {
           if (result.isConfirmed) {
-            console.log(id +" XDDDD");
             this.usuarioServ.EliminarUsuario(id).subscribe(
           
               {
                 next: res => {
-                  this.listaUsuarios = this.listaUsuarios.filter(usuario => parseInt(usuario.codigo_usuario) !== id);
-                  
-                  // Actualizar listas filtradas y paginación
-                  this.filteredUsuarios = this.filteredUsuarios.filter(usuario => parseInt(usuario.codigo_usuario) !== id);
-                  this.totalItems = this.filteredUsuarios.length;
-                  this.calculatePagination();
-                  this.updatePaginatedData();
+                  // Recargar la lista completa de usuarios
+                  this.listarUsuarios();
     
                   Swal.fire({
-                    title: "Eliminado!",
-                    text: "Registro Eliminado con éxito ",
+                    title: "¡Desactivado!",
+                    text: "El usuario ha sido desactivado exitosamente",
                     icon: "success"
                   });
                 },
                 error: err =>{
                  
-                  Swal.fire("El registro no se pudo eliminar", "", "error");
-                  console.log('ERROR  '+ err.error.error);
+                  Swal.fire("Error", "No se pudo desactivar el usuario", "error");
+                  console.log('ERROR: '+ err.error.error);
                 }
       
               });
@@ -104,14 +141,76 @@ export class ListausuariosComponent {
     
             
           }else if (result.isDenied) {
-            Swal.fire("El registro no se elimino", "", "error");
+            Swal.fire("Acción cancelada", "El usuario sigue activo", "info");
     
           }
         });
       }
+
+  habilitarUsuario(id: any, nombre: string): void {
+    Swal.fire({
+      title: `¿Desea habilitar el usuario ${nombre}?`,
+      text: 'El usuario podrá volver a acceder al sistema.',
+      icon: 'question',
+      showDenyButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: 'Sí, Habilitar Usuario',
+      denyButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.usuarioServ.ActivarUsuario(id).subscribe({
+          next: () => {
+            this.listarUsuarios();
+            Swal.fire({
+              title: '¡Habilitado!',
+              text: 'El usuario ha sido habilitado exitosamente',
+              icon: 'success'
+            });
+          },
+          error: (err) => {
+            Swal.fire('Error', 'No se pudo habilitar el usuario', 'error');
+            console.log('ERROR: ' + (err?.error?.error ?? err?.message ?? err));
+          }
+        });
+      } else if (result.isDenied) {
+        Swal.fire('Acción cancelada', 'El usuario sigue deshabilitado', 'info');
+      }
+    });
+  }
   
   ActualizarUsuario(id: any): void {
     this.router.navigate(['home/actualizarUsuarios', id]);
+  }
+
+  /**
+   * Cambia entre tabs de activos e inactivos
+   */
+  cambiarTab(estado: number): void {
+    this.estadoActual = estado;
+    this.currentPage = 1; // Reset a la primera página
+    this.listarUsuarios(); // Hacer llamada a la API con el nuevo estado
+  }
+
+  /**
+   * Aplica filtros de búsqueda (el filtro de estado ahora se hace en la API)
+   */
+  applyFilters(): void {
+    let filtered = [...this.listaUsuarios];
+    
+    // Filtrar por búsqueda si existe
+    if (this.isSearching && this.searchTerm.length > 0) {
+      const searchLower = this.searchTerm.toLowerCase();
+      filtered = filtered.filter(usuario => 
+        usuario.user_username.toLowerCase().includes(searchLower) ||
+        usuario.rol_nombre.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    this.filteredUsuarios = filtered;
+    this.totalItems = this.filteredUsuarios.length;
+    this.calculatePagination();
+    this.updatePaginatedData();
   }
 
   /**
@@ -186,22 +285,8 @@ export class ListausuariosComponent {
   onSearch(searchValue: string): void {
     this.searchTerm = searchValue.toLowerCase().trim();
     this.isSearching = this.searchTerm.length > 0;
-    
-    if (this.isSearching) {
-      this.filteredUsuarios = this.listaUsuarios.filter(usuario => 
-        usuario.nombre_usuario.toLowerCase().includes(this.searchTerm) ||
-        usuario.rol_nombre.toLowerCase().includes(this.searchTerm) ||
-        usuario.rol_descripcion.toLowerCase().includes(this.searchTerm)
-      );
-    } else {
-      this.filteredUsuarios = [...this.listaUsuarios];
-    }
-    
-    // Actualizar paginación después de filtrar
-    this.totalItems = this.filteredUsuarios.length;
     this.currentPage = 1; // Reset a la primera página
-    this.calculatePagination();
-    this.updatePaginatedData();
+    this.applyFilters();
   }
 
   /**
@@ -210,11 +295,8 @@ export class ListausuariosComponent {
   clearSearch(): void {
     this.searchTerm = '';
     this.isSearching = false;
-    this.filteredUsuarios = [...this.listaUsuarios];
-    this.totalItems = this.filteredUsuarios.length;
     this.currentPage = 1;
-    this.calculatePagination();
-    this.updatePaginatedData();
+    this.applyFilters();
   }
 
   /**
