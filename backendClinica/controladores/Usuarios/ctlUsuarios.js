@@ -34,8 +34,123 @@ exports.getUsuariosEstado = async (req, res) => {
 exports.getUsuarioId = async (req, res) => {
 };
 
-exports.registrarUsuario = async (req, res) => {};
+exports.registrarUsuario = async (req, res) => {
+  let connection;
 
-exports.actualizarUsuario = async (req, res) => {};
+  const {
+    user_nombres,
+    user_apellidos,
+    user_username,
+    user_contrasenia,
+    user_correo,
+    rol_id
+  } = req.body;
 
-exports.eliminarUsuario = async (req, res) => {};
+  try {
+    connection = await getConnection();
+
+    await connection.execute(
+      `
+      BEGIN
+        registrar_usuario(
+          :user_nombres,
+          :user_apellidos,
+          :user_username,
+          :user_contrasenia,
+          :user_correo,
+          :rol_id
+        );
+      END;
+      `,
+      {
+        user_nombres,
+        user_apellidos,
+        user_username,
+        user_contrasenia,
+        user_correo,
+        rol_id
+      }
+    );
+
+    res.status(201).json({ message: "Usuario registrado correctamente" });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  } finally {
+    if (connection) await connection.close();
+  }
+};
+
+exports.actualizarUsuario = async (req, res) => {
+  let connection;
+
+  const {
+    user_id,
+    user_nombres,
+    user_apellidos,
+    user_username,
+    user_contrasenia,
+    user_correo
+  } = req.body;
+
+  try {
+    connection = await getConnection();
+
+    await connection.execute(
+      `
+      BEGIN
+        actualizar_usuario(
+          :user_id,
+          :user_nombres,
+          :user_apellidos,
+          :user_username,
+          :user_contrasenia,
+          :user_correo
+        );
+      END;
+      `,
+      {
+        user_id,
+        user_nombres,
+        user_apellidos,
+        user_username,
+        user_contrasenia,
+        user_correo
+      }
+    );
+
+    res.json({ message: "Usuario actualizado correctamente" });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  } finally {
+    if (connection) await connection.close();
+  }
+};
+
+exports.eliminarUsuario = async (req, res) => {
+  let connection;
+
+  try {
+    connection = await getConnection();
+
+    await connection.execute(
+      `
+      BEGIN
+        eliminar_usuario(:user_id);
+      END;
+      `,
+      { user_id: req.params.id }
+    );
+
+    res.json({ message: "Usuario eliminado correctamente" });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  } finally {
+    if (connection) await connection.close();
+  }
+};
