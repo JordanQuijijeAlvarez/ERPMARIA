@@ -23,6 +23,36 @@
         <!-- Form Fields -->
         <div class="card__body">
           <div class="form-grid">
+            <!-- Nombres -->
+            <div class="form-group">
+              <label class="form-label">
+                <i class="fas fa-id-card label-icon"></i>
+                Nombres *
+              </label>
+              <input
+                formControlName="txtNombres"
+                placeholder="Ej: Juan Carlos"
+                type="text"
+                class="form-input"
+              />
+              <app-validators [control]="frmUsuario.get('txtNombres')!"></app-validators>
+            </div>
+
+            <!-- Apellidos -->
+            <div class="form-group">
+              <label class="form-label">
+                <i class="fas fa-id-card label-icon"></i>
+                Apellidos *
+              </label>
+              <input
+                formControlName="txtApellidos"
+                placeholder="Ej: Pérez García"
+                type="text"
+                class="form-input"
+              />
+              <app-validators [control]="frmUsuario.get('txtApellidos')!"></app-validators>
+            </div>
+
             <!-- Nombre de Usuario -->
             <div class="form-group">
               <label class="form-label">

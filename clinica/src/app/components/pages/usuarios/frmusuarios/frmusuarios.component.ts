@@ -18,9 +18,6 @@ import Swal from 'sweetalert2';
     styleUrl: './frmusuarios.component.css'
 })
 export class FrmusuariosComponent {
-guardarUsuario() {
-throw new Error('Method not implemented.');
-}
 
     frmUsuario: FormGroup;
     eventoUpdate: boolean = false;
@@ -42,6 +39,8 @@ throw new Error('Method not implemented.');
       private alertaServ: AlertService
     ) {
       this.frmUsuario = this.formBuilder.group({
+        txtNombres: ['', Validators.required],
+        txtApellidos: ['', Validators.required],
         txtNombreUsuario: ['', Validators.required],
         txtCorreoUsuario: ['', [Validators.required, Validators.email]],
         txtContrasenia: ['', Validators.required],
@@ -96,123 +95,130 @@ throw new Error('Method not implemented.');
           console.log(usuario);
   
           this.frmUsuario.patchValue({
+            txtNombres: usuario.user_nombres,
+            txtApellidos: usuario.user_apellidos,
             txtNombreUsuario: usuario.user_username,
             txtContrasenia: usuario.user_contrasenia,
-            // cbxRoles: usuario.codigo_rol,
             txtCorreoUsuario: usuario.user_correo
           });
         },
         error: (err) => {
           console.log('Error al cargar usuario:', err);
-          alert('No se pudo cargar la información del usuario');
+          Swal.fire({
+            title: 'Error',
+            text: 'No se pudo cargar la información del usuario',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          });
         },
       });
     }
   
-// guardarUsuario(): void {
-//   this.marcarCamposComoTocados();
+  guardarUsuario(): void {
+    this.marcarCamposComoTocados();
 
-//   if (this.frmUsuario.invalid) {
-//     const camposConError: string[] = [];
+    if (this.frmUsuario.invalid) {
+      const camposConError: string[] = [];
 
-//     if (this.frmUsuario.get('txtNombreUsuario')?.invalid) {
-//       camposConError.push('Nombre de Usuario');
-//     }
+      if (this.frmUsuario.get('txtNombres')?.invalid) {
+        camposConError.push('Nombres');
+      }
 
-//     if (this.frmUsuario.get('txtCorreoUsuario')?.invalid) {
-//       camposConError.push('Correo de Usuario');
-//     }
+      if (this.frmUsuario.get('txtApellidos')?.invalid) {
+        camposConError.push('Apellidos');
+      }
 
-//     if (this.frmUsuario.get('txtContrasenia')?.invalid) {
-//       camposConError.push('Contraseña');
-//     }
+      if (this.frmUsuario.get('txtNombreUsuario')?.invalid) {
+        camposConError.push('Nombre de Usuario');
+      }
 
-//     if (this.frmUsuario.get('cbxRoles')?.invalid) {
-//       camposConError.push('Rol del Sistema');
-//     }
+      if (this.frmUsuario.get('txtCorreoUsuario')?.invalid) {
+        camposConError.push('Correo de Usuario');
+      }
 
-//     if (this.isMedicoSelected && this.frmUsuario.get('cbxMedicos')?.invalid) {
-//       camposConError.push('Médico Asignado');
-//     }
+      if (this.frmUsuario.get('txtContrasenia')?.invalid) {
+        camposConError.push('Contraseña');
+      }
 
-//     Swal.fire({
-//       title: 'Campos Requeridos',
-//       text: `Ingrese correctamente los siguientes campos: ${camposConError.join(', ')}`,
-//       icon: 'warning',
-//       confirmButtonColor: '#3085d6',
-//       confirmButtonText: 'Entendido'
-//     });
+      if (this.frmUsuario.get('cbxRoles')?.invalid) {
+        camposConError.push('Rol del Sistema');
+      }
 
-//     return;
-//   }
+      Swal.fire({
+        title: 'Campos Requeridos',
+        text: `Ingrese correctamente los siguientes campos: ${camposConError.join(', ')}`,
+        icon: 'warning',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'Entendido'
+      });
 
-//   const usuario: InUsuario = {
-//     nombre_usuario: this.frmUsuario.value.txtNombreUsuario,
-//     contrasenia: this.frmUsuario.value.txtContrasenia,
-//     codigo_rol: this.frmUsuario.value.cbxRoles,
-//     email: this.frmUsuario.value.txtCorreoUsuario,
-//     codigo: this.eventoUpdate ? String(this.codigo) : '',
-//   };
+      return;
+    }
 
-//   const codigoMedico = this.frmUsuario.value.cbxMedicos;
+    if (this.eventoUpdate) {
+      const usuarioActualizar = {
+        user_id: this.codigo,
+        user_nombres: this.frmUsuario.value.txtNombres,
+        user_apellidos: this.frmUsuario.value.txtApellidos,
+        user_username: this.frmUsuario.value.txtNombreUsuario,
+        user_contrasenia: this.frmUsuario.value.txtContrasenia,
+        user_correo: this.frmUsuario.value.txtCorreoUsuario
+      };
 
-//   if (this.eventoUpdate) {
-//     this.usuarioServ.ActualizarUsuario(usuario).subscribe({
-//       next: () => {
-//         Swal.fire({
-//           title: 'Usuario actualizado',
-//           text: 'Los datos del usuario fueron actualizados con éxito.',
-//           icon: 'success',
-//           confirmButtonText: 'Aceptar',
-//         }).then(() => {
-//           this.router.navigate(['home/listausuarios']);
-//         });
-//       },
-//       error: (err) => {
-//         console.error('Error al actualizar usuario:', err);
-//         Swal.fire('Error', 'Hubo un problema al actualizar el usuario.', 'error');
-//       }
-//     });
-//   } else {
-//     this.usuarioServ.CrearUsuario(usuario).subscribe({
-//       next: (res: any) => {
-//         const nuevoIdUsuario = res.codigo_usuario;
+      this.usuarioServ.ActualizarUsuario(usuarioActualizar as any).subscribe({
+        next: () => {
+          Swal.fire({
+            title: 'Usuario actualizado',
+            text: 'Los datos del usuario fueron actualizados con éxito.',
+            icon: 'success',
+            confirmButtonText: 'Aceptar',
+          }).then(() => {
+            this.router.navigate(['home/listausuarios']);
+          });
+        },
+        error: (err) => {
+          console.error('Error al actualizar usuario:', err);
+          Swal.fire({
+            title: 'Error',
+            text: err.error?.message || 'Hubo un problema al actualizar el usuario.',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          });
+        }
+      });
+    } else {
+      const usuarioNuevo = {
+        user_nombres: this.frmUsuario.value.txtNombres,
+        user_apellidos: this.frmUsuario.value.txtApellidos,
+        user_username: this.frmUsuario.value.txtNombreUsuario,
+        user_contrasenia: this.frmUsuario.value.txtContrasenia,
+        user_correo: this.frmUsuario.value.txtCorreoUsuario,
+        rol_id: this.frmUsuario.value.cbxRoles
+      };
 
-//         if (this.isMedicoSelected && codigoMedico) {
-//           this.medicoServ.AsignarUsuario(codigoMedico, nuevoIdUsuario).subscribe({
-//             next: () => {
-//               Swal.fire({
-//                 title: 'Usuario registrado',
-//                 text: 'El usuario fue registrado y asignado al médico con éxito.',
-//                 icon: 'success',
-//                 confirmButtonText: 'Aceptar',
-//               }).then(() => {
-//                 this.router.navigate(['home/listausuarios']);
-//               });
-//             },
-//             error: (err) => {
-//               console.error('Error al asignar usuario al médico:', err);
-//               Swal.fire('Error', 'Hubo un problema al asignar el usuario al médico.', 'error');
-//             }
-//           });
-//         } else {
-//           Swal.fire({
-//             title: 'Usuario registrado',
-//             text: 'El usuario fue registrado con éxito.',
-//             icon: 'success',
-//             confirmButtonText: 'Aceptar',
-//           }).then(() => {
-//             this.router.navigate(['home/listausuarios']);
-//           });
-//         }
-//       },
-//       error: (err) => {
-//         console.error('Error al crear usuario:', err);
-//         Swal.fire('Error', 'Hubo un problema al registrar el usuario.', 'error');
-//       }
-//     });
-//   }
-// }
+      this.usuarioServ.CrearUsuario(usuarioNuevo as any).subscribe({
+        next: () => {
+          Swal.fire({
+            title: 'Usuario registrado',
+            text: 'El usuario fue registrado con éxito.',
+            icon: 'success',
+            confirmButtonText: 'Aceptar',
+          }).then(() => {
+            this.router.navigate(['home/listausuarios']);
+          });
+        },
+        error: (err) => {
+          console.error('Error al crear usuario:', err);
+          Swal.fire({
+            title: 'Error',
+            text: err.error?.message || 'Hubo un problema al registrar el usuario.',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          });
+        }
+      });
+    }
+  }
 
     marcarCamposComoTocados(): void {
       Object.keys(this.frmUsuario.controls).forEach((campo) => {
