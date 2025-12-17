@@ -4,10 +4,17 @@ import { Router, RouterModule } from '@angular/router';
 import { AlertService } from '../../../../servicios/Alertas/alertas.service';
 import { UsuariosService } from '../../../../servicios/usuarios.service'; 
 import { AuthService } from '../../../../servicios/authservicio.service';
-import { InUsuarioVista } from '../../../../modelos/modeloUsuarios/InUsuarios';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
+
+type UsuarioFila = {
+  user_id: string;
+  user_username: string;
+  rol_nombre: string;
+  user_estado?: string;
+  [key: string]: any;
+};
 
 @Component({
     selector: 'app-listausuarios',
@@ -17,9 +24,9 @@ import Swal from 'sweetalert2';
 })
 export class ListausuariosComponent {
   
-  listaUsuarios: InUsuarioVista[] = [];
-  filteredUsuarios: InUsuarioVista[] = [];
-  paginatedUsuarios: InUsuarioVista[] = [];
+  listaUsuarios: UsuarioFila[] = [];
+  filteredUsuarios: UsuarioFila[] = [];
+  paginatedUsuarios: UsuarioFila[] = [];
   
   // Propiedades de búsqueda
   searchTerm: string = '';
@@ -49,7 +56,7 @@ export class ListausuariosComponent {
   listarUsuarios(): void {
     this.usuarioServ.LUsuariosPorEstado(this.estadoActual).subscribe({
       next: (res) => {
-        this.listaUsuarios = res;
+        this.listaUsuarios = res as unknown as UsuarioFila[];
         this.applyFilters(); // Aplicar filtros de búsqueda
         console.log(res);
       },
@@ -83,17 +90,17 @@ export class ListausuariosComponent {
    * Reglas UI: no permitir DESHABILITAR el propio usuario ni cuentas administrador.
    * Nota: sí se permite HABILITAR (reactivar) cualquier usuario.
    */
-  canDisableUser(usuario: Pick<InUsuarioVista, 'user_username' | 'rol_nombre'>): boolean {
-    return !(this.isSelf(usuario.user_username) || this.isAdminRole(usuario.rol_nombre));
+  canDisableUser(usuario: Pick<UsuarioFila, 'user_username' | 'rol_nombre'>): boolean {
+    return !(this.isSelf(usuario.user_username) || this.isAdminRole(usuario.rol_nombre)); 
   }
 
-  canEnableUser(_usuario: Pick<InUsuarioVista, 'user_username' | 'rol_nombre'>): boolean {
+  canEnableUser(_usuario: Pick<UsuarioFila, 'user_username' | 'rol_nombre'>): boolean {
     return true;
   }
 
   desactivarUsuario(id: any, nombre : string): void {
         // Guardia extra (por si se dispara desde otro lugar)
-        const usuarioFila = this.listaUsuarios.find(u => u.user_id === id);
+        const usuarioFila = this.listaUsuarios.find(u => String(u.user_id) === String(id));
         if (usuarioFila && !this.canDisableUser(usuarioFila)) {
           Swal.fire('Acción no permitida', 'No puedes deshabilitar tu propio usuario ni un administrador.', 'info');
           return;
