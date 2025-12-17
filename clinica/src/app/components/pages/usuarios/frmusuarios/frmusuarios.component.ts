@@ -103,9 +103,13 @@ export class FrmusuariosComponent {
             txtNombres: usuario.user_nombres,
             txtApellidos: usuario.user_apellidos,
             txtNombreUsuario: usuario.user_username,
-            txtContrasenia: usuario.user_contrasenia,
-            txtCorreoUsuario: usuario.user_correo
+            txtContrasenia: '', // Dejar vacío por seguridad (contraseña encriptada)
+            txtCorreoUsuario: usuario.user_correo,
           });
+
+          // Hacer opcional la contraseña al editar (solo actualizar si se ingresa una nueva)
+          this.frmUsuario.get('txtContrasenia')?.clearValidators();
+          this.frmUsuario.get('txtContrasenia')?.updateValueAndValidity();
         },
         error: (err) => {
           console.log('Error al cargar usuario:', err);
@@ -161,12 +165,25 @@ export class FrmusuariosComponent {
     }
 
     if (this.eventoUpdate) {
+      // Validar si se ingresó una nueva contraseña
+      const nuevaContrasenia = this.frmUsuario.value.txtContrasenia;
+      
+      if (!nuevaContrasenia || nuevaContrasenia.trim() === '') {
+        Swal.fire({
+          title: 'Contraseña requerida',
+          text: 'Debe ingresar la nueva contraseña para actualizar el usuario',
+          icon: 'warning',
+          confirmButtonText: 'Entendido'
+        });
+        return;
+      }
+
       const usuarioActualizar = {
         user_id: this.codigo,
         user_nombres: this.frmUsuario.value.txtNombres,
         user_apellidos: this.frmUsuario.value.txtApellidos,
         user_username: this.frmUsuario.value.txtNombreUsuario,
-        user_contrasenia: this.frmUsuario.value.txtContrasenia,
+        user_contrasenia: nuevaContrasenia,
         user_correo: this.frmUsuario.value.txtCorreoUsuario
       };
 

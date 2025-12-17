@@ -85,12 +85,12 @@
             <div class="form-group">
               <label class="form-label">
                 <i class="fas fa-lock label-icon"></i>
-                Contraseña *
+                {{ eventoUpdate ? 'Nueva Contraseña *' : 'Contraseña *' }}
               </label>
               <div style="position: relative;">
                 <input
                   formControlName="txtContrasenia"
-                  placeholder="Mínimo 6 caracteres"
+                  [placeholder]="eventoUpdate ? 'Ingrese la nueva contraseña' : 'Mínimo 6 caracteres'"
                   [type]="mostrarContrasenia ? 'text' : 'password'"
                   class="form-input"
                   style="padding-right: 40px;"
@@ -105,6 +105,9 @@
                   <i [class]="mostrarContrasenia ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
                 </button>
               </div>
+              <small *ngIf="eventoUpdate" style="color: #64748b; font-size: 0.875rem; margin-top: 4px; display: block;">
+                <i class="fas fa-info-circle"></i> Por seguridad, debe ingresar una nueva contraseña para actualizar el usuario
+              </small>
               <app-validators [control]="frmUsuario.get('txtContrasenia')!"></app-validators>
             </div>
 
