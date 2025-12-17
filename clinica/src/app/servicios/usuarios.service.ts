@@ -36,6 +36,10 @@ export class UsuariosService {
     return this.http.delete(`${this.urlServidor}/usuarios/Eliminar/${id}`);
 
   }
+
+  ActivarUsuario(id: number): Observable<any> {
+    return this.http.put(`${this.urlServidor}/usuarios/activar/${id}`, {});
+  }
   ActualizarUsuario(usuarios: InUsuario): Observable<any> {
 
     return this.http.put(`${this.urlServidor}/usuarios/Actualizar`, usuarios);
