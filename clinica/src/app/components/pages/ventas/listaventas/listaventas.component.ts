@@ -5,7 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { AlertService } from '../../../../servicios/Alertas/alertas.service';
 import { DirectivasModule } from '../../../../directivas/directivas.module';
 import { ventaService } from '../../../../servicios/ventas.service';
-
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable'; // <--- ASÍ DEBE QUEDAR
 @Component({
   selector: 'app-listaventas',
   imports: [CommonModule, RouterModule, DirectivasModule, FormsModule],
@@ -13,6 +14,7 @@ import { ventaService } from '../../../../servicios/ventas.service';
   styleUrl: './listaventas.component.css'
 })
 export class listaVentasComponent {
+
 
   
   filteredVentas: any[] = [];
@@ -316,4 +318,64 @@ listarventasActivas(estado: number): void {
 ActualizarVenta(id: any): void {
     this.router.navigate(['home/actualizarVenta', id]);
   }
+
+
+descargarFactura(venta: any) {
+  console.log('Generando factura para la venta:', venta);
+  
+  this.ServicioVentas.getDetalleVentas(venta.venta_id).subscribe((detalles: any[]) => {
+    
+    const doc = new jsPDF();
+
+    // --- ENCABEZADO ---
+    doc.setFontSize(18);
+    doc.text('FACTURA DE VENTA', 14, 20);
+    
+    doc.setFontSize(10);
+    doc.text(`N° Factura: ${venta.venta_id}`, 14, 30);
+    
+    // Formateo de fecha seguro
+    const fecha = new Date(venta.venta_horafecha);
+    const fechaStr = !isNaN(fecha.getTime()) ? fecha.toLocaleDateString() : venta.venta_horafecha;
+    doc.text(`Fecha: ${fechaStr}`, 14, 35);
+    
+    doc.text(`Cliente: ${venta.clientenombre}`, 14, 40);
+    
+    doc.text('Mi Empresa S.A.', 150, 30, { align: 'right' });
+    doc.text('RUC: 123456789001', 150, 35, { align: 'right' });
+
+    // --- TABLA DE DETALLES ---
+    const columnas = ['Producto', 'Cantidad', 'Precio Unit.', 'Subtotal'];
+    const filas = detalles.map(det => [
+      det.prod_nombre,
+      det.detv_cantidad,
+      `$${det.prod_precioventa}`,
+      `$${det.detv_subtotal}`
+    ]);
+
+    // ⚠️ CORRECCIÓN: Usamos la función importada pasando 'doc' como primer parámetro
+    autoTable(doc, {
+      startY: 50,
+      head: [columnas],
+      body: filas,
+      theme: 'grid',
+      headStyles: { fillColor: [66, 66, 66] },
+    });
+
+    // --- TOTALES ---
+    // Aunque usamos la función externa, 'lastAutoTable' se guarda dentro de 'doc'
+    const finalY = (doc as any).lastAutoTable.finalY + 10;
+
+    doc.text(`Subtotal: $${venta.venta_subiva}`, 150, finalY, { align: 'right' });
+    doc.text(`IVA: $${venta.venta_iva}`, 150, finalY + 5, { align: 'right' });
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`TOTAL: $${venta.venta_total}`, 150, finalY + 12, { align: 'right' });
+
+    // --- DESCARGAR ---
+    doc.save(`Factura_${venta.venta_id}.pdf`);
+  });
 }
+}
+
+
