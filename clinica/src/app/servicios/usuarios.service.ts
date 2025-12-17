@@ -16,10 +16,10 @@ export class UsuariosService {
   LUsuarios (): Observable<InUsuarioVista[]> {
     return this.http.get<InUsuarioVista[]>(`${this.urlServidor}/usuarios/listar`);
   }
-  // LUsuarios (): Observable<InUsuarioVista[]> {
 
-  //   return this.http.get<InUsuarioVista[]>(`${this.urlServidor}/usuarios/listar`);
-  // }
+  LUsuariosPorEstado(estado: number): Observable<InUsuarioVista[]> {
+    return this.http.get<InUsuarioVista[]>(`${this.urlServidor}/usuarios/listar?estado=${estado}`);
+  }
 
   LUsuariosId(id: number): Observable<InUsuario> {
   

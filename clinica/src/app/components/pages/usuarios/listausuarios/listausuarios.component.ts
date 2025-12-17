@@ -45,10 +45,10 @@ export class ListausuariosComponent {
     }
   
   listarUsuarios(): void {
-    this.usuarioServ.LUsuarios().subscribe({
+    this.usuarioServ.LUsuariosPorEstado(this.estadoActual).subscribe({
       next: (res) => {
         this.listaUsuarios = res;
-        this.applyFilters(); // Aplicar filtros de estado y búsqueda
+        this.applyFilters(); // Aplicar filtros de búsqueda
         console.log(res);
       },
       error: (err) => {
@@ -115,17 +115,14 @@ export class ListausuariosComponent {
   cambiarTab(estado: number): void {
     this.estadoActual = estado;
     this.currentPage = 1; // Reset a la primera página
-    this.applyFilters();
+    this.listarUsuarios(); // Hacer llamada a la API con el nuevo estado
   }
 
   /**
-   * Aplica todos los filtros (estado y búsqueda)
+   * Aplica filtros de búsqueda (el filtro de estado ahora se hace en la API)
    */
   applyFilters(): void {
     let filtered = [...this.listaUsuarios];
-    
-    // Filtrar por estado (activo/inactivo)
-    filtered = filtered.filter(usuario => parseInt(usuario.user_estado) === this.estadoActual);
     
     // Filtrar por búsqueda si existe
     if (this.isSearching && this.searchTerm.length > 0) {
