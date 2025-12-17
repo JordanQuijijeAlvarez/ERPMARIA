@@ -1,4 +1,5 @@
 const { getConnection, oracledb } = require("../../configuracion/oraclePool");
+const bcrypt = require('bcrypt');
 
 // helper para convertir llaves a minúsculas
 function formatearSalida(rows) {
@@ -71,6 +72,9 @@ exports.registrarUsuario = async (req, res) => {
   try {
     connection = await getConnection();
 
+    // Encriptar la contraseña antes de guardarla
+    const contraseniaEncriptada = await bcrypt.hash(user_contrasenia, 10);
+
     await connection.execute(
       `
       BEGIN
@@ -88,7 +92,7 @@ exports.registrarUsuario = async (req, res) => {
         user_nombres,
         user_apellidos,
         user_username,
-        user_contrasenia,
+        user_contrasenia: contraseniaEncriptada,
         user_correo,
         rol_id
       }
@@ -119,6 +123,9 @@ exports.actualizarUsuario = async (req, res) => {
   try {
     connection = await getConnection();
 
+    // Encriptar la contraseña antes de actualizarla
+    const contraseniaEncriptada = await bcrypt.hash(user_contrasenia, 10);
+
     await connection.execute(
       `
       BEGIN
@@ -137,7 +144,7 @@ exports.actualizarUsuario = async (req, res) => {
         user_nombres,
         user_apellidos,
         user_username,
-        user_contrasenia,
+        user_contrasenia: contraseniaEncriptada,
         user_correo
       }
     );
