@@ -13,7 +13,4 @@ JOIN usuario_rol ur
     ON u.user_id = ur.user_id
 JOIN rol r
     ON r.rol_id = ur.rol_id
-WHERE u.user_estado = 1
-  AND ur.user_rol_estado = 1;
-
 COMMIT;
