@@ -87,12 +87,24 @@
                 <i class="fas fa-lock label-icon"></i>
                 Contraseña *
               </label>
-              <input
-                formControlName="txtContrasenia"
-                placeholder="Mínimo 6 caracteres"
-                type="password"
-                class="form-input"
-              />
+              <div style="position: relative;">
+                <input
+                  formControlName="txtContrasenia"
+                  placeholder="Mínimo 6 caracteres"
+                  [type]="mostrarContrasenia ? 'text' : 'password'"
+                  class="form-input"
+                  style="padding-right: 40px;"
+                />
+                <button
+                  type="button"
+                  (click)="toggleMostrarContrasenia()"
+                  class="btn btn--icon"
+                  style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); padding: 8px; background: transparent; border: none; cursor: pointer; color: #64748b;"
+                  [title]="mostrarContrasenia ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                >
+                  <i [class]="mostrarContrasenia ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                </button>
+              </div>
               <app-validators [control]="frmUsuario.get('txtContrasenia')!"></app-validators>
             </div>
 

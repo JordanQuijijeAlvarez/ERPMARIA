@@ -23,6 +23,7 @@ export class FrmusuariosComponent {
     eventoUpdate: boolean = false;
     codigo: number | null = null;
     estado: boolean = true;
+    mostrarContrasenia: boolean = false;
 
     listaRoles: InRoles[] = [];
 
@@ -84,6 +85,10 @@ export class FrmusuariosComponent {
     onRoleChange(event: any): void {
       const selectedRoleId = parseInt(event.target.value, 10); 
       console.log('ID del rol seleccionado:', selectedRoleId);
+    }
+
+    toggleMostrarContrasenia(): void {
+      this.mostrarContrasenia = !this.mostrarContrasenia;
     }
       
 
