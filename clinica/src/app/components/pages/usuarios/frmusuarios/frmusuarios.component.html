@@ -1,84 +1,84 @@
 <form [formGroup]="frmUsuario" (ngSubmit)="guardarUsuario()">
-  <div class="min-h-screen p-6">
-    <div class="max-w-4xl mx-auto">
+  <div class="form-container">
+    <div class="form-wrapper">
       <!-- Form Content -->
-      <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-        <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
-          <h2 class="text-3xl font-bold text-center text-gray-800 mb-2">
+      <div class="card">
+        <div class="card__header form-header">
+          <h2 class="card__title form-header__title">
             {{ eventoUpdate ? 'ACTUALIZAR USUARIO' : 'REGISTRO DE USUARIO' }}
           </h2>
-          <p class="text-center text-gray-500 text-sm">
+          <p class="card__subtitle">
             {{ eventoUpdate ? 'Modifique la información del usuario según sea necesario' : 'Configure un nuevo usuario del sistema' }}
           </p>
         </div>
         
         <!-- Section Header -->
-        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-          <h3 class="text-lg font-semibold text-gray-800 flex items-center">
-            <i class="fas fa-user-plus text-gray-600 mr-2"></i>
+        <div class="section-header">
+          <h3 class="section-header__title">
+            <i class="fas fa-user-plus section-header__icon"></i>
             Información del Usuario
           </h3>
         </div>
 
         <!-- Form Fields -->
-        <div class="p-6">
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="card__body">
+          <div class="form-grid">
             <!-- Nombre de Usuario -->
-            <div class="lg:col-span-1">
-              <label class="block text-sm font-semibold text-gray-700 mb-2">
-                <i class="fas fa-user text-gray-500 mr-1"></i>
+            <div class="form-group">
+              <label class="form-label">
+                <i class="fas fa-user label-icon"></i>
                 Nombre de Usuario *
               </label>
               <input
                 formControlName="txtNombreUsuario"
                 placeholder="Ej: juan.perez, admin.sistema"
                 type="text"
-                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
+                class="form-input"
               />
               <app-validators [control]="frmUsuario.get('txtNombreUsuario')!"></app-validators>
             </div>
  <!-- correo de Usuario -->
-            <div class="lg:col-span-1">
-              <label class="block text-sm font-semibold text-gray-700 mb-2">
-                <i class="fas fa-envelope text-gray-500 mr-1"></i>
+            <div class="form-group">
+              <label class="form-label">
+                <i class="fas fa-envelope label-icon"></i>
                 Correo de Usuario *
               </label>
               <input
                 formControlName="txtCorreoUsuario"
                 placeholder="Ej: j@***.com, admin.sistema"
                 type="text"
-                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
+                class="form-input"
               />
               <app-validators [control]="frmUsuario.get('txtCorreoUsuario')!"></app-validators>
             </div>
             <!-- Contraseña -->
-            <div class="lg:col-span-1">
-              <label class="block text-sm font-semibold text-gray-700 mb-2">
-                <i class="fas fa-lock text-gray-500 mr-1"></i>
+            <div class="form-group">
+              <label class="form-label">
+                <i class="fas fa-lock label-icon"></i>
                 Contraseña *
               </label>
               <input
                 formControlName="txtContrasenia"
                 placeholder="Mínimo 6 caracteres"
                 type="password"
-                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm"
+                class="form-input"
               />
               <app-validators [control]="frmUsuario.get('txtContrasenia')!"></app-validators>
             </div>
 
             <!-- Rol -->
-            <div class="lg:col-span-1">
-              <label class="block text-sm font-semibold text-gray-700 mb-2">
-                <i class="fas fa-user-tag text-gray-500 mr-1"></i>
+            <div class="form-group">
+              <label class="form-label">
+                <i class="fas fa-user-tag label-icon"></i>
                 Rol del Sistema *
               </label>
               <select 
                 formControlName="cbxRoles" 
                 (change)="onRoleChange($event)"
-                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm cursor-pointer"
+                class="form-select"
               >
-                <option value="" disabled class="text-gray-400">Seleccione un rol</option>
-                <option *ngFor="let rol of listaRoles" [value]="rol.codigo" class="text-gray-900">
+                <option value="" disabled>Seleccione un rol</option>
+                <option *ngFor="let rol of listaRoles" [value]="rol.codigo">
                   {{ rol.nombre }}
                 </option>
               </select>
@@ -86,17 +86,17 @@
             </div>
 
             <!-- Médico (Solo si el rol es médico) -->
-            <div class="lg:col-span-1" *ngIf="isMedicoSelected">
-              <label class="block text-sm font-semibold text-gray-700 mb-2">
-                <i class="fas fa-user-md text-gray-500 mr-1"></i>
+            <div class="form-group" *ngIf="isMedicoSelected">
+              <label class="form-label">
+                <i class="fas fa-user-md label-icon"></i>
                 Médico Asignado *
               </label>
               <select 
                 formControlName="cbxMedicos"
-                class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 hover:bg-white hover:shadow-sm cursor-pointer"
+                class="form-select"
               >
-                <option value="" disabled class="text-gray-400">Seleccione un médico</option>
-                <option *ngFor="let medico of listaMedicoSinUsuario" [value]="medico.codigo" class="text-gray-900">
+                <option value="" disabled>Seleccione un médico</option>
+                <option *ngFor="let medico of listaMedicoSinUsuario" [value]="medico.codigo">
                   Dr. {{ medico.nombre }} {{ medico.apellido }}
                 </option>
               </select>
@@ -104,17 +104,17 @@
             </div>
 
             <!-- Información adicional -->
-            <div class="lg:col-span-2">
-              <div class="bg-blue-50 p-4 rounded-lg">
-                <div class="flex items-start">
-                  <i class="fas fa-info-circle text-blue-500 mt-0.5 mr-2"></i>
-                  <div class="text-sm text-blue-700">
-                    <p class="font-medium mb-1">Información importante:</p>
-                    <ul class="list-disc list-inside space-y-1 text-xs">
+            <div class="form-grid__full">
+              <div class="badge--info info-box">
+                <div class="info-box__content">
+                  <i class="fas fa-info-circle info-box__icon"></i>
+                  <div>
+                    <p class="info-box__title">Información importante:</p>
+                    <ul class="info-box__list">
                       <li>El nombre de usuario debe ser único en el sistema</li>
                       <li>La contraseña debe tener al menos 6 caracteres</li>
-                      <li *ngIf="isMedicoSelected" class="text-orange-700 font-medium">
-                        <i class="fas fa-arrow-right mr-1"></i>
+                      <li *ngIf="isMedicoSelected" class="info-box__list-item--warning">
+                        <i class="fas fa-arrow-right info-box__list-icon"></i>
                         Al seleccionar "Médico" debe asignar un médico específico
                       </li>
                     </ul>
@@ -128,15 +128,15 @@
 
 
             <!-- Mensaje dinámico para rol médico -->
-            <div class="lg:col-span-2" *ngIf="isMedicoSelected">
-              <div class="bg-green-50 border-l-4 border-green-400 p-3 rounded-md">
-                <div class="flex">
-                  <div class="flex-shrink-0">
-                    <i class="fas fa-stethoscope text-green-400"></i>
+            <div class="form-grid__full" *ngIf="isMedicoSelected">
+              <div class="badge--success success-box">
+                <div class="success-box__content">
+                  <div>
+                    <i class="fas fa-stethoscope success-box__icon"></i>
                   </div>
-                  <div class="ml-3">
-                    <p class="text-sm text-green-700">
-                      <span class="font-medium">Rol Médico Seleccionado:</span> 
+                  <div>
+                    <p class="success-box__text">
+                      <span class="success-box__text-bold">Rol Médico Seleccionado:</span> 
                       Ahora debe seleccionar el médico que será asociado a este usuario.
                     </p>
                   </div>
@@ -152,20 +152,20 @@
      
 
       <!-- Action Buttons -->
-      <div class="flex items-center justify-end gap-4 mt-6">
+      <div class="actions-container">
         <button
           type="button"
           (click)="salirSinGuardar()"
-          class="px-6 py-3 bg-white text-gray-800 font-semibold rounded-lg shadow-md border border-gray-300 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 cursor-pointer"
+          class="btn btn--outline"
         >
-          <i class="fas fa-times mr-2"></i>
+          <i class="fas fa-times"></i>
           Cancelar
         </button>
         <button
           type="submit"
-          class="px-8 py-3 bg-white text-gray-800 font-semibold rounded-lg shadow-md border border-gray-300 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 cursor-pointer"
+          class="btn btn--primary"
         >
-          <i class="fas fa-save mr-2"></i>
+          <i class="fas fa-save"></i>
           {{ eventoUpdate ? 'Actualizar Usuario' : 'Guardar Usuario' }}
         </button>
       </div>
