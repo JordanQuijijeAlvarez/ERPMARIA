@@ -79,6 +79,20 @@ BEGIN
 END eliminar_usuario;
 /
 
+CREATE OR REPLACE PROCEDURE activar_usuario (
+    p_user_id IN usuario.user_id%TYPE
+) AS
+BEGIN
+
+    UPDATE usuario
+    SET 
+        user_estado = 1
+    WHERE user_id = p_user_id;
+    COMMIT;
+
+END activar_usuario;
+/
+
 CREATE OR REPLACE TRIGGER trg_auditoria_usuario
 AFTER INSERT OR UPDATE OR DELETE ON usuario
 FOR EACH ROW
