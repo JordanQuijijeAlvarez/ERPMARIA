@@ -32,5 +32,26 @@ exports.getRolesEstado = async (req, res) => {
 };
 
 exports.getRolId = async (req, res) => {
+  let connection;
 
+  try {
+    connection = await getConnection();
+
+    const result = await connection.execute(
+      `SELECT * FROM rol WHERE rol_id = :id AND rol_estado = 1`,
+      { id: req.query.id },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Rol no encontrado' });
+    }
+
+    res.json(formatearSalida(result.rows)[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  } finally {
+    if (connection) await connection.close();
+  }
 };
