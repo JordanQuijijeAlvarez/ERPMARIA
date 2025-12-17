@@ -18,7 +18,7 @@ exports.getUsuariosEstado = async (req, res) => {
 
     const result = await connection.execute(
       `SELECT * FROM VW_USUARIO_ROL WHERE user_estado = :estado`,
-      { estado: 1 },
+      { estado: req.query.estado },
       { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
 
@@ -31,7 +31,8 @@ exports.getUsuariosEstado = async (req, res) => {
   }
 };
 
-exports.getUsuarioId = async (req, res) => {};
+exports.getUsuarioId = async (req, res) => {
+};
 
 exports.registrarUsuario = async (req, res) => {};
 
