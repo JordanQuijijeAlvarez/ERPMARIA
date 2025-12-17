@@ -32,6 +32,28 @@ exports.getUsuariosEstado = async (req, res) => {
 };
 
 exports.getUsuarioId = async (req, res) => {
+  let connection;
+
+  try {
+    connection = await getConnection();
+
+    const result = await connection.execute(
+      `SELECT * FROM VW_USUARIO_ROL WHERE user_id = :id`,
+      { id: req.params.id },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    res.json(formatearSalida(result.rows)[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  } finally {
+    if (connection) await connection.close();
+  }
 };
 
 exports.registrarUsuario = async (req, res) => {
