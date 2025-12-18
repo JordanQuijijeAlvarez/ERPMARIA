@@ -5,19 +5,18 @@ import { FormsModule } from '@angular/forms';
 import { AlertService } from '../../../../servicios/Alertas/alertas.service';
 import { DirectivasModule } from '../../../../directivas/directivas.module';
 import { compraService } from '../../../../servicios/compras.service';
-
-// Asegúrate de importar tu servicio de compras
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-listacompras',
-  standalone: true, // Si usas standalone components
+  standalone: true,
   imports: [CommonModule, RouterModule, DirectivasModule, FormsModule],
-  templateUrl: './listacompras.component.html', // Asegúrate que el nombre coincida
-  styleUrl: './listacompras.component.css'     // Asegúrate que el nombre coincida
+  templateUrl: './listacompras.component.html',
+  styleUrl: './listacompras.component.css'
 })
 export class ListaComprasComponent implements OnInit {
 
-  // Arrays de datos
   Compras: any[] = [];
   filteredCompras: any[] = [];
   paginatedCompras: any[] = [];
@@ -36,53 +35,37 @@ export class ListaComprasComponent implements OnInit {
   mostrarDetalle = false;
   compraSeleccionadaId!: number;
   detalleCompra: any[] = [];
-  
-  // Totales para el modal
   totalDetalle = 0;
   iva = 0;
   subtiva = 0;
 
-  // Estado del Tab (1 = Activas, 0 = Anuladas)
   estadoActual: number = 1;
-
-
-  usuarioId: number = 1; // Reemplaza con la lógica para obtener el ID del usuario actual
+  usuarioId: number = 1; // Ajusta según tu auth service
 
   constructor(
     private router: Router,
     private ServicioAlertas: AlertService,
-    private ServicioCompras: compraService, // Inyectamos el servicio de compras
+    private ServicioCompras: compraService,
   ) { }
 
   ngOnInit(): void {
     this.listarComprasActivas(this.estadoActual);
   }
 
-  // ==========================================
-  // LÓGICA DE PESTAÑAS (TABS)
-  // ==========================================
   cambiarTab(estado: number) {
     this.estadoActual = estado;
-    this.currentPage = 1; 
-    this.searchTerm = ''; 
+    this.currentPage = 1;
+    this.searchTerm = '';
     this.isSearching = false;
     this.listarComprasActivas(estado);
   }
 
-  // ==========================================
-  // CARGA DE DATOS
-  // ==========================================
   listarComprasActivas(estado: number): void {
-    // this.ServicioAlertas.loading('Cargando compras...'); 
-    
+    // this.ServicioAlertas.loading('Cargando...');
     this.ServicioCompras.getComprasEstado(estado).subscribe({
       next: (res: any) => {
         // this.ServicioAlertas.close();
-        console.log('Compras recibidas:', res);
-        
-        // Convertir a array si viene null o un solo objeto
         this.Compras = Array.isArray(res) ? res : (res ? [res] : []);
-
         this.filteredCompras = [...this.Compras];
         this.totalItems = this.filteredCompras.length;
         this.calculatePagination();
@@ -90,103 +73,41 @@ export class ListaComprasComponent implements OnInit {
       },
       error: (err) => {
         // this.ServicioAlertas.close();
-        console.log('No se encontraron registros o error:', err);
-        
-        // Limpiar tablas si hay error o no hay datos
+        console.log('Error o sin datos:', err);
         this.Compras = [];
         this.filteredCompras = [];
         this.paginatedCompras = [];
         this.totalItems = 0;
-        this.currentPage = 1;
       },
     });
   }
 
-  // ==========================================
-  // ACCIONES PRINCIPALES
-  // ==========================================
-
-  // 1. ANULAR COMPRA (Cambia estado a 0)
-  anularCompra(id: number) {
-    this.ServicioAlertas.confirm(
-      'CONFIRMAR ANULACIÓN',
-      '¿Está seguro que desea anular la compra #' + id + '? Esto revertirá el stock ingresado.',
-      'Sí, anular',
-      'Cancelar'
-    ).then((result) => {
-      if (result.isConfirmed) {
-        this.ServicioCompras.AnularCompra(id).subscribe({
-          next: (res) => {
-            // Eliminar de la vista actual
-            this.Compras = this.Compras.filter((c) => c.COMPRA_ID !== id);
-            this.refrescarVistaDespuesDeAccion();
-            this.ServicioAlertas.eliminacionCorrecta(); // O mensaje personalizado "Compra Anulada"
-          },
-          error: (err) => {
-            this.ServicioAlertas.error('ERROR', 'No se pudo anular la compra.');
-            console.log(err);
-          },
-        });
-      }
-    });
-  }
-
-  // 2. CONFIRMAR RECEPCIÓN (Cambia estado registro de 'P' a 'R')
-  confirmarRecepcion(id: number) {
-    this.ServicioAlertas.confirm(
-      'RECIBIR MERCADERÍA',
-      '¿Confirma que ha recibido los productos de la compra #' + id + '? Esto actualizará el inventario.',
-      'Sí, recibir',
-      'Cancelar'
-    ).then((result) => {
-      if (result.isConfirmed) {
-        // Asumiendo que tienes este método en tu servicio
-        this.ServicioCompras.confirmarRecepcionCompra(id, this.usuarioId).subscribe({
-          next: (res) => {
-            this.ServicioAlertas.success('Mercadería recibida', 'El inventario ha sido actualizado.');
-            
-            // Actualizar el estado localmente para no recargar toda la lista
-            const compraIndex = this.Compras.findIndex(c => c.COMPRA_ID === id);
-            if (compraIndex !== -1) {
-              this.Compras[compraIndex].COMPRA_ESTADOREGISTRO = 'R'; // Cambiar a Recibido visualmente
-              this.refrescarVistaDespuesDeAccion();
-            }
-          },
-          error: (err) => {
-            this.ServicioAlertas.error('ERROR', 'No se pudo procesar la recepción.');
-            console.log(err);
-          }
-        });
-      }
-    });
-  }
-
-
-  ActualizarCompra(id: number): void {
-    this.router.navigate(['home/actualizarCompra', id]);
-  }
-
-  // ==========================================
-  // MODAL DE DETALLE
-  // ==========================================
+  // --- LÓGICA DEL MODAL ---
   verDetalle(id: number, total: number, iva: number) {
     this.compraSeleccionadaId = id;
     this.totalDetalle = total;
     this.iva = iva;
-    // Calculamos el subtotal asumiendo Total - IVA (ajusta según tu lógica de negocio)
     this.subtiva = total - iva; 
     
+    // Limpiar antes de cargar para evitar ver datos de la compra anterior
+    this.detalleCompra = []; 
     this.mostrarDetalle = true;
-    this.detalleCompra = []; // Limpiar anterior
 
     this.ServicioCompras.getDetalleCompras(id).subscribe({
       next: (res: any) => {
-    this.detalleCompra = res.detalle_compra ?? [];
-
-        console.log('Detalle de compra recibido:', this.detalleCompra);
+        // A veces el backend devuelve { detalle_compra: [...] } y a veces el array directo
+        // Ajustamos para ambos casos
+        if (res && res.detalle_compra) {
+          this.detalleCompra = res.detalle_compra;
+        } else if (Array.isArray(res)) {
+          this.detalleCompra = res;
+        } else {
+          this.detalleCompra = [];
+        }
       },
       error: (err) => {
-        console.log('Error al cargar detalle', err);
+        this.ServicioAlertas.error('Error', 'No se pudo cargar el detalle');
+        this.cerrarDetalle();
       }
     });
   }
@@ -196,44 +117,106 @@ export class ListaComprasComponent implements OnInit {
     this.detalleCompra = [];
   }
 
-  // ==========================================
-  // BUSQUEDA Y FILTROS
-  // ==========================================
-  onSearch(searchValue: string): void {
-    this.searchTerm = searchValue.toLowerCase().trim();
-    this.isSearching = this.searchTerm.length > 0;
-
-    if (this.isSearching) {
-      this.filteredCompras = this.Compras.filter(c =>
-        // Filtramos por ID (convirtiendo a string)
-        (c.COMPRA_ID + '').includes(this.searchTerm) ||
-        // Filtramos por Nombre de Proveedor (Manejo de nulls)
-        (c.PROVE_NOMBRE ? c.PROVE_NOMBRE.toLowerCase() : '').includes(this.searchTerm)
-      );
-    } else {
-      this.filteredCompras = [...this.Compras];
-    }
-
-    this.resetPaginationAfterFilter();
+  // --- ACCIONES DE COMPRA ---
+  anularCompra(id: number) {
+    this.ServicioAlertas.confirm(
+      'ANULAR COMPRA',
+      `¿Desea anular la compra #${id}? Esto revertirá el stock.`,
+      'Sí, anular', 'Cancelar'
+    ).then((res) => {
+      if (res.isConfirmed) {
+        this.ServicioCompras.AnularCompra(id).subscribe({
+          next: () => {
+            this.ServicioAlertas.eliminacionCorrecta();
+            this.listarComprasActivas(1);
+          },
+          error: () => this.ServicioAlertas.error('Error', 'No se pudo anular')
+        });
+      }
+    });
   }
 
-  clearSearch(): void {
-    this.searchTerm = '';
-    this.isSearching = false;
-    this.filteredCompras = [...this.Compras];
-    this.resetPaginationAfterFilter();
+  confirmarRecepcion(id: number) {
+    this.ServicioAlertas.confirm(
+      'RECIBIR MERCADERÍA',
+      `¿Confirmar recepción de la compra #${id}? Se sumará al stock.`,
+      'Sí, recibir', 'Cancelar'
+    ).then((res) => {
+      if (res.isConfirmed) {
+        this.ServicioCompras.confirmarRecepcionCompra(id, this.usuarioId).subscribe({
+          next: () => {
+            this.ServicioAlertas.success('Éxito', 'Inventario actualizado');
+            this.listarComprasActivas(1);
+          },
+          error: () => this.ServicioAlertas.error('Error', 'Fallo al confirmar')
+        });
+      }
+    });
   }
 
-  // ==========================================
-  // PAGINACIÓN
-  // ==========================================
+  ActualizarCompra(id: number) {
+    this.router.navigate(['home/actualizarCompra', id]);
+  }
+
+  // --- GENERACIÓN DE PDF (COMPRAS) ---
+  descargarFactura(compra: any) {
+    this.ServicioCompras.getDetalleCompras(compra.compra_id || compra.COMPRA_ID).subscribe((res: any) => {
+      // Obtener el array correcto
+      const detalles = Array.isArray(res) ? res : (res.detalle_compra || []);
+
+      const doc = new jsPDF();
+      
+      // Encabezado
+      doc.setFontSize(22);
+      doc.setTextColor(41, 128, 185);
+      doc.text('ORDEN DE COMPRA', 14, 20);
+
+      // Info Proveedor
+      doc.setFontSize(10);
+      doc.setTextColor(100);
+      doc.text(`Proveedor: ${compra.prove_nombre || compra.PROVE_NOMBRE}`, 14, 30);
+      doc.text(`RUC: ${compra.prove_ruc || compra.PROVE_RUC || '---'}`, 14, 35);
+      
+      // Info Compra (Derecha)
+      doc.text(`N° Orden: ${String(compra.compra_id || compra.COMPRA_ID).padStart(6, '0')}`, 150, 30);
+      const fecha = new Date(compra.compra_horafecha || compra.COMPRA_HORAFECHA);
+      doc.text(`Fecha: ${fecha.toLocaleDateString()}`, 150, 35);
+
+      // Tabla
+      const columnas = ['Producto', 'Cant.', 'Costo Unit.', 'Subtotal'];
+      const filas = detalles.map((det: any) => [
+        det.prod_nombre || det.PROD_NOMBRE,
+        det.detc_cantidad || det.DETC_CANTIDAD,
+        `$${parseFloat(det.detc_preciouni || det.DETC_PRECIOUNI).toFixed(2)}`,
+        `$${parseFloat(det.detc_subtotal || det.DETC_SUBTOTAL).toFixed(2)}`
+      ]);
+
+      autoTable(doc, {
+        startY: 45,
+        head: [columnas],
+        body: filas,
+        theme: 'grid',
+        headStyles: { fillColor: [41, 128, 185] },
+        columnStyles: {
+          2: { halign: 'right' },
+          3: { halign: 'right' }
+        }
+      });
+
+      // Totales
+      const finalY = (doc as any).lastAutoTable.finalY + 10;
+      const total = parseFloat(compra.compra_montototal || compra.COMPRA_TOTAL);
+      
+      doc.text(`Total a Pagar: $${total.toFixed(2)}`, 190, finalY, { align: 'right' });
+
+      doc.save(`Orden_Compra_${compra.compra_id || compra.COMPRA_ID}.pdf`);
+    });
+  }
+
+  // --- PAGINACIÓN Y BÚSQUEDA (Idéntico a Ventas) ---
   calculatePagination(): void {
-    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
-    if (this.totalPages === 0) this.totalPages = 1;
-    
-    if (this.currentPage > this.totalPages) {
-      this.currentPage = 1;
-    }
+    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage) || 1;
+    if (this.currentPage > this.totalPages) this.currentPage = 1;
   }
 
   updatePaginatedData(): void {
@@ -242,83 +225,48 @@ export class ListaComprasComponent implements OnInit {
     this.paginatedCompras = this.filteredCompras.slice(startIndex, endIndex);
   }
 
-  goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.updatePaginatedData();
+  onSearch(searchValue: string): void {
+    this.searchTerm = searchValue.toLowerCase().trim();
+    this.isSearching = this.searchTerm.length > 0;
+    if (this.isSearching) {
+      this.filteredCompras = this.Compras.filter(c =>
+        (c.compra_id + '').includes(this.searchTerm) ||
+        (c.prove_nombre || '').toLowerCase().includes(this.searchTerm)
+      );
+    } else {
+      this.filteredCompras = [...this.Compras];
     }
-  }
-
-  previousPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.updatePaginatedData();
-    }
-  }
-
-  nextPage(): void {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.updatePaginatedData();
-    }
-  }
-
-  changeItemsPerPage(newItemsPerPage: number): void {
-    this.itemsPerPage = newItemsPerPage;
-    this.currentPage = 1; 
+    this.totalItems = this.filteredCompras.length;
     this.calculatePagination();
     this.updatePaginatedData();
   }
 
-  getItemRange(): { start: number, end: number } {
-    if (this.totalItems === 0) return { start: 0, end: 0 };
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.isSearching = false;
+    this.filteredCompras = [...this.Compras];
+    this.totalItems = this.filteredCompras.length;
+    this.calculatePagination();
+    this.updatePaginatedData();
+  }
+
+  goToPage(page: number): void { this.currentPage = page; this.updatePaginatedData(); }
+  previousPage(): void { if (this.currentPage > 1) this.goToPage(this.currentPage - 1); }
+  nextPage(): void { if (this.currentPage < this.totalPages) this.goToPage(this.currentPage + 1); }
+  
+  changeItemsPerPage(n: number): void {
+    this.itemsPerPage = n;
+    this.calculatePagination();
+    this.updatePaginatedData();
+  }
+
+  getItemRange() {
     const start = (this.currentPage - 1) * this.itemsPerPage + 1;
     const end = Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
-    return { start, end };
+    return { start: this.totalItems ? start : 0, end };
   }
 
   getPageNumbers(): number[] {
-    const pages: number[] = [];
-    const maxPagesToShow = 5;
-
-    if (this.totalPages <= maxPagesToShow) {
-      for (let i = 1; i <= this.totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      const halfRange = Math.floor(maxPagesToShow / 2);
-      let start = Math.max(1, this.currentPage - halfRange);
-      let end = Math.min(this.totalPages, this.currentPage + halfRange);
-
-      if (this.currentPage <= halfRange) {
-        end = maxPagesToShow;
-      } else if (this.currentPage > this.totalPages - halfRange) {
-        start = this.totalPages - maxPagesToShow + 1;
-      }
-
-      for (let i = start; i <= end; i++) {
-        pages.push(i);
-      }
-    }
-    return pages;
-  }
-
-  // Helper para refrescar después de borrar o actualizar localmente
-  private refrescarVistaDespuesDeAccion(): void {
-    if (this.isSearching) {
-      this.onSearch(this.searchTerm);
-    } else {
-      this.filteredCompras = [...this.Compras];
-      this.resetPaginationAfterFilter();
-    }
-                this.listarComprasActivas(1);
-
-  }
-
-  private resetPaginationAfterFilter(): void {
-    this.totalItems = this.filteredCompras.length;
-    this.currentPage = 1;
-    this.calculatePagination();
-    this.updatePaginatedData();
+    return Array.from({ length: Math.min(5, this.totalPages) }, (_, i) => i + 1);
   }
 }

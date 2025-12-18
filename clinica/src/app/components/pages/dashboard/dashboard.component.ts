@@ -237,13 +237,16 @@ export class DashboardComponent implements OnInit {
       if (modalInstance) modalInstance.hide();
     }
   }
+abrirModalSinMovimiento() {
+    // 1. Validación inicial
+    if (!this.listaSinMovimiento || this.listaSinMovimiento.length === 0) {
+      console.warn('No hay datos para mostrar en el modal Sin Movimiento');
+      return;
+    }
 
-  // ==========================================
-  // MODAL SIN MOVIMIENTO (SWEETALERT2)
-  // ==========================================
-  abrirModalSinMovimiento() {
-    if (this.listaSinMovimiento.length === 0) return;
+    console.log('Abriendo modal con datos:', this.listaSinMovimiento); // Para depurar
 
+    // 2. Construcción segura del HTML
     let htmlTabla = `
       <div style="overflow-x: auto; max-height: 300px;">
         <table style="width: 100%; text-align: left; border-collapse: collapse; font-size: 0.9rem;">
@@ -258,18 +261,27 @@ export class DashboardComponent implements OnInit {
     `;
 
     this.listaSinMovimiento.forEach(item => {
+      // --- PROTECCIÓN DE DATOS ---
+      // Aseguramos que los valores existan antes de usarlos
+      const nombre = item.prod_nombre || 'Sin Nombre';
+      const codigo = item.prod_codbarra || '---';
+      
+      // Convertimos a número float, si falla o es null, usamos 0
+      const capital = parseFloat(item.capital_congelado || 0); 
+      const dias = item.dias_inactivo || 0;
+
       htmlTabla += `
         <tr style="border-bottom: 1px solid #e5e7eb;">
           <td style="padding: 8px;">
-            <div style="font-weight: bold; color: #1f2937;">${item.prod_nombre}</div>
-            <div style="font-size: 0.75rem; color: #9ca3af;">${item.prod_codbarra}</div>
+            <div style="font-weight: bold; color: #1f2937;">${nombre}</div>
+            <div style="font-size: 0.75rem; color: #9ca3af;">${codigo}</div>
           </td>
           <td style="padding: 8px; text-align: center; color: #dc2626; font-weight: bold;">
-            $${item.capital_congelado.toFixed(2)}
+            $${capital.toFixed(2)}
           </td>
           <td style="padding: 8px; text-align: center;">
             <span style="background: #f3e8ff; color: #7e22ce; padding: 2px 8px; border-radius: 99px; font-size: 0.75rem; font-weight: bold;">
-              ${item.dias_inactivo} días
+              ${dias} días
             </span>
           </td>
         </tr>
@@ -278,6 +290,7 @@ export class DashboardComponent implements OnInit {
 
     htmlTabla += `</tbody></table></div>`;
 
+    // 3. Disparar SweetAlert
     Swal.fire({
       title: '<strong>Productos Estancados</strong>',
       icon: 'info',
@@ -287,7 +300,7 @@ export class DashboardComponent implements OnInit {
       confirmButtonText: '<i class="fas fa-thumbs-up"></i> Entendido',
       confirmButtonColor: '#9333ea',
       width: '600px'
-    });
+    }).catch(err => console.error('Error al abrir SweetAlert:', err));
   }
 
   // ==========================================
