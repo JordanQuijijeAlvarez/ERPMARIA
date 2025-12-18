@@ -60,32 +60,32 @@ export const routes: Routes = [
 
       { path: 'perfil', component: PerfilComponent },
 
-      // Clientes (Ejemplo: solo rol "admin" puede crear/actualizar)
+      // Clientes (ADMINISTRADOR y CAJERO tienen permisos de READ y WRITE)
       {
         path: 'listarClientes',
         component: ListaclientesComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['ADMINISTRADOR'] },
+        data: { roles: ['ADMINISTRADOR', 'CAJERO'] },
       },
       {
         path: 'crearCliente',
         component: frmClientesComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['ADMINISTRADOR'] },
+        data: { roles: ['ADMINISTRADOR', 'CAJERO'] },
       },
       {
         path: 'actualizarCliente/:id',
         component: frmClientesComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['ADMINISTRADOR'] },
+        data: { roles: ['ADMINISTRADOR', 'CAJERO'] },
       },
 
-      // Productos (Ejemplo: solo rol "admin" puede crear/actualizar)
+      // Productos (CAJERO solo tiene READ, ADMINISTRADOR tiene full access)
       {
         path: 'listarProductos',
         component: ListaproductosComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['ADMINISTRADOR'] },
+        data: { roles: ['ADMINISTRADOR', 'CAJERO'] },
       },
       {
         path: 'creaproductos',
@@ -101,24 +101,24 @@ export const routes: Routes = [
       },
 
 
-      // VENTAS
+      // VENTAS (CAJERO tiene permisos READ y WRITE)
       {
         path: 'crearVenta',
         component: FrmventasComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['ADMINISTRADOR'] },
+        data: { roles: ['ADMINISTRADOR', 'CAJERO'] },
       },
        {
         path: 'listarVentas',
         component: listaVentasComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['ADMINISTRADOR'] },
+        data: { roles: ['ADMINISTRADOR', 'CAJERO'] },
       },
  {
         path: 'actualizarVenta/:id',
         component: FrmventasComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['ADMINISTRADOR'] },
+        data: { roles: ['ADMINISTRADOR', 'CAJERO'] },
       },
       
       // COMPRAS
@@ -183,12 +183,12 @@ export const routes: Routes = [
       },
 
          
-             // AUDITORIA
+             // AUDITORIA (CAJERO tiene permiso READ)
       {
         path: 'listarHistorial',
         component: ListahistorialComponent,
         canActivate: [RoleGuard],
-        data: { roles: ['ADMINISTRADOR'] },
+        data: { roles: ['ADMINISTRADOR', 'CAJERO'] },
       },
 
       // // Especialidades

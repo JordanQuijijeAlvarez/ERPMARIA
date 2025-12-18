@@ -96,8 +96,8 @@ export class FrmusuariosComponent {
   
     cargarUsuario(id: number): void {
       this.usuarioServ.LUsuariosId(id).subscribe({
-        next: (usuario) => {
-          console.log(usuario);
+        next: (usuario: any) => {
+          console.log('Usuario cargado:', usuario);
   
           this.frmUsuario.patchValue({
             txtNombres: usuario.user_nombres,
@@ -105,7 +105,10 @@ export class FrmusuariosComponent {
             txtNombreUsuario: usuario.user_username,
             txtContrasenia: '', // Dejar vacío por seguridad (contraseña encriptada)
             txtCorreoUsuario: usuario.user_correo,
+            cbxRoles: usuario.rol_id
           });
+
+          console.log('Rol ID cargado:', usuario.rol_id);
 
           // Hacer opcional la contraseña al editar (solo actualizar si se ingresa una nueva)
           this.frmUsuario.get('txtContrasenia')?.clearValidators();
@@ -167,11 +170,25 @@ export class FrmusuariosComponent {
     if (this.eventoUpdate) {
       // Validar si se ingresó una nueva contraseña
       const nuevaContrasenia = this.frmUsuario.value.txtContrasenia;
+      const rolSeleccionado = parseInt(this.frmUsuario.value.cbxRoles, 10);
       
+      console.log('Código usuario:', this.codigo);
+      console.log('Rol seleccionado:', rolSeleccionado);
+
       if (!nuevaContrasenia || nuevaContrasenia.trim() === '') {
         Swal.fire({
           title: 'Contraseña requerida',
           text: 'Debe ingresar la nueva contraseña para actualizar el usuario',
+          icon: 'warning',
+          confirmButtonText: 'Entendido'
+        });
+        return;
+      }
+
+      if (!rolSeleccionado || isNaN(rolSeleccionado)) {
+        Swal.fire({
+          title: 'Rol requerido',
+          text: 'Debe seleccionar un rol válido para el usuario',
           icon: 'warning',
           confirmButtonText: 'Entendido'
         });
@@ -187,15 +204,39 @@ export class FrmusuariosComponent {
         user_correo: this.frmUsuario.value.txtCorreoUsuario
       };
 
+      // Primero actualizar los datos del usuario
       this.usuarioServ.ActualizarUsuario(usuarioActualizar as any).subscribe({
         next: () => {
-          Swal.fire({
-            title: 'Usuario actualizado',
-            text: 'Los datos del usuario fueron actualizados con éxito.',
-            icon: 'success',
-            confirmButtonText: 'Aceptar',
-          }).then(() => {
-            this.router.navigate(['home/listausuarios']);
+          console.log('Usuario actualizado correctamente, ahora actualizando rol...');
+          console.log('Enviando a cambiarRolUsuario:', { user_id: this.codigo, rol_id: rolSeleccionado });
+          
+          // Luego actualizar el rol del usuario
+          this.usuarioServ.cambiarRolUsuario(this.codigo!, rolSeleccionado).subscribe({
+            next: (response) => {
+              console.log('Rol actualizado exitosamente:', response);
+              Swal.fire({
+                title: 'Usuario actualizado',
+                text: 'Los datos del usuario y su rol fueron actualizados con éxito.',
+                icon: 'success',
+                confirmButtonText: 'Aceptar',
+              }).then(() => {
+                this.router.navigate(['home/listarUsuarios']);
+              });
+            },
+            error: (err) => {
+              console.error('=== ERROR AL ACTUALIZAR ROL ===');
+              console.error('Error completo:', err);
+              console.error('Status:', err.status);
+              console.error('Error message:', err.error);
+              console.error('Datos enviados:', { user_id: this.codigo, rol_id: rolSeleccionado });
+              
+              Swal.fire({
+                title: 'Usuario actualizado parcialmente',
+                text: err.error?.message || 'Los datos se actualizaron pero hubo un problema al cambiar el rol.',
+                icon: 'warning',
+                confirmButtonText: 'Aceptar'
+              });
+            }
           });
         },
         error: (err) => {

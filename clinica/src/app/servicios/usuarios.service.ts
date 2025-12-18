@@ -62,6 +62,9 @@ export class UsuariosService {
     return this.http.put(`${this.urlServidor}/usuarios/password`, payload);
   }
 
+  cambiarRolUsuario(user_id: number, rol_id: number): Observable<any> {
+    return this.http.put(`${this.urlServidor}/usuarios/cambiar-rol`, { user_id, rol_id });
+  }
 
    ObtenerCorreoCifrado(username: string): Observable<any> {
 

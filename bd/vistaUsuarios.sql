@@ -5,6 +5,7 @@ SELECT
     u.user_apellidos,
     u.user_username,
     u.user_contrasenia,
+    r.rol_id,
     r.rol_nombre,
     u.user_correo,
     u.user_estado
