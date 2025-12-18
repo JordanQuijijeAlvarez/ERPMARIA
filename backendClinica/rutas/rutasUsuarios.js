@@ -31,6 +31,9 @@ router.put('/Actualizar', authenticateToken,
 router.put('/perfil', authenticateToken,
     controladorUsuarios.actualizarPerfil);
 
+router.put('/password', authenticateToken,
+    controladorUsuarios.cambiarContraseniaPerfil);
+
 router.put('/activar/:id', authenticateToken,
     controladorUsuarios.activarUsuario);
     

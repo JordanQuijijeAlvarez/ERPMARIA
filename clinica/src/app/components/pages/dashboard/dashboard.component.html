@@ -1,145 +1,134 @@
-<div class="container mx-auto px-4 py-6 font-sans">
+<div class="dashboard">
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8 animate-fade-in-down">
+    <section class="dashboard__stats-grid animate-fade-in-down">
 
-        <div *ngIf="listaAlertas.length > 0" (click)="abrirModalPrecios()"
-            class="bg-white rounded-2xl shadow-sm border border-red-100 p-5 flex items-center justify-between cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden h-28">
-            <div class="absolute right-0 top-0 h-full w-20 bg-gradient-to-l from-red-50 to-transparent"></div>
+        <article *ngIf="listaAlertas.length > 0" (click)="abrirModalPrecios()"
+            class="card card--interactive dashboard__stat-card dashboard__stat-card--alert">
             <div>
-                <p class="text-xs font-bold text-red-400 uppercase tracking-widest">Precios</p>
-                <div class="text-3xl font-black text-gray-800 mt-1">{{ listaAlertas.length }}</div>
-                <div class="text-xs text-red-500 font-medium">Requieren revisión</div>
+                <p class="dashboard__stat-label">Precios</p>
+                <div class="dashboard__stat-value">{{ listaAlertas.length }}</div>
+                <div class="dashboard__stat-helper">Requieren revisión</div>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-red-50 text-red-500 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+            <div class="dashboard__stat-icon">
                 <i class="fas fa-exclamation"></i>
             </div>
-        </div>
-        
-        <div *ngIf="listaAlertas.length === 0" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center justify-between opacity-80 h-28">
+        </article>
+
+        <article *ngIf="listaAlertas.length === 0" class="card dashboard__stat-card dashboard__stat-card--success">
             <div>
-                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Precios</p>
-                <div class="text-3xl font-black text-gray-800 mt-1">OK</div>
+                <p class="dashboard__stat-label">Precios</p>
+                <div class="dashboard__stat-value">OK</div>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-green-50 text-green-500 flex items-center justify-center text-xl">
+            <div class="dashboard__stat-icon">
                 <i class="fas fa-check"></i>
             </div>
-        </div>
+        </article>
 
-        <div *ngIf="listaStockBajo.length > 0" (click)="abrirModalStock()"
-            class="bg-white rounded-2xl shadow-sm border border-orange-100 p-5 flex items-center justify-between cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300 h-28">
+        <article *ngIf="listaStockBajo.length > 0" (click)="abrirModalStock()"
+            class="card card--interactive dashboard__stat-card dashboard__stat-card--warning">
             <div>
-                <p class="text-xs font-bold text-orange-400 uppercase tracking-widest">Stock Bajo</p>
-                <div class="text-3xl font-black text-gray-800 mt-1">{{ listaStockBajo.length }}</div>
-                <div class="text-xs text-orange-500 font-medium">Items críticos</div>
+                <p class="dashboard__stat-label">Stock Bajo</p>
+                <div class="dashboard__stat-value">{{ listaStockBajo.length }}</div>
+                <div class="dashboard__stat-helper">Items críticos</div>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center text-xl">
+            <div class="dashboard__stat-icon">
                 <i class="fas fa-box-open"></i>
             </div>
-        </div>
+        </article>
 
-        <div *ngIf="listaStockBajo.length === 0" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center justify-between opacity-80 h-28">
+        <article *ngIf="listaStockBajo.length === 0" class="card dashboard__stat-card dashboard__stat-card--info">
             <div>
-                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Inventario</p>
-                <div class="text-3xl font-black text-gray-800 mt-1">OK</div>
+                <p class="dashboard__stat-label">Inventario</p>
+                <div class="dashboard__stat-value">OK</div>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center text-xl">
+            <div class="dashboard__stat-icon">
                 <i class="fas fa-clipboard-check"></i>
             </div>
-        </div>
+        </article>
 
-        <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-md p-5 flex items-center justify-between h-28 text-white">
+        <article class="card dashboard__stat-card dashboard__stat-card--sales">
             <div>
-                <p class="text-xs font-bold text-blue-200 uppercase tracking-widest">Ventas Hoy</p>
-                <div class="text-3xl font-black mt-1">${{ kpiVentas?.venta_hoy || 0 | number:'1.2-2' }}</div>
-                <div class="text-[10px] text-blue-100 mt-1 flex items-center gap-1">
+                <p class="dashboard__stat-label">Ventas Hoy</p>
+                <div class="dashboard__stat-value dashboard__stat-value--accent">${{ kpiVentas?.venta_hoy || 0 | number:'1.2-2' }}</div>
+                <div class="dashboard__stat-trend">
                     <i *ngIf="kpiVentas?.venta_hoy >= kpiVentas?.venta_ayer" class="fas fa-arrow-up"></i>
                     <i *ngIf="kpiVentas?.venta_hoy < kpiVentas?.venta_ayer" class="fas fa-arrow-down"></i>
                     vs Ayer: ${{ kpiVentas?.venta_ayer }}
                 </div>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center text-xl backdrop-blur-sm">
+            <div class="dashboard__stat-icon">
                 <i class="fas fa-wallet"></i>
             </div>
-        </div>
+        </article>
 
-        <div *ngIf="listaSinMovimiento.length > 0" (click)="abrirModalSinMovimiento()"
-            class="bg-white rounded-2xl shadow-sm border border-purple-100 p-5 flex items-center justify-between cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group h-28">
+        <article *ngIf="listaSinMovimiento.length > 0" (click)="abrirModalSinMovimiento()"
+            class="card card--interactive dashboard__stat-card dashboard__stat-card--secondary">
             <div>
-                <p class="text-xs font-bold text-purple-400 uppercase tracking-widest">Estancados</p>
-                <div class="text-3xl font-black text-gray-800 mt-1">{{ listaSinMovimiento.length }}</div>
-                <div class="text-xs text-purple-500 font-medium">+30 días sin venta</div>
+                <p class="dashboard__stat-label">Estancados</p>
+                <div class="dashboard__stat-value">{{ listaSinMovimiento.length }}</div>
+                <div class="dashboard__stat-helper">+30 días sin venta</div>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-500 flex items-center justify-center text-xl group-hover:rotate-12 transition-transform">
+            <div class="dashboard__stat-icon">
                 <i class="fas fa-hourglass-half"></i>
             </div>
-        </div>
+        </article>
 
-        <div *ngIf="listaSinMovimiento.length === 0" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center justify-between opacity-80 h-28">
+        <article *ngIf="listaSinMovimiento.length === 0" class="card dashboard__stat-card dashboard__stat-card--neutral">
             <div>
-                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Rotación</p>
-                <div class="text-3xl font-black text-gray-800 mt-1">100%</div>
+                <p class="dashboard__stat-label">Rotación</p>
+                <div class="dashboard__stat-value">100%</div>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-gray-100 text-gray-400 flex items-center justify-center text-xl">
+            <div class="dashboard__stat-icon">
                 <i class="fas fa-sync"></i>
             </div>
-        </div>
+        </article>
 
-    </div>
+    </section>
 
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 animate-fade-in-down">
+    <section class="dashboard__charts-grid animate-fade-in-down">
         
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-96">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-gray-700">Evolución de Ventas</h3>
-                <div class="flex bg-gray-100 rounded-lg p-1">
-                    <button (click)="cambiarRango(7)" class="px-3 py-1 text-xs font-bold rounded-md transition-all" [ngClass]="rangoSeleccionado === 7 ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'">7D</button>
-                    <button (click)="cambiarRango(15)" class="px-3 py-1 text-xs font-bold rounded-md transition-all" [ngClass]="rangoSeleccionado === 15 ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'">15D</button>
-                    <button (click)="cambiarRango(30)" class="px-3 py-1 text-xs font-bold rounded-md transition-all" [ngClass]="rangoSeleccionado === 30 ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'">30D</button>
+        <article class="card dashboard__chart-card">
+            <div class="dashboard__chart-header">
+                <h3 class="dashboard__chart-title">Evolución de Ventas</h3>
+                <div class="dashboard__range">
+                    <button type="button" class="dashboard__range-btn" [ngClass]="{ 'dashboard__range-btn--active': rangoSeleccionado === 7 }" (click)="cambiarRango(7)">7D</button>
+                    <button type="button" class="dashboard__range-btn" [ngClass]="{ 'dashboard__range-btn--active': rangoSeleccionado === 15 }" (click)="cambiarRango(15)">15D</button>
+                    <button type="button" class="dashboard__range-btn" [ngClass]="{ 'dashboard__range-btn--active': rangoSeleccionado === 30 }" (click)="cambiarRango(30)">30D</button>
                 </div>
             </div>
-            <div class="flex-1 w-full min-h-0 relative"> 
+            <div class="dashboard__chart-body">
                 <canvas baseChart [data]="lineChartData" [options]="lineChartOptions" [type]="'line'"></canvas>
             </div>
-        </div>
+        </article>
 
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col h-96">
-            <h3 class="text-lg font-bold text-gray-700 mb-4">Top 5 Productos Más Vendidos</h3>
-            <div class="flex-1 w-full min-h-0 relative">
+        <article class="card dashboard__chart-card">
+            <h3 class="dashboard__chart-title">Top 5 Productos Más Vendidos</h3>
+            <div class="dashboard__chart-body">
                 <canvas baseChart [data]="barChartData" [options]="barChartOptions" [type]="'bar'"></canvas>
             </div>
-        </div>
+        </article>
 
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 animate-fade-in-down">
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h3 class="text-lg font-bold text-gray-700 mb-4">Balance del Mes</h3>
-            <div class="h-48 flex justify-center">
-                <canvas baseChart [data]="doughnutChartData" [type]="'doughnut'"></canvas>
+        <article class="card dashboard__chart-card">
+            <h3 class="dashboard__chart-title">Balance del Mes</h3>
+            <div class="dashboard__chart-body">
+                <canvas baseChart [data]="doughnutChartData" [options]="doughnutChartOptions" [type]="'doughnut'"></canvas>
             </div>
-            <div class="mt-4 text-center text-sm text-gray-500">
+            <div class="dashboard__chart-note">
                 Comparativa de Ingresos por ventas vs Egresos por compras.
             </div>
-        </div>
+        </article>
 
-        <div class="lg:col-span-2 bg-gradient-to-r from-blue-600 to-blue-800 p-8 rounded-2xl shadow-md text-white flex flex-col justify-center items-start">
-            <h2 class="text-3xl font-black mb-2">¡Todo listo para hoy!</h2>
-            <p class="opacity-90 mb-8 text-lg">Recuerda revisar el stock crítico antes de cerrar el día para evitar quiebres de stock mañana.</p>
-            <button (click)="abrirModalStock()" class="bg-white text-blue-700 px-8 py-3 rounded-xl font-bold shadow hover:bg-gray-100 hover:scale-105 transition-all">
-                Ver Inventario Ahora <i class="fas fa-arrow-right ml-2"></i>
-            </button>
-        </div>
-    </div>
+    </section>
 
 
     <div class="modal fade animate-pop-in" id="modalPreciosBootstrap" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 1.5rem;">
+            <div class="modal-content dashboard__modal">
                 
-                <div class="modal-header border-bottom-0 pt-4 px-4 bg-white">
-                    <h5 class="modal-title fw-bold text-dark fs-3 d-flex align-items-center">
-                        <i class="fas fa-hand-holding-usd text-primary me-2"></i>
+                <div class="modal-header dashboard__modal-header">
+                    <h5 class="modal-title d-flex align-items-center">
+                        <i class="fas fa-hand-holding-usd me-2"></i>
                         Ajuste de Rentabilidad
                     </h5>
                     <button type="button" class="btn-close" (click)="cerrarModalPrecios()"></button>
@@ -148,8 +137,8 @@
                 <div class="modal-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
-                            <thead class="bg-light sticky-top">
-                                <tr class="text-muted small text-uppercase">
+                            <thead class="sticky-top">
+                                <tr>
                                     <th class="ps-4 py-3">Producto</th>
                                     <th class="text-center">Costo</th>
                                     <th class="text-center">Venta actual</th>
@@ -160,28 +149,28 @@
                             <tbody>
                                 <tr *ngFor="let item of listaAlertas">
                                     <td class="ps-4 py-3">
-                                        <div class="fw-bold text-dark">{{ item.prod_nombre }}</div>
-                                        <small class="text-muted">{{ item.prod_codbarra }}</small>
+                                        <div class="dashboard__table-title">{{ item.prod_nombre }}</div>
+                                        <small class="dashboard__table-subtitle">{{ item.prod_codbarra }}</small>
                                     </td>
                                     <td class="text-center">
-                                        <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-3">
+                                        <span class="badge badge--danger">
                                             ${{ item.prod_preciocompra | number:'1.2-2' }}
                                         </span>
                                     </td>
-                                    <td class="text-center text-muted text-decoration-line-through">
+                                    <td class="text-center dashboard__price-old">
                                         ${{ item.prod_precioventa | number:'1.2-2' }}
                                     </td>
                                     <td class="text-center">
-                                        <div class="input-group input-group-sm mx-auto" style="max-width: 150px;">
-                                            <span class="input-group-text bg-white text-muted">$</span>
-                                            <input type="number" [(ngModel)]="item.nuevo_precio" class="form-control text-center fw-bold text-dark border-secondary-subtle">
+                                        <div class="dashboard__price-input">
+                                            <span>$</span>
+                                            <input type="number" [(ngModel)]="item.nuevo_precio">
                                         </div>
-                                        <div class="text-primary mt-1" style="font-size: 0.75rem;">
+                                        <div class="dashboard__price-suggested">
                                             Sugerido: ${{ item.precio_sugerido }}
                                         </div>
                                     </td>
                                     <td class="text-center">
-                                        <button (click)="guardarPrecioIndividual(item)" class="btn btn-primary btn-sm rounded-circle shadow-sm" title="Guardar">
+                                        <button type="button" (click)="guardarPrecioIndividual(item)" class="btn btn--primary btn--icon" title="Guardar">
                                             <i class="fas fa-check"></i>
                                         </button>
                                     </td>
@@ -191,8 +180,8 @@
                     </div>
                 </div>
 
-                <div class="modal-footer border-top-0 pb-4 px-4">
-                    <button type="button" class="btn btn-light px-4 fw-bold" (click)="cerrarModalPrecios()">Cerrar</button>
+                <div class="modal-footer dashboard__modal-footer">
+                    <button type="button" class="btn btn--outline" (click)="cerrarModalPrecios()">Cerrar</button>
                 </div>
             </div>
         </div>
@@ -201,11 +190,11 @@
 
     <div class="modal fade animate-pop-in" id="modalStockBootstrap" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 1.5rem;">
+            <div class="modal-content dashboard__modal">
                 
-                <div class="modal-header border-bottom-0 pt-4 px-4 bg-white">
-                    <h5 class="modal-title fw-bold text-dark fs-3 d-flex align-items-center">
-                        <i class="fas fa-boxes text-warning me-2"></i>
+                <div class="modal-header dashboard__modal-header">
+                    <h5 class="modal-title d-flex align-items-center">
+                        <i class="fas fa-boxes me-2"></i>
                         Reabastecer Inventario
                     </h5>
                     <button type="button" class="btn-close" (click)="cerrarModalStock()"></button>
@@ -214,8 +203,8 @@
                 <div class="modal-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
-                            <thead class="bg-light sticky-top">
-                                <tr class="text-muted small text-uppercase">
+                            <thead class="sticky-top">
+                                <tr>
                                     <th class="ps-4 py-3 text-center" style="width: 50px;">
                                         <i class="fas fa-check-square"></i>
                                     </th>
@@ -226,9 +215,9 @@
                             </thead>
                             <tbody>
                                 <tr *ngFor="let item of listaStockBajo" 
-                                    class="cursor-pointer" 
+                                    class="dashboard__table-row" 
                                     (click)="item.selected = !item.selected"
-                                    [class.table-warning]="item.selected">
+                                    [class.dashboard__table-row--selected]="item.selected">
                                     
                                     <td class="ps-4 py-3 text-center">
                                         <div class="form-check d-flex justify-content-center">
@@ -237,17 +226,17 @@
                                     </td>
                                     
                                     <td>
-                                        <div class="fw-bold text-dark">{{ item.prod_nombre }}</div>
-                                        <small class="text-muted">{{ item.prod_codbarra }}</small>
+                                        <div class="dashboard__table-title">{{ item.prod_nombre }}</div>
+                                        <small class="dashboard__table-subtitle">{{ item.prod_codbarra }}</small>
                                     </td>
                                     
                                     <td class="text-center">
-                                        <span class="fw-bold text-danger">{{ item.prod_stock }}</span>
-                                        <small class="text-muted ms-1">/ {{ item.PROD_STOCKMIN }} min</small>
+                                        <span class="dashboard__stock-critical">{{ item.prod_stock }}</span>
+                                        <small class="dashboard__table-subtitle">/ {{ item.prod_stock_minimo }} min</small>
                                     </td>
                                     
                                     <td class="text-center">
-                                        <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-3 py-2">
+                                        <span class="badge badge--primary">
                                             +{{ item.cantidad_sugerida }} un.
                                         </span>
                                     </td>
@@ -257,10 +246,10 @@
                     </div>
                 </div>
 
-                <div class="modal-footer border-top-0 pb-4 px-4">
-                    <button type="button" class="btn btn-light px-4 fw-bold me-2" (click)="cerrarModalStock()">Cancelar</button>
-                    <button type="button" class="btn btn-warning text-white px-4 fw-bold shadow-sm" (click)="irACompraConItems()">
-                        Generar Orden de Compra <i class="fas fa-arrow-right ms-2"></i>
+                <div class="modal-footer dashboard__modal-footer">
+                    <button type="button" class="btn btn--outline" (click)="cerrarModalStock()">Cancelar</button>
+                    <button type="button" class="btn btn--warning" (click)="irACompraConItems()">
+                        Generar Orden de Compra <i class="fas fa-arrow-right"></i>
                     </button>
                 </div>
             </div>

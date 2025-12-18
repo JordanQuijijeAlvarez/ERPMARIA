@@ -1,65 +1,232 @@
 <div class="perfil">
-  <div class="perfil__card">
-    <div class="perfil__header">
-      <h1 class="perfil__title">Mi perfil</h1>
-      <p class="perfil__subtitle">Puedes editar tus datos (sin cambiar rol)</p>
+  <div class="perfil__pageHeader">
+    <div class="perfil__pageTitle">
+      <i class="fa fa-user perfil__pageIcon" aria-hidden="true"></i>
+      <div>
+        <h1 class="perfil__title">Mi perfil</h1>
+        <p class="perfil__subtitle">Tus datos personales y seguridad</p>
+      </div>
     </div>
 
-    <div *ngIf="loading" class="perfil__loading">Cargando...</div>
+    <div class="perfil__pageActions" *ngIf="!loading">
+      <button
+        class="perfil__btn perfil__btn--primary"
+        type="button"
+        *ngIf="!editandoPerfil"
+        (click)="habilitarEdicion()"
+      >
+        <i class="fa fa-pen" aria-hidden="true"></i>
+        Editar perfil
+      </button>
 
-    <div *ngIf="!loading" class="perfil__content">
-      <div class="perfil__meta" *ngIf="perfil">
-        <div class="perfil__meta-item">
-          <span class="perfil__meta-label">Rol</span>
-          <span class="perfil__meta-value">{{ perfil.rol_nombre }}</span>
+      <button
+        class="perfil__btn perfil__btn--cancel"
+        type="button"
+        *ngIf="editandoPerfil"
+        (click)="cancelarEdicion()"
+      >
+        <i class="fa fa-xmark" aria-hidden="true"></i>
+        Cancelar
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="perfil__loading">
+    <i class="fa fa-circle-notch fa-spin" aria-hidden="true"></i>
+    Cargando tu perfil...
+  </div>
+
+  <div *ngIf="!loading" class="perfil__layout">
+    <!-- Datos de Perfil -->
+    <section class="perfil__card">
+      <div class="perfil__cardHeader">
+        <div class="perfil__cardTitle">
+          <i class="fa fa-id-card" aria-hidden="true"></i>
+          <h2>Datos del perfil</h2>
+        </div>
+
+        <div class="perfil__role" *ngIf="perfil">
+          <span class="perfil__roleLabel">Rol</span>
+          <span class="perfil__roleValue">{{ perfil.rol_nombre }}</span>
         </div>
       </div>
 
-      <form [formGroup]="form" (ngSubmit)="guardar()" class="perfil__form">
+      <form [formGroup]="perfilForm" (ngSubmit)="guardarPerfil()" class="perfil__form">
         <div class="perfil__grid">
           <div class="perfil__field">
-            <label class="perfil__label" for="user_nombres">Nombres</label>
+            <label class="perfil__label" for="user_nombres">
+              <i class="fa fa-signature" aria-hidden="true"></i>
+              Nombres
+            </label>
             <input id="user_nombres" class="perfil__input" type="text" formControlName="user_nombres" />
-            <small class="perfil__error" *ngIf="form.get('user_nombres')?.touched && form.get('user_nombres')?.invalid">
+            <small
+              class="perfil__error"
+              *ngIf="perfilForm.get('user_nombres')?.touched && perfilForm.get('user_nombres')?.invalid"
+            >
               Requerido
             </small>
           </div>
 
           <div class="perfil__field">
-            <label class="perfil__label" for="user_apellidos">Apellidos</label>
+            <label class="perfil__label" for="user_apellidos">
+              <i class="fa fa-signature" aria-hidden="true"></i>
+              Apellidos
+            </label>
             <input id="user_apellidos" class="perfil__input" type="text" formControlName="user_apellidos" />
-            <small class="perfil__error" *ngIf="form.get('user_apellidos')?.touched && form.get('user_apellidos')?.invalid">
+            <small
+              class="perfil__error"
+              *ngIf="perfilForm.get('user_apellidos')?.touched && perfilForm.get('user_apellidos')?.invalid"
+            >
               Requerido
             </small>
           </div>
 
           <div class="perfil__field">
-            <label class="perfil__label" for="user_username">Usuario</label>
+            <label class="perfil__label" for="user_username">
+              <i class="fa fa-at" aria-hidden="true"></i>
+              Usuario
+            </label>
             <input id="user_username" class="perfil__input" type="text" formControlName="user_username" />
-            <small class="perfil__error" *ngIf="form.get('user_username')?.touched && form.get('user_username')?.invalid">
+            <small
+              class="perfil__error"
+              *ngIf="perfilForm.get('user_username')?.touched && perfilForm.get('user_username')?.invalid"
+            >
               Requerido
             </small>
           </div>
 
           <div class="perfil__field">
-            <label class="perfil__label" for="user_correo">Correo</label>
+            <label class="perfil__label" for="user_correo">
+              <i class="fa fa-envelope" aria-hidden="true"></i>
+              Correo
+            </label>
             <input id="user_correo" class="perfil__input" type="email" formControlName="user_correo" />
-            <small class="perfil__error" *ngIf="form.get('user_correo')?.touched && form.get('user_correo')?.invalid">
+            <small
+              class="perfil__error"
+              *ngIf="perfilForm.get('user_correo')?.touched && perfilForm.get('user_correo')?.invalid"
+            >
               Ingresa un correo válido
             </small>
           </div>
         </div>
 
-        <div class="perfil__actions">
-          <button class="perfil__btn perfil__btn--primary" type="submit" [disabled]="saving">
-            {{ saving ? 'Guardando...' : 'Guardar cambios' }}
-          </button>
-
-          <button class="perfil__btn perfil__btn--secondary" type="button" (click)="irSetup2FA()">
-            Habilitar autenticación doble factor
+        <div class="perfil__actions" *ngIf="editandoPerfil">
+          <button class="perfil__btn perfil__btn--primary" type="submit" [disabled]="savingPerfil">
+            <i class="fa fa-floppy-disk" aria-hidden="true"></i>
+            {{ savingPerfil ? 'Guardando...' : 'Guardar cambios' }}
           </button>
         </div>
       </form>
-    </div>
+    </section>
+
+    <!-- Seguridad -->
+    <section class="perfil__card">
+      <div class="perfil__cardHeader">
+        <div class="perfil__cardTitle">
+          <i class="fa fa-shield-halved" aria-hidden="true"></i>
+          <h2>Seguridad</h2>
+        </div>
+      </div>
+
+      <div class="perfil__securityGrid">
+        <div class="perfil__securityItem">
+          <div class="perfil__securityText">
+            <h3>
+              <i class="fa fa-key" aria-hidden="true"></i>
+              Cambiar contraseña
+            </h3>
+            <p>Para cambiarla, ingresa tu contraseña anterior.</p>
+          </div>
+
+          <form [formGroup]="passwordForm" (ngSubmit)="cambiarContrasenia()" class="perfil__passwordForm">
+            <div class="perfil__grid">
+              <div class="perfil__field">
+                <label class="perfil__label" for="oldPassword">
+                  <i class="fa fa-lock" aria-hidden="true"></i>
+                  Contraseña anterior
+                </label>
+                <div class="perfil__inputGroup">
+                  <input
+                    id="oldPassword"
+                    class="perfil__input"
+                    [type]="showOldPassword ? 'text' : 'password'"
+                    formControlName="oldPassword"
+                    autocomplete="current-password"
+                  />
+                  <button
+                    class="perfil__iconBtn"
+                    type="button"
+                    (click)="toggleOldPassword()"
+                    [attr.aria-label]="showOldPassword ? 'Ocultar contraseña' : 'Ver contraseña'"
+                  >
+                    <i [class]="showOldPassword ? 'fa fa-eye-slash' : 'fa fa-eye'" aria-hidden="true"></i>
+                  </button>
+                </div>
+                <small
+                  class="perfil__error"
+                  *ngIf="passwordForm.get('oldPassword')?.touched && passwordForm.get('oldPassword')?.invalid"
+                >
+                  Requerido
+                </small>
+              </div>
+
+              <div class="perfil__field">
+                <label class="perfil__label" for="newPassword">
+                  <i class="fa fa-lock" aria-hidden="true"></i>
+                  Nueva contraseña
+                </label>
+                <div class="perfil__inputGroup">
+                  <input
+                    id="newPassword"
+                    class="perfil__input"
+                    [type]="showNewPassword ? 'text' : 'password'"
+                    formControlName="newPassword"
+                    autocomplete="new-password"
+                  />
+                  <button
+                    class="perfil__iconBtn"
+                    type="button"
+                    (click)="toggleNewPassword()"
+                    [attr.aria-label]="showNewPassword ? 'Ocultar contraseña' : 'Ver contraseña'"
+                  >
+                    <i [class]="showNewPassword ? 'fa fa-eye-slash' : 'fa fa-eye'" aria-hidden="true"></i>
+                  </button>
+                </div>
+                <small
+                  class="perfil__error"
+                  *ngIf="passwordForm.get('newPassword')?.touched && passwordForm.get('newPassword')?.invalid"
+                >
+                  Requerido
+                </small>
+              </div>
+            </div>
+
+            <div class="perfil__actions">
+              <button class="perfil__btn perfil__btn--primary" type="submit" [disabled]="savingPassword">
+                <i class="fa fa-key" aria-hidden="true"></i>
+                {{ savingPassword ? 'Actualizando...' : 'Actualizar contraseña' }}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="perfil__securityItem">
+          <div class="perfil__securityText">
+            <h3>
+              <i class="fa fa-mobile-screen" aria-hidden="true"></i>
+              Autenticación de dos factores
+            </h3>
+            <p>Activa 2FA para proteger tu cuenta con un código extra.</p>
+          </div>
+
+          <div class="perfil__actions">
+            <button class="perfil__btn perfil__btn--primary" type="button" (click)="irSetup2FA()">
+              <i class="fa fa-shield" aria-hidden="true"></i>
+              Habilitar autenticación doble factor
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 </div>

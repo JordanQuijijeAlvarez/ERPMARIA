@@ -1,122 +1,119 @@
+
 <div class="setup-2fa">
   <div class="setup-2fa__container">
-    <!-- Header -->
-    <div class="setup-2fa__header">
-      <button class="setup-2fa__back-btn" (click)="goBack()">
-        <i class="fas fa-arrow-left"></i>
-        Volver
-      </button>
-      <h1 class="setup-2fa__title">
-        <i class="fas fa-shield-alt"></i>
-        Autenticación de Dos Factores (2FA)
-      </h1>
-      <p class="setup-2fa__description">
-        Aumenta la seguridad de tu cuenta con autenticación de dos factores
-      </p>
-    </div>
-
-    <!-- Mensaje -->
-    <div *ngIf="message" 
-         [class]="'setup-2fa__message setup-2fa__message--' + messageType">
-      <i [class]="messageType === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle'"></i>
-      {{ message }}
-    </div>
-
-    <!-- Estado Actual -->
-    <div class="setup-2fa__status">
-      <div class="setup-2fa__status-card">
-        <div class="setup-2fa__status-icon" [class.active]="isEnabled">
-          <i [class]="isEnabled ? 'fas fa-lock' : 'fas fa-lock-open'"></i>
-        </div>
-        <div class="setup-2fa__status-info">
-          <h3>Estado: {{ isEnabled ? 'Activado' : 'Desactivado' }}</h3>
-          <p>{{ isEnabled ? 'Tu cuenta está protegida con 2FA' : 'Tu cuenta no tiene 2FA activado' }}</p>
-        </div>
-      </div>
-    </div>
-
     <!-- Sección de Configuración -->
     <div class="setup-2fa__content">
-      
-      <!-- Si no está habilitado: mostrar instrucciones y botón para configurar -->
-      <div *ngIf="!isEnabled && !showQR" class="setup-2fa__instructions">
-        <div class="setup-2fa__card">
-          <h2 class="setup-2fa__card-title">
-            <i class="fas fa-mobile-alt"></i>
-            ¿Cómo funciona?
-          </h2>
-          <ol class="setup-2fa__steps">
-            <li>
-              <strong>Descarga Google Authenticator</strong>
-              <p>Instala la app en tu teléfono desde la tienda de aplicaciones</p>
-            </li>
-            <li>
-              <strong>Escanea el código QR</strong>
-              <p>Usa la app para escanear el código que generaremos</p>
-            </li>
-            <li>
-              <strong>Ingresa el código</strong>
-              <p>La app generará códigos de 6 dígitos cada 30 segundos</p>
-            </li>
-            <li>
-              <strong>¡Listo!</strong>
-              <p>Necesitarás este código cada vez que inicies sesión</p>
-            </li>
-          </ol>
-          
-          <button 
-            class="setup-2fa__button setup-2fa__button--primary"
-            (click)="setup2FA()"
-            [disabled]="loading">
-            <i class="fas fa-qrcode"></i>
-            {{ loading ? 'Generando...' : 'Generar Código QR' }}
+
+      <!-- Si no está habilitado: todo en una sola card (split interno cuando showQR=true) -->
+      <div *ngIf="!isEnabled" class="setup-2fa__card">
+        <div class="setup-2fa__card-header">
+          <button class="setup-2fa__back-btn" (click)="goBack()">
+            <i class="fas fa-arrow-left"></i>
+            Volver
           </button>
+
+       </div>
+
+        <div class="setup-2fa__title-row">
+          <h1 class="setup-2fa__title">
+            <i class="fas fa-shield-alt"></i>
+            Autenticación de Dos Factores (2FA)
+          </h1>
+          <div
+            class="setup-2fa__status-text"
+            [class.setup-2fa__status-text--active]="isEnabled"
+            [class.setup-2fa__status-text--inactive]="!isEnabled">
+            <i [class]="isEnabled ? 'fas fa-lock' : 'fas fa-lock-open'"></i>
+            Estado: <span class="setup-2fa__status-value">{{ isEnabled ? 'Activado' : 'Desactivado' }}</span>
+          </div>
         </div>
-      </div>
+        <p class="setup-2fa__description">
+          Aumenta la seguridad de tu cuenta con autenticación de dos factores
+        </p>
 
-      <!-- Mostrar QR y formulario de verificación -->
-      <div *ngIf="showQR" class="setup-2fa__qr-section">
-        <div class="setup-2fa__card">
-          <h2 class="setup-2fa__card-title">
-            <i class="fas fa-qrcode"></i>
-            Escanea este código QR
-          </h2>
-          
-          <div class="setup-2fa__qr-container">
-            <img [src]="qrCode" alt="Código QR para 2FA" class="setup-2fa__qr-image">
+
+        <div class="setup-2fa__card-split" [class.setup-2fa__card-split--two]="showQR">
+          <div class="setup-2fa__instructions">
+            <h2 class="setup-2fa__card-title">
+              <i class="fas fa-mobile-alt"></i>
+              ¿Cómo funciona?
+            </h2>
+            <ol class="setup-2fa__steps">
+              <li>
+                <strong>Descarga Google Authenticator</strong>
+                <p>Instala la app en tu teléfono desde la tienda de aplicaciones</p>
+              </li>
+              <li>
+                <strong>Escanea el código QR</strong>
+                <p>Usa la app para escanear el código que generaremos</p>
+              </li>
+              <li>
+                <strong>Ingresa el código</strong>
+                <p>La app generará códigos de 6 dígitos cada 30 segundos</p>
+              </li>
+              <li>
+                <strong>¡Listo!</strong>
+                <p>Necesitarás este código cada vez que inicies sesión</p>
+              </li>
+            </ol>
+
+            <button
+              class="setup-2fa__button setup-2fa__button--primary"
+              (click)="setup2FA()"
+              [disabled]="loading">
+              <i class="fas fa-qrcode"></i>
+              {{ loading ? 'Generando...' : 'Generar Código QR' }}
+            </button>
           </div>
 
-          <div class="setup-2fa__secret">
-            <p><strong>Clave secreta manual:</strong></p>
-            <code>{{ secret }}</code>
-            <small>Guarda esta clave en un lugar seguro por si pierdes acceso a la app</small>
-          </div>
+          <!-- Panel derecho: QR y verificación -->
+          <div *ngIf="showQR" class="setup-2fa__qr-section">
+            <h2 class="setup-2fa__card-title">
+              <i class="fas fa-qrcode"></i>
+              Escanea este código QR
+            </h2>
 
+            <div class="setup-2fa__qr-container">
+              <img [src]="qrCode" alt="Código QR para 2FA" class="setup-2fa__qr-image">
+            </div>
+          </div>
+        </div>
+
+        <!-- Clave manual a ancho completo -->
+        <div *ngIf="showQR" class="setup-2fa__secret">
+          <p><strong>Clave secreta manual:</strong></p>
+          <code>{{ secret }}</code>
+          <small>Guarda esta clave en un lugar seguro por si pierdes acceso a la app</small>
+        </div>
+
+        <!-- Debajo: verificación (ancho completo) -->
+        <div *ngIf="showQR" class="setup-2fa__verify-section">
           <form [formGroup]="verificationForm" (ngSubmit)="verifyCode()" class="setup-2fa__form">
             <div class="setup-2fa__form-group">
               <label for="code">Ingresa el código de 6 dígitos:</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 id="code"
                 formControlName="code"
                 maxlength="6"
                 placeholder="000000"
                 class="setup-2fa__input"
                 [class.invalid]="verificationForm.get('code')?.invalid && verificationForm.get('code')?.touched">
-              <small *ngIf="verificationForm.get('code')?.invalid && verificationForm.get('code')?.touched" 
-                     class="setup-2fa__error">
+              <small
+                *ngIf="verificationForm.get('code')?.invalid && verificationForm.get('code')?.touched"
+                class="setup-2fa__error">
                 Debe ser un código de 6 dígitos
               </small>
             </div>
 
             <div class="setup-2fa__form-actions">
-              <button 
+              <button
                 type="button"
                 class="setup-2fa__button setup-2fa__button--secondary"
                 (click)="showQR = false">
                 Cancelar
               </button>
-              <button 
+              <button
                 type="submit"
                 class="setup-2fa__button setup-2fa__button--primary"
                 [disabled]="!verificationForm.valid || loading">
@@ -138,8 +135,8 @@
             <i class="fas fa-exclamation-triangle"></i>
             Necesitarás tu app de autenticación cada vez que inicies sesión.
           </p>
-          
-          <button 
+
+          <button
             class="setup-2fa__button setup-2fa__button--danger"
             (click)="disable2FA()"
             [disabled]="loading">
@@ -149,25 +146,6 @@
         </div>
       </div>
 
-    </div>
-
-    <!-- Apps compatibles -->
-    <div class="setup-2fa__apps">
-      <h3>Apps compatibles:</h3>
-      <div class="setup-2fa__apps-list">
-        <div class="setup-2fa__app">
-          <i class="fab fa-google"></i>
-          Google Authenticator
-        </div>
-        <div class="setup-2fa__app">
-          <i class="fas fa-mobile"></i>
-          Microsoft Authenticator
-        </div>
-        <div class="setup-2fa__app">
-          <i class="fas fa-key"></i>
-          Authy
-        </div>
-      </div>
     </div>
   </div>
 </div>
