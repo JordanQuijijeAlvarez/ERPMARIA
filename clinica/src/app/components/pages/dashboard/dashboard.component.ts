@@ -59,7 +59,11 @@ export class DashboardComponent implements OnInit {
       }
     ]
   };
-  public lineChartOptions: ChartOptions<'line'> = { responsive: true };
+  public lineChartOptions: ChartOptions<'line'> = { 
+    responsive: true,
+    maintainAspectRatio: true,
+    aspectRatio: 2
+  };
 
   // 2. Barras (Top Productos)
   public barChartData: ChartConfiguration<'bar'>['data'] = {
@@ -72,7 +76,11 @@ export class DashboardComponent implements OnInit {
       }
     ]
   };
-  public barChartOptions: ChartOptions<'bar'> = { responsive: true };
+  public barChartOptions: ChartOptions<'bar'> = { 
+    responsive: true,
+    maintainAspectRatio: true,
+    aspectRatio: 2
+  };
 
   // 3. Donut (Finanzas)
   public doughnutChartData: ChartConfiguration<'doughnut'>['data'] = {
@@ -84,6 +92,11 @@ export class DashboardComponent implements OnInit {
         hoverOffset: 4
       }
     ]
+  };
+  public doughnutChartOptions: ChartOptions<'doughnut'> = { 
+    responsive: true,
+    maintainAspectRatio: true,
+    aspectRatio: 1.5
   };
 
   // ==========================================
