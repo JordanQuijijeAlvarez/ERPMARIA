@@ -1201,10 +1201,10 @@ SELECT
     prod_nombre,
     prod_codbarra,
     prod_stock,
-    prod_stock_minimo,
+    PROD_STOCKMIN,
     prod_preciocompra,
     -- Sugerencia: Comprar lo que falta para llegar al mínimo + un margen (ej: 10 unidades extra)
-    (prod_stock_minimo - prod_stock) + 10 AS cantidad_sugerida
+    (PROD_STOCKMIN - prod_stock) + 10 AS cantidad_sugerida
 FROM PRODUCTO
-WHERE prod_stock <= prod_stock_minimo
+WHERE prod_stock <= PROD_STOCKMIN
   AND prod_estado = '1'; -- Solo productos activos

@@ -74,7 +74,7 @@ INSERT INTO USUARIO (
     user_nombres, user_apellidos, user_username, 
     user_contrasenia, user_correo
 ) VALUES (
-    'Kenneth', 'Administrador', 'kenneth',
+    'MARIA', 'Administrador', 'admin',
     '123456', NULL
 );
 
@@ -90,7 +90,7 @@ DECLARE
 BEGIN
     SELECT user_id INTO v_user_id
     FROM USUARIO
-    WHERE user_username = 'kenneth';
+    WHERE user_username = 'admin';
 
     SELECT rol_id INTO v_rol_id
     FROM ROL

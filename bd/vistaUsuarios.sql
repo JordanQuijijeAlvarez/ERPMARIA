@@ -12,5 +12,4 @@ FROM usuario u
 JOIN usuario_rol ur
     ON u.user_id = ur.user_id
 JOIN rol r
-    ON r.rol_id = ur.rol_id
-COMMIT;
+    ON r.rol_id = ur.rol_id;

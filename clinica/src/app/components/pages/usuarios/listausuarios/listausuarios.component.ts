@@ -61,13 +61,7 @@ export class ListausuariosComponent {
         console.log(res);
       },
       error: (err) => {
-        this.ServicioAlertas.infoEventoConfir(
-          'SESIÓN EXPIRADA',
-          'Inicie nuevamente sesión',
-          () => {
-            this.router.navigate(['/login']);
-          }
-        );
+       
       },
     });
   }

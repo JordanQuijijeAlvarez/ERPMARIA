@@ -99,6 +99,7 @@ CREATE TABLE PRODUCTO (
     prove_id          NUMBER ,
     prod_estado       CHAR(1) DEFAULT '1' CHECK (prod_estado IN ('0','1')) NOT NULL,
     prod_fechregistro DATE DEFAULT SYSDATE
+    prod_umedida      VARCHAR2(10)
 );
 
 
@@ -193,18 +194,22 @@ CREATE TABLE COMPRA (
     compra_horafecha     DATE NOT NULL,
     compra_montototal    NUMBER(10, 2) NOT NULL,
     compra_iva           NUMBER NOT NULL,
+    compra_subiva           NUMBER NOT NULL,
+    compra_descripcion   VARCHAR2(150),
     compra_estado        CHAR(1) CHECK (compra_estado IN ('0','1')) NOT NULL,
     compra_estadoregistro CHAR(1) DEFAULT '1' CHECK (compra_estadoregistro IN ('0','1')) NOT NULL,
     compra_fechregistro  DATE DEFAULT SYSDATE,
     local_id             NUMBER NOT NULL,
     prove_id             NUMBER NOT NULL,
     user_id              NUMBER NOT NULL
+
 );
 
 -- DETALLE_COMPRA
 CREATE TABLE DETALLE_COMPRA (
     detc_id              NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     detc_cantidad        NUMBER(10, 2) NOT NULL,
+    detc_preciouni      NUMBER(10, 2) NOT NULL,
     detc_subtotal        NUMBER(10, 2) NOT NULL,
     detc_estado          CHAR(1) CHECK (detc_estado IN ('0','1')) NOT NULL,
     detc_estadoregistro  CHAR(1) DEFAULT '1' CHECK (detc_estadoregistro IN ('0','1')) NOT NULL,
@@ -306,7 +311,30 @@ ALTER TABLE COMPRA DROP CONSTRAINT SYS_C007828;
 ALTER TABLE COMPRA ADD CONSTRAINT CK_COMPRA_ESTADOREGISTRO 
 CHECK (compra_estadoregistro IN ('P', 'R', '0', '1'));
 
-  ALTER TABLE PRODUCTO ADD prod_stock_minimo NUMBER DEFAULT 5;
-
-
   --ALERTA se agrego el campo prod_margenpg a la tabla producto para guardar el margen de ganancia por producto
+
+
+-- Tabla para almacenar configuración de autenticación de dos factores (2FA)
+CREATE TABLE USUARIO_2FA (
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    usuario_id NUMBER NOT NULL,
+    secret_2fa VARCHAR2(100),
+    enabled NUMBER(1) DEFAULT 0,
+    last_used_code VARCHAR2(10),
+    last_used_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_usuario_2fa FOREIGN KEY (usuario_id) REFERENCES USUARIO(user_id) ON DELETE CASCADE,
+    CONSTRAINT uk_usuario_2fa UNIQUE (usuario_id)
+);
+
+-- Índice para búsquedas rápidas por usuario
+CREATE INDEX idx_usuario_2fa_usuario_id ON USUARIO_2FA(usuario_id);
+
+-- Comentarios para documentación
+COMMENT ON TABLE USUARIO_2FA IS 'Almacena los secretos y configuración de autenticación de dos factores para usuarios';
+COMMENT ON COLUMN USUARIO_2FA.usuario_id IS 'ID del usuario (referencia a USUARIO.codigo)';
+COMMENT ON COLUMN USUARIO_2FA.secret_2fa IS 'Secreto base32 para generar códigos TOTP';
+COMMENT ON COLUMN USUARIO_2FA.enabled IS '1 si 2FA está activo, 0 si está deshabilitado';
+COMMENT ON COLUMN USUARIO_2FA.created_at IS 'Fecha de creación del registro';
+COMMENT ON COLUMN USUARIO_2FA.updated_at IS 'Fecha de última actualización';
