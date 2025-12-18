@@ -46,6 +46,11 @@ export class HeaderComponent implements OnInit {
   cerrarSesion(){
     this.alertaServ.preguntaRedireccion('¿CERRAR SESIÓN?', 'login');
   }
+
+  irPerfil(){
+    this.isDropdownOpen = false;
+    this.router.navigate(['/home/perfil']);
+  }
  
   
 }

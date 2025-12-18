@@ -45,6 +45,19 @@ export class UsuariosService {
     return this.http.put(`${this.urlServidor}/usuarios/Actualizar`, usuarios);
   }
 
+  obtenerMiPerfil(): Observable<any> {
+    return this.http.get(`${this.urlServidor}/usuarios/me`);
+  }
+
+  actualizarMiPerfil(payload: {
+    user_nombres: string;
+    user_apellidos: string;
+    user_username: string;
+    user_correo: string;
+  }): Observable<any> {
+    return this.http.put(`${this.urlServidor}/usuarios/perfil`, payload);
+  }
+
 
    ObtenerCorreoCifrado(username: string): Observable<any> {
 

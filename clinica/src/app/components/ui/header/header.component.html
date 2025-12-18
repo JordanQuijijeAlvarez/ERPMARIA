@@ -61,6 +61,15 @@
         
         <p style="color: black; text-align: center;">{{nombreUserAccedido.toUpperCase()}}</p>
         <p style="color: black; text-align: center;">{{rol.toUpperCase()}}</p>
+
+        <a
+          class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
+          (click)="irPerfil()"
+          style="text-align: center;"
+        >
+          Perfil
+        </a>
+
         <a
           class="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
         (click)="cerrarSesion()" style="text-align: center;">

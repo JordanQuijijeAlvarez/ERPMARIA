@@ -13,6 +13,9 @@ router.post('/reenviar-otp',
 router.get('/listar', authenticateToken,
     controladorUsuarios.getUsuariosEstado);
 
+router.get('/me', authenticateToken,
+    controladorUsuarios.getMe);
+
 router.get('/:id', authenticateToken,
     controladorUsuarios.getUsuarioId);
 
@@ -24,6 +27,9 @@ router.post('/Registrar', authenticateToken,
 
 router.put('/Actualizar', authenticateToken,
     controladorUsuarios.actualizarUsuario);
+
+router.put('/perfil', authenticateToken,
+    controladorUsuarios.actualizarPerfil);
 
 router.put('/activar/:id', authenticateToken,
     controladorUsuarios.activarUsuario);
