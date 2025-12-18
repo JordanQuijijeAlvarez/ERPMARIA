@@ -58,6 +58,10 @@ export class UsuariosService {
     return this.http.put(`${this.urlServidor}/usuarios/perfil`, payload);
   }
 
+  cambiarMiContrasenia(payload: { oldPassword: string; newPassword: string }): Observable<any> {
+    return this.http.put(`${this.urlServidor}/usuarios/password`, payload);
+  }
+
 
    ObtenerCorreoCifrado(username: string): Observable<any> {
 

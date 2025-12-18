@@ -114,6 +114,64 @@ exports.actualizarPerfil = async (req, res) => {
   }
 };
 
+exports.cambiarContraseniaPerfil = async (req, res) => {
+  let connection;
+
+  try {
+    const userId = getAuthenticatedUserId(req);
+    if (!userId) {
+      return res.status(401).json({ message: 'Token inválido (sin id de usuario).' });
+    }
+
+    const { oldPassword, newPassword } = req.body ?? {};
+
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ message: 'Debes enviar la contraseña anterior y la nueva contraseña.' });
+    }
+
+    connection = await getConnection();
+
+    const result = await connection.execute(
+      `
+      SELECT user_contrasenia
+      FROM USUARIO
+      WHERE user_id = :id
+      `,
+      { id: userId },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    if (!result.rows || result.rows.length === 0) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    const storedHash = result.rows[0].USER_CONTRASENIA;
+    const ok = await bcrypt.compare(oldPassword, storedHash);
+    if (!ok) {
+      return res.status(400).json({ message: 'La contraseña anterior es incorrecta.' });
+    }
+
+    const newHash = await bcrypt.hash(newPassword, 10);
+
+    await connection.execute(
+      `
+      UPDATE USUARIO
+      SET user_contrasenia = :hash
+      WHERE user_id = :id
+      `,
+      { id: userId, hash: newHash },
+      { autoCommit: true }
+    );
+
+    return res.json({ message: 'Contraseña actualizada correctamente' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: error.message });
+  } finally {
+    if (connection) await connection.close();
+  }
+};
+
 exports.getUsuariosEstado = async (req, res) => {
   let connection;
 
