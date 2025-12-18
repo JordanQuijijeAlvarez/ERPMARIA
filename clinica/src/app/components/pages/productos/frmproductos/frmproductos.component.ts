@@ -153,7 +153,7 @@ export class FrmproductoComponent {
               icon: 'success',
               confirmButtonText: 'Aceptar',
             }).then(() => {
-              this.router.navigate(['/home/listarproductos']);
+              this.router.navigate(['/home/listarProductos']);
             });
           },
           error: (err) => {
@@ -177,7 +177,7 @@ export class FrmproductoComponent {
               icon: 'success',
               confirmButtonText: 'Aceptar',
             }).then(() => {
-              this.router.navigate(['/home/listarproductos']);
+              this.router.navigate(['/home/listarProductos']);
             });
           },
           error: (err) => {
@@ -209,7 +209,7 @@ export class FrmproductoComponent {
       cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        this.router.navigate(['/home/listarproductos']);
+        this.router.navigate(['/home/listarProductos']);
       }
     });
   }
@@ -372,31 +372,57 @@ export class FrmproductoComponent {
     });
   }
   // Lógica de guardado (Ajustada para recibir el ID padre)
-  registrarSubcategoriaExpress(idPadre: number, nombreSub: string) {
+ registrarSubcategoriaExpress(idPadre: number, nombreSub: string) {
 
-    const nuevaSubcat: InSubcategoria = {
-      subcat_id: 0,
-      cat_id: idPadre,
-      subcat_nombre: nombreSub,
-      subcat_descripcion: ''
-    };
+    const nuevaSubcat: InSubcategoria = {
+      subcat_id: 0,
+      cat_id: idPadre,
+      subcat_nombre: nombreSub,
+      subcat_descripcion: ''
+    };
 
-    this.alertaServ.loading('Creando subcategoría...');
+    this.alertaServ.loading('Creando subcategoría...');
 
-    this.subcategoriaServ.CrearSubcategorias(nuevaSubcat).subscribe({
+    this.subcategoriaServ.CrearSubcategorias(nuevaSubcat).subscribe({
+      next: (res: any) => {
+        this.alertaServ.close();
+        this.alertaServ.success('Éxito', 'Subcategoría agregada');
+
+        // 1. Recargamos la lista del formulario principal
+        // IMPORTANTE: Pasamos una función callback para ejecutar DESPUÉS de cargar la lista
+        this.recargarListaYSeleccionar(res); 
+      },
+      error: (err) => {
+        console.error(err);
+        this.alertaServ.error('Error', 'No se pudo registrar');
+      }
+    });
+  }
+
+// Método auxiliar para recargar y seleccionar
+  recargarListaYSeleccionar(nuevaSubcatGuardada: any) {
+    this.subcategoriaServ.LSubcategoriasEstado(1).subscribe({
       next: (res) => {
-        this.alertaServ.close();
-        this.alertaServ.success('Éxito', 'Subcategoría agregada');
+        this.listaSubcategorias = res;
+        
+        // 2. Buscamos el ID correcto. 
+        // A veces el backend devuelve el objeto creado en 'res', o un mensaje.
+        // Si 'nuevaSubcatGuardada' tiene el ID, úsalo. Si no, búscalo por nombre en la lista nueva.
+        
+        let idParaSeleccionar = nuevaSubcatGuardada.subcat_id; // Opción A: Backend devuelve el objeto
 
-        // Recargamos la lista del formulario principal
-        this.listarSubcategoriaEstado(1);
+        if (!idParaSeleccionar) {
+           // Opción B: Si el backend no devuelve ID, buscamos por nombre en la lista recién cargada
+           const encontrada = this.listaSubcategorias.find(s => s.subcat_nombre === nuevaSubcatGuardada.subcat_nombre); // O usa el nombre que enviaste
+           if (encontrada) idParaSeleccionar = encontrada.subcat_id;
+        }
 
-        // (Opcional) Aquí podrías agregar la lógica para auto-seleccionar 
-        // la nueva subcategoría como hicimos antes
-      },
-      error: (err) => {
-        console.error(err);
-        this.alertaServ.error('Error', 'No se pudo registrar');
+        // 3. SELECCIONAR EN EL FORMULARIO
+        if (idParaSeleccionar) {
+            this.frmProducto.patchValue({
+                cbxSubcategoria: idParaSeleccionar
+            });
+        }
       }
     });
   }

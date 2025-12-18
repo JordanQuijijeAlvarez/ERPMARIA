@@ -71,7 +71,7 @@ export class FrmCategoriasComponent implements OnInit {
           'Error de Carga',
           'No se pudo obtener la información de la categoría'
         );
-        this.router.navigate(['home/listacategorias']);
+        this.router.navigate(['home/listarCategorias']);
       },
     });
   }
@@ -116,7 +116,7 @@ export class FrmCategoriasComponent implements OnInit {
       this.categoriaServ.ActualizarCategoria(categoria).subscribe({
         next: (res) => {
           this.alertaServ.success('Categoría actualizada con éxito.', '');
-          this.router.navigate(['home/listacategorias']);
+          this.router.navigate(['home/listarCategorias']);
         },
         error: (err) => {
           console.log('Error al actualizar:', err);
@@ -130,7 +130,7 @@ export class FrmCategoriasComponent implements OnInit {
       this.categoriaServ.CrearCategoria(categoria).subscribe({
         next: (res) => {
           this.alertaServ.success('Categoría registrada con éxito.', '');
-          this.router.navigate(['home/listacategorias']);
+          this.router.navigate(['home/listarCategorias']);
         },
         error: (err) => {
           console.log('Error al crear:', err);
@@ -164,7 +164,7 @@ export class FrmCategoriasComponent implements OnInit {
       cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        this.router.navigate(['/home/listacategoria']);
+        this.router.navigate(['/home/listarCategorias']);
       }
     });
   }

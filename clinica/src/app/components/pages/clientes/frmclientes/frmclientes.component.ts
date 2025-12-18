@@ -220,7 +220,7 @@ export class frmClientesComponent {
       this.clienteServ.Actualizarcliente(cliente).subscribe({
         next: (res) => {
           this.alertaServ.success('cliente actualizado con éxito.', '');
-          this.router.navigate(['home/listarclientes']);
+          this.router.navigate(['home/listarClientes']);
         },
         error: (err) => {
           console.log('Error al actualizar cliente:', err.error.msg);
@@ -234,7 +234,7 @@ export class frmClientesComponent {
       this.clienteServ.Crearcliente(cliente).subscribe({
         next: (res) => {
           this.alertaServ.success('cliente registrado con éxito.', '');
-          this.router.navigate(['home/listarclientes']);
+          this.router.navigate(['home/listarClientes']);
         },
         error: (err) => {
           console.log('Error al crear cliente:', err);
@@ -268,7 +268,7 @@ export class frmClientesComponent {
       cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        this.router.navigate(['/home/listaclientes']);
+        this.router.navigate(['/home/listarClientes']);
       }
     });
   }

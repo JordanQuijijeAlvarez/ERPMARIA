@@ -356,7 +356,7 @@ export class FrmventasComponent implements OnInit {
       this.ServicioVentas.ActualizarVenta(this.codigoventa, ventaObjeto).subscribe({
         next: () => {
           this.alertaServ.success('Actualizado', 'Venta modificada correctamente');
-          this.router.navigate(['home/listaventas']);
+          this.router.navigate(['home/listarVentas']);
         },
         error: () => this.alertaServ.error('Error', 'No se pudo actualizar.')
       });
@@ -364,7 +364,7 @@ export class FrmventasComponent implements OnInit {
       this.ServicioVentas.CrearVenta(ventaObjeto).subscribe({
         next: () => {
           this.alertaServ.success('Registrado', 'Venta creada exitosamente');
-          this.router.navigate(['home/listaventas']);
+          this.router.navigate(['home/listarVentas']);
         },
         error: () => this.alertaServ.error('Error', 'No se pudo registrar.')
       });
@@ -395,13 +395,13 @@ export class FrmventasComponent implements OnInit {
       },
       error: () => {
         this.alertaServ.error('Error', 'No se pudo cargar la venta');
-        this.router.navigate(['home/listaventas']);
+        this.router.navigate(['home/listarVentas']);
       }
     });
   }
 
   cancelarVenta() {
-    this.router.navigate(['home/listaventas']);
+    this.router.navigate(['home/listarVentas']);
   }
 
   // Getters
