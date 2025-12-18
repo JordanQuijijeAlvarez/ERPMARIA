@@ -6,7 +6,7 @@
 .sidebar {
 	width: 240px;
 	background: 
-		url('/assets/images/dodles.png') repeat,
+		/* url('/assets/images/dodles.png') repeat, */
 		linear-gradient(var(--color-primary-dark), var(--color-primary));
 	background-size: 200px auto, cover;
 	background-blend-mode: soft-light;

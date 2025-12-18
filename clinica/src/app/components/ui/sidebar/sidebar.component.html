@@ -24,11 +24,11 @@
       </li>
 
       <!-- COMERCIAL -->
-      <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR']">
+      <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR', 'CAJERO']">
         Comercial
       </p>
 
-      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR', 'CAJERO']">
         <a
           routerLink="listarClientes"
           routerLinkActive="sidebar__nav-link--active"
@@ -39,7 +39,7 @@
         </a>
       </li>
 
-      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR', 'CAJERO']">
         <a
           routerLink="listarVentas"
           routerLinkActive="sidebar__nav-link--active"
@@ -51,11 +51,11 @@
       </li>
 
       <!-- INVENTARIO -->
-      <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR']">
+      <p class="sidebar__section-title" *appMostrarSiRol="['ADMINISTRADOR', 'CAJERO']">
         Inventario
       </p>
 
-      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
+      <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR', 'CAJERO']">
         <a
           routerLink="listarProductos"
           routerLinkActive="sidebar__nav-link--active"
@@ -120,15 +120,15 @@
         </a>
       </li>
 
-       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR']">
-        <a
+       <li class="sidebar__nav-item" *appMostrarSiRol="['ADMINISTRADOR', 'CAJERO']">
+        <!-- <a
           routerLink="listarHistorial"
           routerLinkActive="sidebar__nav-link--active"
           class="sidebar__nav-link"
         >
           <i class="fa fa-users sidebar__icon"></i>
           <span>Historial</span>
-        </a>
+        </a> -->
       </li>
     </ul>
   </nav>
