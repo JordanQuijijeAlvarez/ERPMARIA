@@ -1,0 +1,65 @@
+<div class="perfil">
+  <div class="perfil__card">
+    <div class="perfil__header">
+      <h1 class="perfil__title">Mi perfil</h1>
+      <p class="perfil__subtitle">Puedes editar tus datos (sin cambiar rol)</p>
+    </div>
+
+    <div *ngIf="loading" class="perfil__loading">Cargando...</div>
+
+    <div *ngIf="!loading" class="perfil__content">
+      <div class="perfil__meta" *ngIf="perfil">
+        <div class="perfil__meta-item">
+          <span class="perfil__meta-label">Rol</span>
+          <span class="perfil__meta-value">{{ perfil.rol_nombre }}</span>
+        </div>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="guardar()" class="perfil__form">
+        <div class="perfil__grid">
+          <div class="perfil__field">
+            <label class="perfil__label" for="user_nombres">Nombres</label>
+            <input id="user_nombres" class="perfil__input" type="text" formControlName="user_nombres" />
+            <small class="perfil__error" *ngIf="form.get('user_nombres')?.touched && form.get('user_nombres')?.invalid">
+              Requerido
+            </small>
+          </div>
+
+          <div class="perfil__field">
+            <label class="perfil__label" for="user_apellidos">Apellidos</label>
+            <input id="user_apellidos" class="perfil__input" type="text" formControlName="user_apellidos" />
+            <small class="perfil__error" *ngIf="form.get('user_apellidos')?.touched && form.get('user_apellidos')?.invalid">
+              Requerido
+            </small>
+          </div>
+
+          <div class="perfil__field">
+            <label class="perfil__label" for="user_username">Usuario</label>
+            <input id="user_username" class="perfil__input" type="text" formControlName="user_username" />
+            <small class="perfil__error" *ngIf="form.get('user_username')?.touched && form.get('user_username')?.invalid">
+              Requerido
+            </small>
+          </div>
+
+          <div class="perfil__field">
+            <label class="perfil__label" for="user_correo">Correo</label>
+            <input id="user_correo" class="perfil__input" type="email" formControlName="user_correo" />
+            <small class="perfil__error" *ngIf="form.get('user_correo')?.touched && form.get('user_correo')?.invalid">
+              Ingresa un correo válido
+            </small>
+          </div>
+        </div>
+
+        <div class="perfil__actions">
+          <button class="perfil__btn perfil__btn--primary" type="submit" [disabled]="saving">
+            {{ saving ? 'Guardando...' : 'Guardar cambios' }}
+          </button>
+
+          <button class="perfil__btn perfil__btn--secondary" type="button" (click)="irSetup2FA()">
+            Habilitar autenticación doble factor
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

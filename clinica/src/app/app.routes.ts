@@ -29,6 +29,7 @@ import { ListaCategoriasComponent } from './components/pages/categorias/listacat
 import { ListaComprasComponent } from './components/pages/ventas copy/listacompras/listacompras.component';
 import { FrmComprasComponent } from './components/pages/ventas copy/frmcompras/frmcompras.component';
 import { ListahistorialComponent } from './components/pages/historial/listaproveedores/listahistorial.component';
+import { PerfilComponent } from './components/pages/perfil/perfil.component';
 
 export const routes: Routes = [
 
@@ -56,6 +57,8 @@ export const routes: Routes = [
 
       },
       { path: 'setup-2fa', component: Setup2faComponent },
+
+      { path: 'perfil', component: PerfilComponent },
 
       // Clientes (Ejemplo: solo rol "admin" puede crear/actualizar)
       {

@@ -11,6 +11,109 @@ function formatearSalida(rows) {
   });
 }
 
+function getAuthenticatedUserId(req) {
+  const id = req?.user?.id;
+  const parsed = Number(id);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
+exports.getMe = async (req, res) => {
+  let connection;
+
+  try {
+    const userId = getAuthenticatedUserId(req);
+    if (!userId) {
+      return res.status(401).json({ message: 'Token inválido (sin id de usuario).' });
+    }
+
+    connection = await getConnection();
+
+    const result = await connection.execute(
+      `
+      SELECT
+        user_id,
+        user_nombres,
+        user_apellidos,
+        user_username,
+        user_correo,
+        user_estado,
+        rol_nombre
+      FROM VW_USUARIO_ROL
+      WHERE user_id = :id
+      `,
+      { id: userId },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    if (!result.rows || result.rows.length === 0) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    return res.json(formatearSalida(result.rows)[0]);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: error.message });
+  } finally {
+    if (connection) await connection.close();
+  }
+};
+
+exports.actualizarPerfil = async (req, res) => {
+  let connection;
+
+  try {
+    const userId = getAuthenticatedUserId(req);
+    if (!userId) {
+      return res.status(401).json({ message: 'Token inválido (sin id de usuario).' });
+    }
+
+    const {
+      user_nombres,
+      user_apellidos,
+      user_username,
+      user_correo
+    } = req.body ?? {};
+
+    if (!user_nombres || !user_apellidos || !user_username || !user_correo) {
+      return res.status(400).json({ message: 'Faltan campos requeridos para actualizar el perfil.' });
+    }
+
+    connection = await getConnection();
+
+    await connection.execute(
+      `
+      UPDATE USUARIO
+      SET
+        user_nombres = :user_nombres,
+        user_apellidos = :user_apellidos,
+        user_username = :user_username,
+        user_correo = :user_correo
+      WHERE user_id = :user_id
+      `,
+      {
+        user_id: userId,
+        user_nombres,
+        user_apellidos,
+        user_username,
+        user_correo
+      },
+      { autoCommit: true }
+    );
+
+    return res.json({ message: 'Perfil actualizado correctamente' });
+  } catch (error) {
+    // ORA-00001: unique constraint violated (por ejemplo username único)
+    if (error && typeof error.message === 'string' && error.message.includes('ORA-00001')) {
+      return res.status(409).json({ message: 'El nombre de usuario ya existe. Intenta con otro.' });
+    }
+
+    console.error(error);
+    return res.status(500).json({ message: error.message });
+  } finally {
+    if (connection) await connection.close();
+  }
+};
+
 exports.getUsuariosEstado = async (req, res) => {
   let connection;
 
