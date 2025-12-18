@@ -8,6 +8,9 @@ router.get('/listar', authenticateToken,
 
 router.get('/:id', authenticateToken,
     controladorRoles.getRolId);
-    
+
+router.put('/cambiar-rol', authenticateToken,
+    controladorRoles.cambiarRolUsuario
+);    
 
 module.exports = router; 

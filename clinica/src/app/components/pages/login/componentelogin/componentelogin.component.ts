@@ -59,9 +59,18 @@ export class ComponenteloginComponent implements OnInit {
           this.formLogin.get('token2fa')?.setValidators([Validators.required, Validators.pattern(/^\d{6}$/)]);
           this.formLogin.get('token2fa')?.updateValueAndValidity();
         } else {
-          // Login exitoso
+          // Login exitoso - redirigir según rol
           console.log('Login exitoso, redirigiendo...');
-          this.router.navigate(['home/dashboard']);
+          const userRole = this.authservicio.obtenerRol();
+          
+          if (userRole === 'ADMINISTRADOR') {
+            this.router.navigate(['home/dashboard']);
+          } else if (userRole === 'CAJERO') {
+            this.router.navigate(['home/listarClientes']);
+          } else {
+            // Otros roles van al home por defecto
+            this.router.navigate(['home/']);
+          }
         }
       }, 
       error: err => {
