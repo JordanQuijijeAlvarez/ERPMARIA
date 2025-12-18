@@ -36,6 +36,9 @@ router.put('/password', authenticateToken,
 
 router.put('/activar/:id', authenticateToken,
     controladorUsuarios.activarUsuario);
+
+router.put('/cambiar-rol', authenticateToken,
+    controladorUsuarios.cambiarRolUsuario);
     
 router.post('/recuperar/correo', controladorLogin.obtenerCorreo);
 
