@@ -55,3 +55,36 @@ exports.getRolId = async (req, res) => {
     if (connection) await connection.close();
   }
 };
+
+exports.cambiarRolUsuario = async (req, res) => {
+  let connection;
+
+  const { user_id, rol_id } = req.body;
+
+  try {
+    connection = await getConnection();
+
+    await connection.execute(
+      `
+      BEGIN
+        cambiar_rol_usuario(
+          :user_id,
+          :rol_id
+        );
+      END;
+      `,
+      {
+        user_id,
+        rol_id
+      }
+    );
+
+    res.json({ message: "Rol del usuario actualizado correctamente" });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  } finally {
+    if (connection) await connection.close();
+  }
+};
