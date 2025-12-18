@@ -21,26 +21,24 @@ export class ListaComprasComponent implements OnInit {
   filteredCompras: any[] = [];
   paginatedCompras: any[] = [];
 
-  // Paginación
   currentPage: number = 1;
   itemsPerPage: number = 5;
   totalPages: number = 0;
   totalItems: number = 0;
 
-  // Búsqueda
   searchTerm: string = '';
   isSearching: boolean = false;
 
-  // Modal Detalle
   mostrarDetalle = false;
   compraSeleccionadaId!: number;
   detalleCompra: any[] = [];
+  
   totalDetalle = 0;
   iva = 0;
   subtiva = 0;
 
   estadoActual: number = 1;
-  usuarioId: number = 1; // Ajusta según tu auth service
+  usuarioId: number = 1; // ID del usuario actual
 
   constructor(
     private router: Router,
@@ -54,17 +52,16 @@ export class ListaComprasComponent implements OnInit {
 
   cambiarTab(estado: number) {
     this.estadoActual = estado;
-    this.currentPage = 1;
-    this.searchTerm = '';
+    this.currentPage = 1; 
+    this.searchTerm = ''; 
     this.isSearching = false;
     this.listarComprasActivas(estado);
   }
 
   listarComprasActivas(estado: number): void {
-    // this.ServicioAlertas.loading('Cargando...');
     this.ServicioCompras.getComprasEstado(estado).subscribe({
       next: (res: any) => {
-        // this.ServicioAlertas.close();
+        console.log('Compras recibidas:', res);
         this.Compras = Array.isArray(res) ? res : (res ? [res] : []);
         this.filteredCompras = [...this.Compras];
         this.totalItems = this.filteredCompras.length;
@@ -72,43 +69,35 @@ export class ListaComprasComponent implements OnInit {
         this.updatePaginatedData();
       },
       error: (err) => {
-        // this.ServicioAlertas.close();
-        console.log('Error o sin datos:', err);
+        console.log('No se encontraron registros o hubo error:', err);
         this.Compras = [];
         this.filteredCompras = [];
         this.paginatedCompras = [];
         this.totalItems = 0;
+        this.currentPage = 1;
       },
     });
   }
 
-  // --- LÓGICA DEL MODAL ---
   verDetalle(id: number, total: number, iva: number) {
     this.compraSeleccionadaId = id;
     this.totalDetalle = total;
     this.iva = iva;
     this.subtiva = total - iva; 
     
-    // Limpiar antes de cargar para evitar ver datos de la compra anterior
-    this.detalleCompra = []; 
     this.mostrarDetalle = true;
+    this.detalleCompra = [];
 
     this.ServicioCompras.getDetalleCompras(id).subscribe({
       next: (res: any) => {
-        // A veces el backend devuelve { detalle_compra: [...] } y a veces el array directo
-        // Ajustamos para ambos casos
-        if (res && res.detalle_compra) {
-          this.detalleCompra = res.detalle_compra;
-        } else if (Array.isArray(res)) {
+        // Manejo flexible de la respuesta del backend
+        if (Array.isArray(res)) {
           this.detalleCompra = res;
-        } else {
-          this.detalleCompra = [];
+        } else if (res && res.detalle_compra) {
+          this.detalleCompra = res.detalle_compra;
         }
       },
-      error: (err) => {
-        this.ServicioAlertas.error('Error', 'No se pudo cargar el detalle');
-        this.cerrarDetalle();
-      }
+      error: (err) => console.error(err)
     });
   }
 
@@ -117,20 +106,29 @@ export class ListaComprasComponent implements OnInit {
     this.detalleCompra = [];
   }
 
-  // --- ACCIONES DE COMPRA ---
+  // --- ACCIONES ---
+
+  ActualizarCompra(id: number): void {
+    this.router.navigate(['home/actualizarCompra', id]);
+  }
+
   anularCompra(id: number) {
     this.ServicioAlertas.confirm(
-      'ANULAR COMPRA',
-      `¿Desea anular la compra #${id}? Esto revertirá el stock.`,
-      'Sí, anular', 'Cancelar'
-    ).then((res) => {
-      if (res.isConfirmed) {
+      'CONFIRMAR ANULACIÓN',
+      '¿Está seguro que desea anular la compra #' + id + '? Esto revertirá el stock.',
+      'Sí, anular',
+      'Cancelar'
+    ).then((result) => {
+      if (result.isConfirmed) {
         this.ServicioCompras.AnularCompra(id).subscribe({
-          next: () => {
+          next: (res) => {
+            this.Compras = this.Compras.filter((c) => (c.compra_id || c.COMPRA_ID) !== id);
+            this.refrescarVista();
             this.ServicioAlertas.eliminacionCorrecta();
-            this.listarComprasActivas(1);
           },
-          error: () => this.ServicioAlertas.error('Error', 'No se pudo anular')
+          error: (err) => {
+            this.ServicioAlertas.error('ERROR', 'No se pudo anular la compra.');
+          },
         });
       }
     });
@@ -139,50 +137,45 @@ export class ListaComprasComponent implements OnInit {
   confirmarRecepcion(id: number) {
     this.ServicioAlertas.confirm(
       'RECIBIR MERCADERÍA',
-      `¿Confirmar recepción de la compra #${id}? Se sumará al stock.`,
-      'Sí, recibir', 'Cancelar'
-    ).then((res) => {
-      if (res.isConfirmed) {
+      '¿Confirma que ha recibido los productos de la compra #' + id + '?',
+      'Sí, recibir',
+      'Cancelar'
+    ).then((result) => {
+      if (result.isConfirmed) {
         this.ServicioCompras.confirmarRecepcionCompra(id, this.usuarioId).subscribe({
-          next: () => {
-            this.ServicioAlertas.success('Éxito', 'Inventario actualizado');
-            this.listarComprasActivas(1);
+          next: (res) => {
+            this.ServicioAlertas.success('Éxito', 'Inventario actualizado.');
+            this.listarComprasActivas(1); // Recargamos para ver el nuevo estado
           },
-          error: () => this.ServicioAlertas.error('Error', 'Fallo al confirmar')
+          error: (err) => {
+            this.ServicioAlertas.error('ERROR', 'No se pudo procesar la recepción.');
+          }
         });
       }
     });
   }
 
-  ActualizarCompra(id: number) {
-    this.router.navigate(['home/actualizarCompra', id]);
-  }
-
-  // --- GENERACIÓN DE PDF (COMPRAS) ---
   descargarFactura(compra: any) {
-    this.ServicioCompras.getDetalleCompras(compra.compra_id || compra.COMPRA_ID).subscribe((res: any) => {
-      // Obtener el array correcto
+    const id = compra.compra_id || compra.COMPRA_ID;
+    this.ServicioCompras.getDetalleCompras(id).subscribe((res: any) => {
       const detalles = Array.isArray(res) ? res : (res.detalle_compra || []);
-
       const doc = new jsPDF();
-      
-      // Encabezado
+
+      // Estilos PDF (Igual que ventas)
       doc.setFontSize(22);
+      doc.setFont('helvetica', 'bold');
       doc.setTextColor(41, 128, 185);
       doc.text('ORDEN DE COMPRA', 14, 20);
 
-      // Info Proveedor
       doc.setFontSize(10);
-      doc.setTextColor(100);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 100, 100);
       doc.text(`Proveedor: ${compra.prove_nombre || compra.PROVE_NOMBRE}`, 14, 30);
-      doc.text(`RUC: ${compra.prove_ruc || compra.PROVE_RUC || '---'}`, 14, 35);
       
-      // Info Compra (Derecha)
-      doc.text(`N° Orden: ${String(compra.compra_id || compra.COMPRA_ID).padStart(6, '0')}`, 150, 30);
       const fecha = new Date(compra.compra_horafecha || compra.COMPRA_HORAFECHA);
-      doc.text(`Fecha: ${fecha.toLocaleDateString()}`, 150, 35);
+      doc.text(`Fecha: ${fecha.toLocaleDateString()}`, 14, 35);
+      doc.text(`N° Orden: ${String(id).padStart(6, '0')}`, 14, 40);
 
-      // Tabla
       const columnas = ['Producto', 'Cant.', 'Costo Unit.', 'Subtotal'];
       const filas = detalles.map((det: any) => [
         det.prod_nombre || det.PROD_NOMBRE,
@@ -192,28 +185,25 @@ export class ListaComprasComponent implements OnInit {
       ]);
 
       autoTable(doc, {
-        startY: 45,
+        startY: 50,
         head: [columnas],
         body: filas,
         theme: 'grid',
-        headStyles: { fillColor: [41, 128, 185] },
-        columnStyles: {
-          2: { halign: 'right' },
-          3: { halign: 'right' }
-        }
+        headStyles: { fillColor: [41, 128, 185], halign: 'center' },
+        columnStyles: { 2: { halign: 'right' }, 3: { halign: 'right' }, 1: { halign: 'center'} }
       });
 
-      // Totales
       const finalY = (doc as any).lastAutoTable.finalY + 10;
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0);
       const total = parseFloat(compra.compra_montototal || compra.COMPRA_TOTAL);
-      
-      doc.text(`Total a Pagar: $${total.toFixed(2)}`, 190, finalY, { align: 'right' });
+      doc.text(`Total: $${total.toFixed(2)}`, 190, finalY, { align: 'right' });
 
-      doc.save(`Orden_Compra_${compra.compra_id || compra.COMPRA_ID}.pdf`);
+      doc.save(`Compra_${id}.pdf`);
     });
   }
 
-  // --- PAGINACIÓN Y BÚSQUEDA (Idéntico a Ventas) ---
+  // --- PAGINACIÓN Y BÚSQUEDA ---
   calculatePagination(): void {
     this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage) || 1;
     if (this.currentPage > this.totalPages) this.currentPage = 1;
@@ -225,18 +215,36 @@ export class ListaComprasComponent implements OnInit {
     this.paginatedCompras = this.filteredCompras.slice(startIndex, endIndex);
   }
 
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePaginatedData();
+    }
+  }
+
+  previousPage(): void { if (this.currentPage > 1) { this.currentPage--; this.updatePaginatedData(); } }
+  nextPage(): void { if (this.currentPage < this.totalPages) { this.currentPage++; this.updatePaginatedData(); } }
+
+  getItemRange(): { start: number, end: number } {
+    const start = (this.currentPage - 1) * this.itemsPerPage + 1;
+    const end = Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
+    return { start: this.totalItems === 0 ? 0 : start, end };
+  }
+
   onSearch(searchValue: string): void {
     this.searchTerm = searchValue.toLowerCase().trim();
     this.isSearching = this.searchTerm.length > 0;
+
     if (this.isSearching) {
       this.filteredCompras = this.Compras.filter(c =>
-        (c.compra_id + '').includes(this.searchTerm) ||
-        (c.prove_nombre || '').toLowerCase().includes(this.searchTerm)
+        (c.prove_nombre?.toLowerCase() || '').includes(this.searchTerm) ||
+        (c.compra_id + '').includes(this.searchTerm)
       );
     } else {
       this.filteredCompras = [...this.Compras];
     }
     this.totalItems = this.filteredCompras.length;
+    this.currentPage = 1;
     this.calculatePagination();
     this.updatePaginatedData();
   }
@@ -246,27 +254,35 @@ export class ListaComprasComponent implements OnInit {
     this.isSearching = false;
     this.filteredCompras = [...this.Compras];
     this.totalItems = this.filteredCompras.length;
+    this.currentPage = 1;
     this.calculatePagination();
     this.updatePaginatedData();
   }
 
-  goToPage(page: number): void { this.currentPage = page; this.updatePaginatedData(); }
-  previousPage(): void { if (this.currentPage > 1) this.goToPage(this.currentPage - 1); }
-  nextPage(): void { if (this.currentPage < this.totalPages) this.goToPage(this.currentPage + 1); }
-  
-  changeItemsPerPage(n: number): void {
-    this.itemsPerPage = n;
+  changeItemsPerPage(newItemsPerPage: number): void {
+    this.itemsPerPage = newItemsPerPage;
+    this.currentPage = 1;
     this.calculatePagination();
     this.updatePaginatedData();
-  }
-
-  getItemRange() {
-    const start = (this.currentPage - 1) * this.itemsPerPage + 1;
-    const end = Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
-    return { start: this.totalItems ? start : 0, end };
   }
 
   getPageNumbers(): number[] {
-    return Array.from({ length: Math.min(5, this.totalPages) }, (_, i) => i + 1);
+    const pages = [];
+    const maxPages = 5;
+    for (let i = 1; i <= Math.min(this.totalPages, maxPages); i++) {
+      pages.push(i);
+    }
+    return pages;
+  }
+
+  private refrescarVista(): void {
+    if (this.isSearching) {
+      this.onSearch(this.searchTerm);
+    } else {
+      this.filteredCompras = [...this.Compras];
+      this.totalItems = this.filteredCompras.length;
+      this.calculatePagination();
+      this.updatePaginatedData();
+    }
   }
 }
