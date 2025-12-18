@@ -236,8 +236,10 @@ export class FrmventasComponent implements OnInit {
     }
   }
 
-  procesarAgregadoProducto(producto: any) {
-    this.stockActual = producto.prod_stock;
+ procesarAgregadoProducto(producto: any) {
+    // 1. Guardamos el stock real del producto para validaciones futuras
+    // Es importante que 'producto.prod_stock' venga numérico desde la base de datos
+    this.stockActual = parseInt(producto.prod_stock) || 0;
 
     if (this.stockActual <= 0) {
       this.alertaServ.error('Sin Stock', `El producto "${producto.prod_nombre}" está agotado.`);
@@ -247,21 +249,24 @@ export class FrmventasComponent implements OnInit {
     const index = this.listaDetalles.findIndex(item => item.id_producto === producto.prod_id);
 
     if (index !== -1) {
-      // Validar stock antes de sumar
+      // SI YA EXISTE: Validamos si al sumar 1 superamos el stock
       if (this.listaDetalles[index].cantidad + 1 > this.stockActual) {
-         this.alertaServ.info('Stock Máximo', 'No hay más unidades disponibles.');
-         return;
+         this.alertaServ.info('Stock Máximo', `Solo hay ${this.stockActual} unidades disponibles.`);
+         return; // <--- DETENEMOS AQUÍ
       }
-      this.aumentarCantidad(index);
+      
+      this.aumentarCantidad(index); // Ahora es seguro llamar a aumentar
       this.alertaServ.success('Agregado', `+1 ${producto.prod_nombre}`);
     } else {
+      // SI ES NUEVO: Validamos que haya al menos 1 (ya lo hicimos arriba con <= 0)
       const nuevoDetalle = {
         id_producto: producto.prod_id,
         codigo: producto.prod_codbarra,
         nombreProducto: producto.prod_nombre,
         precioUnitario: parseFloat(producto.prod_precioventa) || 0,
         cantidad: 1,
-        subtotal: parseFloat(producto.prod_precioventa) || 0
+        subtotal: parseFloat(producto.prod_precioventa) || 0,
+        stockMaximo: this.stockActual // <--- GUARDAMOS EL STOCK MÁXIMO EN EL DETALLE
       };
       this.listaDetalles.push(nuevoDetalle);
       this.calcularTotales();
@@ -284,6 +289,17 @@ export class FrmventasComponent implements OnInit {
 
   aumentarCantidad(index: number) {
     const item = this.listaDetalles[index];
+    
+    // VALIDACIÓN DE STOCK
+    // Usamos item.stockMaximo si lo guardamos, o la variable global stockActual si acabamos de buscarlo.
+    // Lo ideal es guardar stockMaximo en cada item del array para no depender de la variable global volátil.
+    const stockLimite = item.stockMaximo || this.stockActual; 
+
+    if (item.cantidad >= stockLimite) {
+      this.alertaServ.info('Límite alcanzado', `No puedes vender más de ${stockLimite} unidades.`);
+      return; // <--- DETENEMOS EL INCREMENTO
+    }
+
     item.cantidad++;
     item.subtotal = item.cantidad * item.precioUnitario;
     this.calcularTotales();

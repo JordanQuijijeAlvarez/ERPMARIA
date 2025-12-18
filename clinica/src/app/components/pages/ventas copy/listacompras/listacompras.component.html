@@ -70,23 +70,21 @@
       </a>
     </div>
 
-    <!-- Tabs -->
-    <div class="tabs">
-      <button
-        (click)="cambiarTab(1)"
-        [class.active]="estadoActual === 1"
-        class="tabs__button"
-      >
-        <i class="fas fa-check-circle"></i> Activas
-      </button>
-      <button
-        (click)="cambiarTab(0)"
-        [class.active]="estadoActual === 0"
-        class="tabs__button"
-      >
-        <i class="fas fa-ban"></i> Anuladas
-      </button>
+   <div class="tabs">
+      <ul class="tabs__list">
+        <li class="tabs__item">
+          <button class="tabs__button" [class.tabs__button--active]="estadoActual === 1" (click)="cambiarTab(1)">
+            <i class="fas fa-check-circle"></i> Activas
+          </button>
+        </li>
+        <li class="tabs__item">
+          <button class="tabs__button" [class.tabs__button--active]="estadoActual === 0" (click)="cambiarTab(0)">
+            <i class="fas fa-ban"></i> Anuladas
+          </button>
+        </li>
+      </ul>
     </div>
+    
 
     
     <div>
@@ -277,25 +275,20 @@
   
   <!-- Modal for Compra Detail -->
   <div *ngIf="mostrarDetalle" class="modal">
-    <div class="modal__overlay" (click)="cerrarDetalle()"></div>
-    <div class="modal__content modal__content--large">
-      <div class="modal__header">
-        <h3 class="modal__title">
-          <i class="fas fa-file-invoice-dollar"></i>
-          Detalle de Compra #{{ compraSeleccionadaId }}
-        </h3>
-        <button 
-          (click)="cerrarDetalle()"
-          class="modal__close"
-        >
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
+    <div class="modal__content">
+    <div class="modal__header">
+      <h3 class="modal__title">
+        Detalle de la Factura #{{ compraSeleccionadaId }}
+      </h3>
+      <button class="modal__close" (click)="cerrarDetalle()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
 
-      <div class="modal__body">
-        <table class="table">
-          <thead>
-            <tr>
+    <div class="modal__body">
+      <table class="table">
+        <thead>
+          <tr>
               <th>Producto</th>
               <th>Cantidad</th>
               <th>Costo Unit.</th>
@@ -311,22 +304,25 @@
             </tr>
           </tbody>
         </table>
-        
-        <div class="compras-modal__totals">
-          <div class="compras-modal__total-row">
-            <p class="compras-modal__total-label">Subtotal</p>
-            <p class="compras-modal__total-value">{{ subtiva | currency:'USD' }}</p>
-          </div>
-          <div class="compras-modal__total-row">
-            <p class="compras-modal__total-label">IVA</p>
-            <p class="compras-modal__total-value">{{ iva | currency:'USD' }}</p>
-          </div>
-          <div class="compras-modal__total-row compras-modal__total-row--final">
-            <p class="compras-modal__total-label">Total</p>
-            <p class="compras-modal__total-value">{{ totalDetalle | currency:'USD' }}</p>
-          </div>
+         </div>
+        <div class="modal__footer">
+      <div class="modal__totals">
+        <div class="modal__total-item">
+          <span>IVA+ Subtotal:</span>
+          <span>{{ iva | currency:'USD' }}</span>
+        </div>
+        <div class="modal__total-item">
+          <span>Subtotal:</span>
+          <span>{{ subtiva | currency:'USD' }}</span>
+        </div>
+        <div class="modal__total-item modal__total-item--highlight">
+          <span>Total:</span>
+          <span>{{ totalDetalle | currency:'USD' }}</span>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+
+
