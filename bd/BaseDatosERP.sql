@@ -307,9 +307,7 @@ COMMIT;
 
 ---ejecutar una sola vez;
 
-ALTER TABLE COMPRA DROP CONSTRAINT SYS_C007828;
-ALTER TABLE COMPRA ADD CONSTRAINT CK_COMPRA_ESTADOREGISTRO 
-CHECK (compra_estadoregistro IN ('P', 'R', '0', '1'));
+
 
   --ALERTA se agrego el campo prod_margenpg a la tabla producto para guardar el margen de ganancia por producto
 
@@ -338,3 +336,15 @@ COMMENT ON COLUMN USUARIO_2FA.secret_2fa IS 'Secreto base32 para generar código
 COMMENT ON COLUMN USUARIO_2FA.enabled IS '1 si 2FA está activo, 0 si está deshabilitado';
 COMMENT ON COLUMN USUARIO_2FA.created_at IS 'Fecha de creación del registro';
 COMMENT ON COLUMN USUARIO_2FA.updated_at IS 'Fecha de última actualización';
+
+
+
+  -- 1. Eliminar la restricción antigua (usando el nombre exacto que te dio el error)
+ALTER TABLE COMPRA DROP CONSTRAINT SYS_C007985;
+
+-- 2. Agregar la nueva restricción con los estados ampliados
+ALTER TABLE COMPRA ADD CONSTRAINT CK_COMPRA_ESTADO 
+CHECK (compra_estadoregistro IN ('P', 'R', '0', '1'));
+
+-- 3. Establecer un valor por defecto para que no llegue NULL nunca
+ALTER TABLE COMPRA MODIFY (compra_estadoregistro DEFAULT 'P');
