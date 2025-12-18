@@ -195,7 +195,7 @@ export class FrmusuariosComponent {
             icon: 'success',
             confirmButtonText: 'Aceptar',
           }).then(() => {
-            this.router.navigate(['home/listausuarios']);
+            this.router.navigate(['home/listarUsuarios']);
           });
         },
         error: (err) => {
@@ -226,7 +226,7 @@ export class FrmusuariosComponent {
             icon: 'success',
             confirmButtonText: 'Aceptar',
           }).then(() => {
-            this.router.navigate(['home/listausuarios']);
+            this.router.navigate(['home/listarUsuarios']);
           });
         },
         error: (err) => {
@@ -263,7 +263,7 @@ export class FrmusuariosComponent {
             cancelButtonText: 'Cancelar',
           }).then((result) => {
             if (result.isConfirmed) {
-              this.router.navigate(['/home/listausuarios']);
+              this.router.navigate(['/home/listarUsuarios']);
             }
           });
         }

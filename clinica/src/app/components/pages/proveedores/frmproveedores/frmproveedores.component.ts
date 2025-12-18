@@ -130,7 +130,7 @@ rucExistsValidator(): AsyncValidatorFn {
           'No se pudo cargar la información del proveedor',
           'Comuníquese con su administrador de TI'
         );
-        this.router.navigate(['home/listarproveedores']);
+        this.router.navigate(['home/listarProveedores']);
       },
     });
   }
@@ -218,7 +218,7 @@ rucExistsValidator(): AsyncValidatorFn {
       this.proveedorServ.ActualizarProveedor(proveedor).subscribe({
         next: (res) => {
           this.alertaServ.success('Proveedor actualizado con éxito.', '');
-          this.router.navigate(['home/dashboard']);
+          this.router.navigate(['home/listarProveedores']);
         },
         error: (err) => {
           console.log('Error al actualizar:', err);
@@ -232,7 +232,7 @@ rucExistsValidator(): AsyncValidatorFn {
       this.proveedorServ.CrearProveedor(proveedor).subscribe({
         next: (res) => {
           this.alertaServ.success('Proveedor registrado con éxito.', '');
-          this.router.navigate(['home/listarproveedores']);
+          this.router.navigate(['home/listarProveedores']);
         },
         error: (err) => {
           console.log('Error al crear:', err);
@@ -266,7 +266,7 @@ rucExistsValidator(): AsyncValidatorFn {
       cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        this.router.navigate(['/home/listarproveedores']);
+        this.router.navigate(['/home/listarProveedores']);
       }
     });
   }
