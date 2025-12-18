@@ -35,3 +35,31 @@ JOIN rol_permiso rp ON rp.rol_id = r.rol_id
 JOIN permiso p ON p.perm_id = rp.perm_id
 WHERE r.rol_nombre = 'CAJERO'
 ORDER BY p.perm_recurso_tabla, p.perm_recurso_accion;
+
+CREATE OR REPLACE PROCEDURE cambiar_rol_usuario (
+    p_user_id IN usuario_rol.user_id%TYPE,
+    p_rol_id  IN usuario_rol.rol_id%TYPE
+) AS
+BEGIN
+
+    -- 1. Desactivar roles actuales del usuario
+    UPDATE usuario_rol
+    SET user_rol_estado = 0
+    WHERE user_id = p_user_id
+      AND user_rol_estado = 1;
+
+    -- 2. Asignar nuevo rol
+    INSERT INTO usuario_rol (
+        user_id,
+        rol_id,
+        user_rol_estado
+    ) VALUES (
+        p_user_id,
+        p_rol_id,
+        1
+    );
+
+    COMMIT;
+
+END cambiar_rol_usuario;
+/
