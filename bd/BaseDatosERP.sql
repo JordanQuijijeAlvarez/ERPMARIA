@@ -13,7 +13,7 @@ CREATE TABLE LOCAL (
 CREATE TABLE CATEGORIA (
     cat_id           NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     cat_nombre       VARCHAR2(70) NOT NULL,
-    cat_descripcion  VARCHAR2(100) NOT NULL,
+    cat_descripcion  VARCHAR2(100) ,
     cat_estado       CHAR(1) DEFAULT '1' CHECK (cat_estado IN ('0','1')) NOT NULL,
     cat_fechregistro DATE DEFAULT SYSDATE
 );
@@ -22,7 +22,7 @@ CREATE TABLE CATEGORIA (
 CREATE TABLE SUBCATEGORIA (
     subcat_id           NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     subcat_nombre       VARCHAR2(70) NOT NULL,
-    subcat_descripcion  VARCHAR2(100) NOT NULL,
+    subcat_descripcion  VARCHAR2(100) ,
     cat_id              NUMBER,
     subcat_estado       CHAR(1) DEFAULT '1' CHECK (subcat_estado IN ('0','1')) NOT NULL,
     subcat_fechregistro DATE DEFAULT SYSDATE
