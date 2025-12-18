@@ -140,6 +140,6 @@ export class Setup2faComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/home/dashboard']);
+    this.router.navigate(['/home/perfil']);
   }
 }
