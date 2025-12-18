@@ -1,3 +1,6 @@
+INSERT INTO rol (rol_nombre)
+VALUES ('CAJERO');
+
 INSERT INTO rol_permiso (rol_id, perm_id)
 SELECT
     r.rol_id,
