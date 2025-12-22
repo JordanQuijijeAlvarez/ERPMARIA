@@ -29,6 +29,7 @@ export interface InProductoDetalle {
 	prov_nombre:string,
 	prov_estado:number,
 	prov_preciocompra:number
+	prod_fechregistro?:Date
     //estado: string,
     //usuario:string,
 }

@@ -7,10 +7,11 @@ import { AlertService } from '../../../../servicios/Alertas/alertas.service';
 import { DirectivasModule } from '../../../../directivas/directivas.module';
 import { clienteService } from '../../../../servicios/clientes.service';
 import { InClientes } from '../../../../modelos/modelClientes/InClientes';
+import { ModalReportePdfComponent, ConfiguracionReporte } from '../../../shared/modal-reporte-pdf/modal-reporte-pdf.component';
 
 @Component({
     selector: 'app-listaClientes',
-    imports: [CommonModule, RouterModule, DirectivasModule, FormsModule],
+    imports: [CommonModule, RouterModule, DirectivasModule, FormsModule, ModalReportePdfComponent],
     templateUrl: './listaclientes.component.html',
     styleUrl: './listaclientes.component.css'
 })
@@ -27,6 +28,10 @@ export class ListaclientesComponent {
   // Propiedades para búsqueda
   searchTerm: string = '';
   isSearching: boolean = false;
+
+  // Propiedades para el modal de reportes
+  mostrarModalReporte: boolean = false;
+  configuracionReporte!: ConfiguracionReporte;
 
   constructor(
     private http: HttpClient,
@@ -262,5 +267,43 @@ export class ListaclientesComponent {
 
   Actualizarcliente(id: any): void {
     this.router.navigate(['home/actualizarCliente', id]);
+  }
+
+  // Métodos para el modal de reportes
+  abrirModalReporte() {
+    this.configuracionReporte = {
+      titulo: 'REPORTE DE CLIENTES',
+      nombreArchivo: 'Reporte_Clientes',
+      columnas: ['Cédula', 'Nombre Completo', 'Email', 'Dirección', 'Fecha Registro'],
+      datosOriginales: this.listaclientes,
+      nombreEntidad: 'clientes',
+      campoFecha: 'client_fechregistro',
+      empresa: {
+        nombre: 'Minimarket Maria',
+        ruc: '094847366001',
+        direccion: 'PASAJE Y JUNIN ESQUINA',
+        telefono: '0989847332',
+        email: 'facturacionmaria@gmail.com'
+      },
+      formatearFila: (cliente: any) => {
+        const fecha = new Date(cliente.client_fechregistro);
+        const fechaStr = !isNaN(fecha.getTime()) 
+          ? fecha.toLocaleDateString('es-ES')
+          : cliente.client_fechregistro || 'N/A';
+        
+        return [
+          cliente.client_cedula || 'N/A',
+          `${cliente.client_nombres || ''} ${cliente.client_apellidos || ''}`.trim() || 'N/A',
+          cliente.client_correo || 'N/A',
+          cliente.client_direccion || 'N/A',
+          fechaStr
+        ];
+      }
+    };
+    this.mostrarModalReporte = true;
+  }
+
+  cerrarModalReporte() {
+    this.mostrarModalReporte = false;
   }
 }

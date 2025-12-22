@@ -9,7 +9,7 @@ export interface InVenta {
     cliente_id:number,
     user_id:number,
     venta_descripcion:string
-
+    // venta_fechregistro?:Date
 }
 
 

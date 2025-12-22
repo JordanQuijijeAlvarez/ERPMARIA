@@ -7,9 +7,10 @@ import { DirectivasModule } from '../../../../directivas/directivas.module';
 import { ventaService } from '../../../../servicios/ventas.service';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable'; // <--- ASÍ DEBE QUEDAR
+import { ModalReportePdfComponent, ConfiguracionReporte } from '../../../shared/modal-reporte-pdf/modal-reporte-pdf.component';
 @Component({
   selector: 'app-listaventas',
-  imports: [CommonModule, RouterModule, DirectivasModule, FormsModule],
+  imports: [CommonModule, RouterModule, DirectivasModule, FormsModule, ModalReportePdfComponent],
   templateUrl: './listaventas.component.html',
   styleUrl: './listaventas.component.css'
 })
@@ -43,6 +44,10 @@ export class listaVentasComponent {
 
 
     estadoActual: number = 1;
+
+  // Propiedades para el modal de reportes
+  mostrarModalReporte: boolean = false;
+  configuracionReporte!: ConfiguracionReporte;
 
 
 
@@ -466,6 +471,45 @@ descargarFactura(venta: any) {
     doc.save(`Factura_Venta_${venta.venta_id}.pdf`);
   });
 }
+
+// Métodos para el modal de reportes
+abrirModalReporte() {
+  this.configuracionReporte = {
+    titulo: 'REPORTE DE VENTAS',
+    nombreArchivo: 'Reporte_Ventas',
+    columnas: ['ID', 'Fecha', 'Cliente', 'Usuario', 'Total'],
+    datosOriginales: this.Ventas,
+    nombreEntidad: 'ventas',
+    campoFecha: 'venta_horafecha',
+    empresa: {
+      nombre: this.Ventas[0]?.local_nombre || 'Minimarket Maria',
+      ruc: '094847366001',
+      direccion: 'PASAJE Y JUNIN ESQUINA',
+      telefono: '0989847332',
+      email: 'facturacionmaria@gmail.com'
+    },
+    formatearFila: (venta: any) => {
+      const fecha = new Date(venta.venta_horafecha);
+      const fechaStr = !isNaN(fecha.getTime()) 
+        ? fecha.toLocaleDateString('es-ES') + ' ' + fecha.toLocaleTimeString('es-ES')
+        : venta.venta_horafecha;
+      
+      return [
+        String(venta.venta_id).padStart(6, '0'),
+        fechaStr,
+        venta.clientenombre || 'Consumidor Final',
+        venta.usuarionombre || 'N/A',
+        `$${parseFloat(venta.venta_total).toFixed(2)}`
+      ];
+    }
+  };
+  this.mostrarModalReporte = true;
 }
+
+cerrarModalReporte() {
+  this.mostrarModalReporte = false;
+}
+}
+
 
 

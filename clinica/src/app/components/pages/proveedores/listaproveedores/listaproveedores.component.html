@@ -61,13 +61,20 @@
         </div>
       </div>
       
-      <!-- New Provider Button -->
-      <a routerLink="../crearProveedor">
-        <button type="button" class="btn btn--primary">
-          <i class="fas fa-plus"></i>
-          <span>Nuevo Proveedor</span>
+      <!-- Action Buttons -->
+      <div style="display: flex; gap: 10px;">
+        <button type="button" class="btn btn--primary" (click)="abrirModalReporte()" title="Generar reporte PDF">
+          <i class="fas fa-file-pdf"></i>
+          <span>Generar Reporte</span>
         </button>
-      </a>
+        
+        <a routerLink="../crearProveedor">
+          <button type="button" class="btn btn--primary">
+            <i class="fas fa-plus"></i>
+            <span>Nuevo Proveedor</span>
+          </button>
+        </a>
+      </div>
     </div>
       
     
@@ -241,3 +248,10 @@
     </div>
   </div>
 </div>
+
+<!-- Modal de Reporte PDF -->
+<app-modal-reporte-pdf
+  [mostrar]="mostrarModalReporte"
+  [configuracion]="configuracionReporte"
+  (cerrar)="cerrarModalReporte()">
+</app-modal-reporte-pdf>

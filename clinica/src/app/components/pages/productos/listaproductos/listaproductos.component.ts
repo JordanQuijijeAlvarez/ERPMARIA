@@ -6,10 +6,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InProducto, InProductoDetalle } from '../../../../modelos/modeloProductos/InProducto';
 import { productosService } from '../../../../servicios/productos.service';
+import { ModalReportePdfComponent, ConfiguracionReporte } from '../../../shared/modal-reporte-pdf/modal-reporte-pdf.component';
 
 @Component({
     selector: 'app-listaproductos',
-    imports: [CommonModule, RouterModule, FormsModule],
+    imports: [CommonModule, RouterModule, FormsModule, ModalReportePdfComponent],
     templateUrl: './listaproductos.component.html',
     styleUrl: './listaproductos.component.css'
 })
@@ -27,6 +28,10 @@ export class ListaproductosComponent {
   // Propiedades para búsqueda
   searchTerm: string = '';
   isSearching: boolean = false;
+
+  // Propiedades para el modal de reportes
+  mostrarModalReporte: boolean = false;
+  configuracionReporte!: ConfiguracionReporte;
 
 
   constructor(
@@ -269,4 +274,37 @@ export class ListaproductosComponent {
     this.router.navigate(['/home/actualizarProducto', id]);
   }
 
+  // Métodos para el modal de reportes
+  abrirModalReporte() {
+    this.configuracionReporte = {
+      titulo: 'REPORTE DE PRODUCTOS',
+      nombreArchivo: 'Reporte_Productos',
+      columnas: ['Código Barras', 'Nombre', 'Categoría', 'Stock', 'Precio Compra', 'Precio Venta'],
+      datosOriginales: this.listaProductos,
+      nombreEntidad: 'productos',
+      campoFecha: 'prod_fechregistro',
+      empresa: {
+        nombre: 'Minimarket Maria',
+        ruc: '094847366001',
+        direccion: 'PASAJE Y JUNIN ESQUINA',
+        telefono: '0989847332',
+        email: 'facturacionmaria@gmail.com'
+      },
+      formatearFila: (producto: any) => {
+        return [
+          producto.prod_codbarra || 'N/A',
+          producto.prod_nombre,
+          producto.cat_nombre || 'Sin categoría',
+          producto.prod_stock?.toString() || '0',
+          `$${parseFloat(producto.prod_preciocompra || 0).toFixed(2)}`,
+          `$${parseFloat(producto.prod_precioventa || 0).toFixed(2)}`
+        ];
+      }
+    };
+    this.mostrarModalReporte = true;
+  }
+
+  cerrarModalReporte() {
+    this.mostrarModalReporte = false;
+  }
 }

@@ -15,11 +15,12 @@ import { DirectivasModule } from '../../../../directivas/directivas.module';
 
 import { ProveedorService } from '../../../../servicios/proveedores.service';
 import { InProveedor } from '../../../../modelos/modelProveedor/InProveedor';
+import { ModalReportePdfComponent, ConfiguracionReporte } from '../../../shared/modal-reporte-pdf/modal-reporte-pdf.component';
 
 @Component({
   selector: 'app-listaproveedores',
   standalone: true, // Asumo que es standalone por los imports directos
-  imports: [CommonModule, RouterModule, DirectivasModule, FormsModule],
+  imports: [CommonModule, RouterModule, DirectivasModule, FormsModule, ModalReportePdfComponent],
   templateUrl: './listaproveedores.component.html',
   styleUrl: './listaproveedores.component.css'
 })
@@ -37,6 +38,10 @@ export class ListaproveedoresComponent implements OnInit {
   // Propiedades para búsqueda
   searchTerm: string = '';
   isSearching: boolean = false;
+
+  // Propiedades para el modal de reportes
+  mostrarModalReporte: boolean = false;
+  configuracionReporte!: ConfiguracionReporte;
 
   constructor(
     private http: HttpClient,
@@ -265,5 +270,39 @@ export class ListaproveedoresComponent implements OnInit {
   ActualizarProveedor(ruc:any,id: any): void {
     // Redirige a la ruta de edición de proveedores
     this.router.navigate(['home/actualizarProveedor', id]);
+  }
+
+  // Métodos para el modal de reportes
+  abrirModalReporte() {
+    this.configuracionReporte = {
+      titulo: 'REPORTE DE PROVEEDORES',
+      nombreArchivo: 'Reporte_Proveedores',
+      columnas: ['RUC', 'Nombre', 'Contacto', 'Teléfono', 'Email', 'Dirección'],
+      datosOriginales: this.listaProveedores,
+      nombreEntidad: 'proveedores',
+      campoFecha: 'prove_fechregistro',
+      empresa: {
+        nombre: 'Minimarket Maria',
+        ruc: '094847366001',
+        direccion: 'PASAJE Y JUNIN ESQUINA',
+        telefono: '0989847332',
+        email: 'facturacionmaria@gmail.com'
+      },
+      formatearFila: (proveedor: any) => {
+        return [
+          proveedor.prove_ruc || 'N/A',
+          proveedor.prove_nombre || 'N/A',
+          proveedor.prove_descripcion || 'N/A',
+          proveedor.prove_telefono || 'N/A',
+          proveedor.prove_correo || 'N/A',
+          proveedor.prove_direccion || 'N/A'
+        ];
+      }
+    };
+    this.mostrarModalReporte = true;
+  }
+
+  cerrarModalReporte() {
+    this.mostrarModalReporte = false;
   }
 }

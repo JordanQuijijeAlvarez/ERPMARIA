@@ -1,0 +1,185 @@
+<div class="modal-overlay" *ngIf="mostrar" (click)="cerrarModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <i class="fas fa-file-pdf"></i>
+        Generar Reporte PDF
+      </h2>
+      <button class="modal-close" (click)="cerrarModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <!-- Título del reporte -->
+      <div class="info-section">
+        <p class="info-text">
+          <i class="fas fa-info-circle"></i>
+          Generando reporte de: <strong>{{ configuracion.titulo }}</strong>
+        </p>
+        <p class="info-subtext">
+          Total de registros disponibles: {{ configuracion.datosOriginales.length || 0 }}
+        </p>
+      </div>
+
+      <!-- Selector de tipo de filtro -->
+      <div class="filter-selector">
+        <label class="filter-label">Seleccione el período del reporte:</label>
+        
+        <div class="filter-buttons">
+          <button 
+            type="button"
+            class="filter-btn"
+            [class.active]="tipoFiltro === 'todos'"
+            (click)="cambiarTipoFiltro('todos')">
+            <i class="fas fa-list"></i>
+            Todos
+          </button>
+          
+          <button 
+            type="button"
+            class="filter-btn"
+            [class.active]="tipoFiltro === 'dia'"
+            (click)="cambiarTipoFiltro('dia')">
+            <i class="fas fa-calendar-day"></i>
+            Por Día
+          </button>
+          
+          <button 
+            type="button"
+            class="filter-btn"
+            [class.active]="tipoFiltro === 'mes'"
+            (click)="cambiarTipoFiltro('mes')">
+            <i class="fas fa-calendar-alt"></i>
+            Por Mes
+          </button>
+          
+          <button 
+            type="button"
+            class="filter-btn"
+            [class.active]="tipoFiltro === 'rango'"
+            (click)="cambiarTipoFiltro('rango')">
+            <i class="fas fa-calendar-week"></i>
+            Por Rango
+          </button>
+        </div>
+      </div>
+
+      <!-- Filtros según tipo seleccionado -->
+      <div class="filter-content">
+        <!-- Filtro por día -->
+        <div class="filter-group" *ngIf="tipoFiltro === 'dia'">
+          <label class="input-label">
+            <i class="fas fa-calendar"></i>
+            Fecha específica:
+          </label>
+          <input 
+            type="date" 
+            class="date-input"
+            [(ngModel)]="fechaInicio"
+            [max]="fechaFin">
+        </div>
+
+        <!-- Filtro por mes -->
+        <div class="filter-group" *ngIf="tipoFiltro === 'mes'">
+          <div class="month-selector">
+            <div class="input-group">
+              <label class="input-label">
+                <i class="fas fa-calendar-alt"></i>
+                Mes:
+              </label>
+              <select class="select-input" [(ngModel)]="mesSeleccionado">
+                <option value="01">Enero</option>
+                <option value="02">Febrero</option>
+                <option value="03">Marzo</option>
+                <option value="04">Abril</option>
+                <option value="05">Mayo</option>
+                <option value="06">Junio</option>
+                <option value="07">Julio</option>
+                <option value="08">Agosto</option>
+                <option value="09">Septiembre</option>
+                <option value="10">Octubre</option>
+                <option value="11">Noviembre</option>
+                <option value="12">Diciembre</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">
+                <i class="fas fa-calendar"></i>
+                Año:
+              </label>
+              <select class="select-input" [(ngModel)]="anioSeleccionado">
+                <option *ngFor="let anio of aniosDisponibles" [value]="anio">
+                  {{ anio }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filtro por rango -->
+        <div class="filter-group" *ngIf="tipoFiltro === 'rango'">
+          <div class="range-selector">
+            <div class="input-group">
+              <label class="input-label">
+                <i class="fas fa-calendar-day"></i>
+                Fecha inicio:
+              </label>
+              <input 
+                type="date" 
+                class="date-input"
+                [(ngModel)]="fechaInicio"
+                [max]="fechaFin">
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">
+                <i class="fas fa-calendar-check"></i>
+                Fecha fin:
+              </label>
+              <input 
+                type="date" 
+                class="date-input"
+                [(ngModel)]="fechaFin"
+                [min]="fechaInicio">
+            </div>
+          </div>
+        </div>
+
+        <!-- Mensaje para "Todos" -->
+        <div class="filter-message" *ngIf="tipoFiltro === 'todos'">
+          <i class="fas fa-info-circle"></i>
+          Se generará el reporte con todos los registros disponibles sin filtros de fecha.
+        </div>
+      </div>
+
+      <!-- Vista previa de registros filtrados -->
+      <div class="preview-section">
+        <div class="preview-info">
+          <i class="fas fa-filter"></i>
+          Registros que coinciden con el filtro: 
+          <strong class="preview-count">{{ obtenerDatosFiltrados().length }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer con botones de acción -->
+    <div class="modal-footer">
+      <button class="btn btn-cancel" (click)="cerrarModal()">
+        <i class="fas fa-times"></i>
+        Cancelar
+      </button>
+      
+      <button 
+        class="btn btn-generate" 
+        (click)="generarReporte()"
+        [disabled]="obtenerDatosFiltrados().length === 0">
+        <i class="fas fa-file-pdf"></i>
+        Generar PDF
+      </button>
+    </div>
+  </div>
+</div>
