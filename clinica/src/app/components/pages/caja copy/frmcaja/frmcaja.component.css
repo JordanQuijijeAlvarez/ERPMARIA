@@ -1,0 +1,110 @@
+/* =========================================
+   ESTILOS DEL MODAL (Forzados)
+   ========================================= */
+
+/* 1. EL CONTENEDOR PRINCIPAL */
+.modal {
+  /* Usamos !important para anular el 'display: none' de Bootstrap */
+  display: flex !important; 
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1050; /* Z-index alto para estar encima de todo */
+  align-items: center;
+  justify-content: center;
+  background-color: transparent; /* El fondo lo da el overlay */
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* 2. EL FONDO OSCURO (Overlay) */
+.modal_overlay, 
+.modal__overlay,
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Negro semitransparente */
+  backdrop-filter: blur(3px); /* Efecto borroso */
+  z-index: 1051;
+}
+
+/* 3. LA CAJA BLANCA (Contenido) */
+.modal_content,
+.modal__content,
+.modal-content {
+  position: relative;
+  background-color: #ffffff;
+  width: 90%;
+  max-width: 500px; /* Ancho para modal pequeño */
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  z-index: 1052; /* Encima del overlay */
+  display: flex;
+  flex-direction: column;
+  border: none; /* Quitar bordes de bootstrap */
+  animation: slideDown 0.3s ease-out;
+}
+
+/* Animación suave */
+@keyframes slideDown {
+  from { transform: translateY(-50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* 4. PARTES INTERNAS DEL MODAL */
+.modal_header, .modal__header, .modal-header {
+  padding: 15px 20px;
+  border-bottom: 1px solid #dee2e6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f9fa;
+  border-radius: 8px 8px 0 0;
+}
+
+.modal_body, .modal__body, .modal-body {
+  padding: 20px;
+  color: #333;
+}
+
+.modal_footer, .modal__footer, .modal-footer {
+  padding: 15px 20px;
+  border-top: 1px solid #dee2e6;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  background-color: #fff;
+  border-radius: 0 0 8px 8px;
+}
+
+/* Títulos y Botones */
+.modal_title, .modal__title, .modal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.modal_close, .modal__close, .modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+}
+
+/* Ajuste para inputs dentro del modal */
+.form-group {
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}

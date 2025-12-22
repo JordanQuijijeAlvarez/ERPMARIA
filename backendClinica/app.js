@@ -8,12 +8,14 @@ const rutasCliente = require('./rutas/rutasCliente');
 const rutasProductos = require('./rutas/rutasProducto');
 const rutasCompra = require('./rutas/rutasCompra');
 const rutasVentas = require('./rutas/rutasVenta');
+const rutasCajas = require('./rutas/rutasCaja');
 const rutasCategoria = require('./rutas/rutasCategoria');
 const rutasSubCategoria = require('./rutas/rutasSubCategoria');
 const rutasLocal = require('./rutas/rutasLocal');
 const rutasProveedor = require('./rutas/rutasProveedor');
 const rutasUsuarios = require('./rutas/rutasUsuarios');
 const rutasRoles = require('./rutas/rutasRoles');
+const auditoria = require('./rutas/rutasAuditoria');
 
 
 const login = require('./controladores/Login/ctlLogin');
@@ -33,12 +35,13 @@ app.use('/productos', rutasProductos);
 app.use('/categorias', rutasCategoria);
 app.use('/compras', rutasCompra);
 app.use('/ventas', rutasVentas);
-
+app.use('/caja', rutasCajas);
 app.use('/subcategorias', rutasSubCategoria);
 app.use('/local', rutasLocal);
 app.use('/proveedores', rutasProveedor);
 app.use('/usuarios', rutasUsuarios);
 app.use('/roles', rutasRoles);
+app.use('/auditoria', auditoria);
 
 
 // Ruta provisional 

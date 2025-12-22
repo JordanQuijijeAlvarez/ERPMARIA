@@ -148,26 +148,33 @@ exports.getclienteCedulaEstado = async (req, res) => {
     }
 };
 
+
 // ==========================================
-// 5. REGISTRAR CLIENTE
+// 5. REGISTRAR CLIENTE (ACTUALIZADO)
 // ==========================================
 exports.Registrarcliente = async (req, res) => {
-    const { client_cedula, client_nombres, client_apellidos, client_direccion, client_correo } = req.body;
+    // 1. Ahora recibimos también el user_id desde el front
+    const { user_id, client_cedula, client_nombres, client_apellidos, client_direccion, client_correo } = req.body;
     let connection;
     
-    // Validar datos básicos para evitar errores de Oracle vacíos
-    if(!client_cedula || !client_nombres) {
-         return res.status(400).json({error: "Datos incompletos"});
+    // Validación
+    if(!client_cedula || !client_nombres || !user_id) {
+         return res.status(400).json({error: "Datos incompletos: Falta cédula, nombre o el usuario logueado."});
     }
 
     try {
         connection = await getConnection();
-        const query = `BEGIN registrarcliente(:1, :2, :3, :4, :5); END;`;
-        const values = [client_cedula, client_nombres, client_apellidos, client_direccion, client_correo];
+        
+        // 2. Modificamos el Query: Agregamos un parámetro más (:1) al inicio
+        // Suponiendo que tu SP es: registrarcliente(p_user_id, p_cedula, ...)
+        const query = `BEGIN registrarcliente(:1, :2, :3, :4, :5, :6); END;`;
+        
+        // 3. El user_id va PRIMERO en el array
+        const values = [user_id, client_cedula, client_nombres, client_apellidos, client_direccion, client_correo];
 
         await connection.execute(query, values, { autoCommit: true });
         
-        res.status(200).json({ message: 'cliente registrado' });
+        res.status(200).json({ message: 'Cliente registrado correctamente' });
 
     } catch (error) {
         console.log(error);
@@ -176,22 +183,31 @@ exports.Registrarcliente = async (req, res) => {
         if (connection) await connection.close();
     }
 };
-
 // ==========================================
-// 6. ACTUALIZAR CLIENTE
+// 6. ACTUALIZAR CLIENTE (ACTUALIZADO)
 // ==========================================
 exports.Actualizarcliente = async (req, res) => {
-    const { client_id, client_cedula, client_nombres, client_apellidos, client_direccion, client_correo } = req.body;
+    // Recibimos user_id para saber quién editó
+    const { user_id, client_id, client_cedula, client_nombres, client_apellidos, client_direccion, client_correo } = req.body;
     let connection;
+
+    if(!user_id) {
+        return res.status(400).json({error: "Falta el ID del usuario que realiza la acción"});
+   }
 
     try {
         connection = await getConnection();
-        const query = `BEGIN actualizarcliente(:1, :2, :3, :4, :5, :6); END;`;
-        const values = [client_id, client_cedula, client_nombres, client_apellidos, client_direccion, client_correo];
+        
+        // Asumiendo que actualizaste el SP actualizarcliente para recibir el user_id primero
+        // QUERY: actualizarcliente(p_user_id, p_client_id, ...)
+        const query = `BEGIN actualizarcliente(:1, :2, :3, :4, :5, :6, :7); END;`;
+        
+        // user_id va primero
+        const values = [user_id, client_id, client_cedula, client_nombres, client_apellidos, client_direccion, client_correo];
 
         await connection.execute(query, values, { autoCommit: true });
         
-        res.status(200).json({ message: 'cliente actualizado' });
+        res.status(200).json({ message: 'Cliente actualizado correctamente' });
 
     } catch (error) {
         console.log(error);
@@ -202,19 +218,30 @@ exports.Actualizarcliente = async (req, res) => {
 };
 
 // ==========================================
-// 7. ELIMINAR CLIENTE
+// 7. ELIMINAR CLIENTE (ACTUALIZADO)
 // ==========================================
 exports.eliminarcliente = async (req, res) => {
     const { id } = req.params;
+    // OJO: En DELETE a veces el body no llega dependiendo del cliente HTTP.
+    // Asegúrate de enviar el user_id en el body o por query string (?user_id=5)
+    const user_id = req.body.user_id || req.query.user_id; 
+    
     let connection;
+
+    if(!user_id) {
+        return res.status(400).json({error: "Falta el ID del usuario para auditar la eliminación"});
+    }
 
     try {
         connection = await getConnection();
-        const query = `BEGIN eliminarcliente(:1); END;`;
         
-        await connection.execute(query, [id], { autoCommit: true });
+        // Asumiendo SP: eliminarcliente(p_user_id, p_client_id)
+        const query = `BEGIN eliminarcliente(:1, :2); END;`;
         
-        res.status(200).json({ message: "El registro se eliminó correctamente" });
+        // user_id primero
+        await connection.execute(query, [user_id, id], { autoCommit: true });
+        
+        res.status(200).json({ message: "El registro se eliminó y auditó correctamente" });
 
     } catch (error) {
         console.log(error);

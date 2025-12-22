@@ -1,0 +1,73 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { map, Observable } from 'rxjs';
+import { InUsuarioVista, InUsuario} from '../modelos/modeloUsuarios/InUsuarios';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UsuariosService {
+
+  private urlServidor = 'http://localhost:3000';
+
+
+  constructor(private http: HttpClient) { }
+  
+  LUsuarios (): Observable<InUsuarioVista[]> {
+    return this.http.get<InUsuarioVista[]>(`${this.urlServidor}/usuarios/listar`);
+  }
+
+  LUsuariosPorEstado(estado: number): Observable<InUsuarioVista[]> {
+    return this.http.get<InUsuarioVista[]>(`${this.urlServidor}/usuarios/listar?estado=${estado}`);
+  }
+
+  LUsuariosId(id: number): Observable<InUsuario> {
+  
+    return this.http.get<InUsuario>(`${this.urlServidor}/usuarios/${id}`);
+  }
+    
+  CrearUsuario(usuarios: InUsuario): Observable<any> {
+
+    return this.http.post(`${this.urlServidor}/usuarios/Registrar`, usuarios);
+  }
+
+
+  EliminarUsuario(id:number):Observable<any>{
+    return this.http.delete(`${this.urlServidor}/usuarios/Eliminar/${id}`);
+
+  }
+
+  ActivarUsuario(id: number): Observable<any> {
+    return this.http.put(`${this.urlServidor}/usuarios/activar/${id}`, {});
+  }
+  ActualizarUsuario(usuarios: InUsuario): Observable<any> {
+
+    return this.http.put(`${this.urlServidor}/usuarios/Actualizar`, usuarios);
+  }
+
+  obtenerMiPerfil(): Observable<any> {
+    return this.http.get(`${this.urlServidor}/usuarios/me`);
+  }
+
+  actualizarMiPerfil(payload: {
+    user_nombres: string;
+    user_apellidos: string;
+    user_username: string;
+    user_correo: string;
+  }): Observable<any> {
+    return this.http.put(`${this.urlServidor}/usuarios/perfil`, payload);
+  }
+
+  cambiarMiContrasenia(payload: { oldPassword: string; newPassword: string }): Observable<any> {
+    return this.http.put(`${this.urlServidor}/usuarios/password`, payload);
+  }
+
+  cambiarRolUsuario(user_id: number, rol_id: number): Observable<any> {
+    return this.http.put(`${this.urlServidor}/usuarios/cambiar-rol`, { user_id, rol_id });
+  }
+
+   ObtenerCorreoCifrado(username: string): Observable<any> {
+
+       return this.http.post(`${this.urlServidor}/usuarios/recuperar/correo`,{ 'nombreUsuario': username });
+     }
+}

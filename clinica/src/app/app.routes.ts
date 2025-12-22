@@ -26,10 +26,13 @@ import { ListaproveedoresComponent } from './components/pages/proveedores/listap
 import { frmProveedoresComponent } from './components/pages/proveedores/frmproveedores/frmproveedores.component';
 import { FrmCategoriasComponent } from './components/pages/categorias/frmcategorias/frmcategorias.component';
 import { ListaCategoriasComponent } from './components/pages/categorias/listacategorias/listacategorias.component';
-import { ListaComprasComponent } from './components/pages/ventas copy/listacompras/listacompras.component';
-import { FrmComprasComponent } from './components/pages/ventas copy/frmcompras/frmcompras.component';
+import { ListaComprasComponent } from './components/pages/compras/listacompras/listacompras.component';
+import { FrmComprasComponent } from './components/pages/compras/frmcompras/frmcompras.component';
 import { ListahistorialComponent } from './components/pages/historial/listaproveedores/listahistorial.component';
 import { PerfilComponent } from './components/pages/perfil/perfil.component';
+import { frmCajaComponent } from './components/pages/caja/frmcaja/frmcaja.component';
+import { ListacajasComponent } from './components/pages/caja/listacaja/listacajas.component';
+import { ListarAuditoriasComponent } from './components/pages/caja copy/listarauditorias/listarauditorias.component';
 
 export const routes: Routes = [
 
@@ -60,6 +63,25 @@ export const routes: Routes = [
 
       { path: 'perfil', component: PerfilComponent },
 
+      {
+        path: 'auditoria',
+        component: ListarAuditoriasComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['ADMINISTRADOR', 'CAJERO'] },
+      },
+
+      {
+        path: 'caja',
+        component: frmCajaComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['ADMINISTRADOR', 'CAJERO'] },
+      },{
+        path: 'listarcajas',
+        component: ListacajasComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['ADMINISTRADOR', 'CAJERO'] },
+      },
+
       // Clientes (ADMINISTRADOR y CAJERO tienen permisos de READ y WRITE)
       {
         path: 'listarClientes',
@@ -67,6 +89,8 @@ export const routes: Routes = [
         canActivate: [RoleGuard],
         data: { roles: ['ADMINISTRADOR', 'CAJERO'] },
       },
+       // Caja
+      
       {
         path: 'crearCliente',
         component: frmClientesComponent,
@@ -191,45 +215,7 @@ export const routes: Routes = [
         data: { roles: ['ADMINISTRADOR', 'CAJERO'] },
       },
 
-      // // Especialidades
-      // {
-      //   path: 'listarespecialidades',
-      //   component: listaEspecialidadesComponent,
-      //   canActivate: [RoleGuard],
-      //   data: { roles: ['ADMINISTRADOR'] },
-      // },
-      // {
-      //   path: 'crearEspecialidades',
-      //   component: FrmespecialidadsComponent,
-      //   canActivate: [RoleGuard],
-      //   data: { roles: ['ADMINISTRADOR'] },
-      // },
-      // {
-      //   path: 'actualizarEspecialidades/:id',
-      //   component: FrmespecialidadsComponent,
-      //   canActivate: [RoleGuard],
-      //   data: { roles: ['ADMINISTRADOR'] },
-      // },
-
-      // Horarios
-      // {
-      //   path: 'listarhorarios',
-      //   component: listaHorariosComponent,
-      //   canActivate: [RoleGuard],
-      //   data: { roles: ['ADMINISTRADOR'] },
-      // },
-      // {
-      //   path: 'crearHorarios',
-      //   component: FrmhorariosComponent,
-      //   canActivate: [RoleGuard],
-      //   data: { roles: ['ADMINISTRADOR'] },
-      // },
-      // {
-      //   path: 'actualizarHorarios/:id',
-      //   component: FrmhorariosComponent,
-      //   canActivate: [RoleGuard],
-      //   data: { roles: ['ADMINISTRADOR'] },
-      // },
+     
 
       //Usuarios
       {

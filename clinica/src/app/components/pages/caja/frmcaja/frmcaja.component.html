@@ -1,0 +1,130 @@
+<div class="caja-dashboard card">
+  <div class="card__header">
+    <h2 class="card__title">
+      <i class="fas fa-cash-register"></i> CONTROL DE CAJA
+    </h2>
+    <div class="caja-status">
+      Estado: 
+      <span class="badge" [ngClass]="cajaAbierta ? 'badge--success' : 'badge--danger'">
+        {{ cajaAbierta ? 'ABIERTA' : 'CERRADA' }}
+      </span>
+    </div>
+  </div>
+
+  <div class="card__body text-center p-4">
+    <button *ngIf="!cajaAbierta" (click)="abrirModalApertura()" class="btn btn--primary btn--lg">
+      <i class="fas fa-key"></i> ABRIR CAJA (INICIAR TURNO)
+    </button>
+
+    <button *ngIf="cajaAbierta" (click)="abrirModalCierre()" class="btn btn--danger btn--lg">
+      <i class="fas fa-lock"></i> CERRAR CAJA (ARQUEO)
+    </button>
+  </div>
+</div>
+
+
+<div class="modal" *ngIf="mostrarModalApertura">
+  <div class="modal__overlay" (click)="cerrarModales()"></div>
+  <div class="modal__content modal__content--sm">
+    <div class="modal__header">
+      <h3 class="modal__title">Apertura de Caja</h3>
+      <button class="modal__close" (click)="cerrarModales()"><i class="fas fa-times"></i></button>
+    </div>
+    
+    <div class="modal__body">
+      <div class="form-group">
+        <label>Monto Inicial (Base en efectivo)</label>
+        <div class="input-group">
+          <span class="input-group-text">$</span>
+          <input type="number" [(ngModel)]="montoInicialInput" class="form-control" placeholder="0.00">
+        </div>
+        <small class="text-muted">Ingrese el dinero con el que inicia el día (cambio).</small>
+      </div>
+    </div>
+
+    <div class="modal__footer">
+      <button class="btn btn--outline" (click)="cerrarModales()">Cancelar</button>
+      <button class="btn btn--primary" (click)="confirmarApertura()">
+        <i class="fas fa-check"></i> Abrir Turno
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal" *ngIf="mostrarModalCierre">
+  <div class="modal__overlay" (click)="cerrarModales()"></div>
+  <div class="modal__content">
+    <div class="modal__header bg-dark text-white">
+      <h3 class="modal__title"><i class="fas fa-calculator"></i> Arqueo de Caja</h3>
+      <button class="modal__close text-white" (click)="cerrarModales()"><i class="fas fa-times"></i></button>
+    </div>
+
+    <div class="modal__body">
+      
+      <div class="resumen-grid">
+        <div class="resumen-item">
+          <span class="label">Monto Inicial (+)</span>
+          <span class="value text-primary">{{ resumenCierre.monto_inicial | currency:'USD' }}</span>
+        </div>
+        <div class="resumen-item">
+          <span class="label">Ventas Efectivo (+)</span>
+          <span class="value text-success">{{ resumenCierre.total_ventas | currency:'USD' }}</span>
+        </div>
+        <div class="resumen-item">
+          <span class="label">Gastos/Compras (-)</span>
+          <span class="value text-danger">{{ resumenCierre.total_egresos | currency:'USD' }}</span>
+        </div>
+        <div class="resumen-item total-sistema">
+          <span class="label">Debería haber:</span>
+          <span class="value">{{ resumenCierre.saldo_esperado | currency:'USD' }}</span>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="arqueo-input-section">
+        <label class="form-label"><strong>¿Cuánto dinero físico contaste?</strong></label>
+        <div class="input-group input-group-lg">
+          <span class="input-group-text bg-white">$</span>
+          <input type="number" 
+                 [(ngModel)]="montoRealUsuario" 
+                 (keyup)="calcularDiferencia()" 
+                 class="form-control text-end font-bold" 
+                 style="font-size: 1.5rem;">
+        </div>
+      </div>
+
+      <div class="cuadre-result" 
+           [ngClass]="{'bg-success-light': diferencia >= 0, 'bg-danger-light': diferencia < 0}">
+        
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="font-bold">Diferencia:</span>
+          <span class="font-bold" style="font-size: 1.2rem;"
+                [ngClass]="{'text-success': diferencia >= 0, 'text-danger': diferencia < 0}">
+            {{ diferencia | currency:'USD' }}
+          </span>
+        </div>
+        
+        <div class="status-text text-end">
+          <small *ngIf="diferencia === 0">¡Caja Cuadrada Perfectamente!</small>
+          <small *ngIf="diferencia > 0">Sobrante (Posible error en cambio no entregado)</small>
+          <small *ngIf="diferencia < 0">FALTANTE (Dinero perdido)</small>
+        </div>
+      </div>
+
+      <div class="form-group mt-3">
+        <label>Observaciones del Cierre</label>
+        <textarea [(ngModel)]="observacionCierre" class="form-control" rows="2" placeholder="Ej: Faltan 10ctvs por redondeo..."></textarea>
+      </div>
+
+    </div>
+
+    <div class="modal__footer">
+      <button class="btn btn--outline" (click)="cerrarModales()">Cancelar</button>
+      <button class="btn btn--danger" (click)="confirmarCierre()">
+        <i class="fas fa-lock"></i> Cerrar Caja Definitivamente
+      </button>
+    </div>
+  </div>
+</div>

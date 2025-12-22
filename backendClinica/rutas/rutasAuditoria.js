@@ -1,0 +1,8 @@
+const express = require('express');
+const router = express.Router();
+const AudiController = require('../controladores/auditoria/ctlauditoria.js');
+const authenticateToken = require('../middleware/auth');
+
+router.get('/', authenticateToken, AudiController.getAuditoria);
+
+module.exports = router; 

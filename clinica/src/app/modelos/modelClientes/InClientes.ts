@@ -7,7 +7,7 @@ export interface InClientes {
 	client_direccion:string,
 	client_correo:string
     //estado: string,
-    //usuario:string,
+    user_id?:number;
     //fecha_registro:string;
 
 

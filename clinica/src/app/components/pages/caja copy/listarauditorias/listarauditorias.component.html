@@ -1,0 +1,87 @@
+<div class="card">
+  <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+    <h3 class="mb-0"><i class="fas fa-history"></i> Auditoría del Sistema</h3>
+    
+    <div class="input-group" style="max-width: 300px;">
+      <input type="text" 
+             class="form-control" 
+             placeholder="Buscar tabla, operación..." 
+             [(ngModel)]="filtro" 
+             (keyup.enter)="buscar()">
+      <button class="btn btn-light" (click)="buscar()">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="card-body">
+    
+    <div *ngIf="loading" class="text-center p-4">
+      <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+      <p>Cargando registros...</p>
+    </div>
+
+    <div class="table-responsive" *ngIf="!loading">
+      <table class="table table-bordered table-hover">
+        <thead class="thead-light">
+          <tr>
+            <th>ID</th>
+            <th>Fecha</th>
+            <th>Usuario</th>
+            <th>Operación</th>
+            <th>Detalles (JSON)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of listaAuditoria">
+            <td>{{ item.audi_id }}</td>
+            <td>{{ item.fecha | date:'dd/MM/yy HH:mm' }}</td>
+            <td>
+              <span class="font-weight-bold">{{ item.user_nombres }}</span>
+            </td>
+            <td>
+              <span class="badge" 
+                [ngClass]="{
+                  ' bg-success': item.operacion === 'REGISTRAR',
+                  ' bg-warning': item.operacion === 'ACTUALIZAR',
+                  ' bg-danger': item.operacion === 'ELIMINAR' || item.operacion === 'ANULAR'
+                }">
+                {{ item.operacion }}
+              </span>
+              <br>
+              <small class="text-muted">{{ item.tabla }} (ID: {{ item.registro_id }})</small>
+            </td>
+            <td style="font-size: 0.85rem;">
+              <div *ngIf="item.dato_antiguo">
+                <strong class="text-danger">Anterior:</strong>
+                <pre class="bg-light p-1 border">{{ formatearJson(item.dato_antiguo) }}</pre>
+              </div>
+              <div *ngIf="item.dato_nuevo">
+                <strong class="text-success">Nuevo:</strong>
+                <pre class="bg-light p-1 border">{{ formatearJson(item.dato_nuevo) }}</pre>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <small>Total registros: {{ totalRegistros }}</small>
+      <div>
+        <button class="btn btn-sm btn-outline-secondary" 
+                [disabled]="page === 1" 
+                (click)="cambiarPagina(-1)">
+          Anterior
+        </button>
+        <span class="mx-3">Pág {{ page }}</span>
+        <button class="btn btn-sm btn-outline-secondary" 
+                [disabled]="(page * size) >= totalRegistros" 
+                (click)="cambiarPagina(1)">
+          Siguiente
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

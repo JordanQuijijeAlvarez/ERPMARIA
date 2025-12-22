@@ -1,0 +1,48 @@
+<div class="card">
+  <div class="card__header">
+    <h2 class="card__title">Historial de Cajas</h2>
+  </div>
+  
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Cajero</th>
+          <th>Apertura</th>
+          <th>Cierre</th>
+          <th>Estado</th>
+          <th class="text-right">Diferencia</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of listaCajas">
+          <td>#{{ item.caja_id }}</td>
+          <td>{{ item.cajero_nombre }}</td>
+          <td>{{ item.fecha_inicio | date:'dd/MM/yy HH:mm' }}</td>
+          <td>
+            <span *ngIf="item.fecha_fin">{{ item.fecha_fin | date:'dd/MM/yy HH:mm' }}</span>
+            <span *ngIf="!item.fecha_fin" class="text-muted">---</span>
+          </td>
+          <td>
+            <span class="badge" [ngClass]="item.estado === '1' ? ' bg-success' : ' bg-danger'">
+              {{ item.estado === '1' ? 'ABIERTA' : 'CERRADA' }}
+            </span>
+          </td>
+          <td class="text-right font-bold">
+            <span *ngIf="item.estado === '0'" 
+                  [ngClass]="{'text-danger': item.diferencia < 0, 'text-success': item.diferencia > 0}">
+              {{ item.diferencia | currency:'USD' }}
+            </span>
+          </td>
+          <td class="text-center">
+            <button class="btn btn--sm btn--info" (click)="generarReportePDF(item)" title="Descargar Reporte">
+              <i class="fas fa-file-pdf"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

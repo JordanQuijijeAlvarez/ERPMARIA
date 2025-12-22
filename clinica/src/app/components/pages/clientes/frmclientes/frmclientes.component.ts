@@ -212,7 +212,8 @@ export class frmClientesComponent {
       client_apellidos: this.frmCliente.value.txtApellidos,
       client_correo: this.frmCliente.value.txtCorreo,
       client_direccion: this.frmCliente.value.txtDireccion,
-      client_id: 0
+      client_id: 0,
+      user_id: 1
     };
 
     if (this.eventoUpdate) {

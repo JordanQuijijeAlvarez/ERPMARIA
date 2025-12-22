@@ -1,0 +1,47 @@
+/* ========================================
+   LISTA DE CLIENTES - ESTILOS ESPECÍFICOS
+   ======================================== */
+
+/* ----- Contenedor principal ----- */
+.clientes {
+  padding: 24px;
+}
+
+/* ----- Sección de encabezado ----- */
+.clientes-header {
+  margin-bottom: 24px;
+}
+
+.clientes-header__search {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+/* ----- Tabla de clientes ----- */
+.clientes-table {
+  margin-top: 24px;
+}
+
+.clientes-table__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.clientes-table__row-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ----- Badge de búsqueda ----- */
+.clientes-search-badge {
+  position: static;
+  transform: none;
+}
+
+/* ----- Botón limpiar en tabla vacía ----- */
+.clientes-table__empty-button {
+  margin-top: 16px;
+}
