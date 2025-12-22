@@ -66,7 +66,7 @@ exports.getClientes = async (req, res) => {
     try {
         connection = await getConnection();
         const result = await connection.execute(
-            `SELECT * FROM CLIENTE`,
+            `SELECT * FROM CLIENTE ORDER BY client_id DESC`,
             [],
             { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
@@ -125,7 +125,7 @@ exports.getclienteCedulaEstado = async (req, res) => {
         connection = await getConnection();
         // Nota: En Oracle los parámetros posicionales son :1, :2 o por nombre :cedula, :estado
         // Es más seguro usar bind por nombre o posición estricta.
-        const query = `SELECT * FROM CLIENTE WHERE client_cedula = :cedula AND client_estado = :estado`;
+        const query = `SELECT * FROM CLIENTE WHERE client_cedula = :cedula AND client_estado = :estado `;
         
         const result = await connection.execute(
             query,

@@ -1,6 +1,22 @@
 <div class="card">
-  <div class="card__header">
+  <div class="card__header d-flex justify-content-between align-items-center">
     <h2 class="card__title">Historial de Cajas</h2>
+    
+    <div class="header-actions">
+      <button 
+        *ngIf="!tieneCajaAbierta" 
+        class="btn btn--success" 
+        (click)="abrirCaja()">
+        <i class="fas fa-cash-register"></i> Abrir Nueva Caja
+      </button>
+
+      <button 
+        *ngIf="tieneCajaAbierta" 
+        class="btn btn--danger" 
+        (click)="cerrarCaja()">
+        <i class="fas fa-lock"></i> Cerrar Caja Actual
+      </button>
+    </div>
   </div>
   
   <div class="table-responsive">
@@ -26,7 +42,7 @@
             <span *ngIf="!item.fecha_fin" class="text-muted">---</span>
           </td>
           <td>
-            <span class="badge" [ngClass]="item.estado === '1' ? ' bg-success' : ' bg-danger'">
+            <span class="badge" [ngClass]="item.estado === '1' ? 'badge-success' : 'badge-danger'">
               {{ item.estado === '1' ? 'ABIERTA' : 'CERRADA' }}
             </span>
           </td>
@@ -35,6 +51,7 @@
                   [ngClass]="{'text-danger': item.diferencia < 0, 'text-success': item.diferencia > 0}">
               {{ item.diferencia | currency:'USD' }}
             </span>
+            <span *ngIf="item.estado === '1'" class="text-muted">En curso...</span>
           </td>
           <td class="text-center">
             <button class="btn btn--sm btn--info" (click)="generarReportePDF(item)" title="Descargar Reporte">

@@ -42,8 +42,8 @@ export class clienteService {
   }
 
 
-  Eliminarcliente(id:number):Observable<any>{
-    return this.http.delete(`${this.urlServidor}/clientes/eliminar/${id}`);
+  Eliminarcliente(id:number, userid:number):Observable<any>{
+    return this.http.delete(`${this.urlServidor}/clientes/eliminar/${id}`, { body: { user_id: userid } });
 
   }
   Actualizarcliente(cliente: InClientes): Observable<any> {

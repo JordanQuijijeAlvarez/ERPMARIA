@@ -1,18 +1,16 @@
 const { getConnection, oracledb } = require('../../configuracion/oraclePool');
-
-exports.getAuditoria = async(req, res) => {
+exports.getAuditoria = async (req, res) => {
     let connection;
 
     try {
-        // Obtener parámetros de la URL (Query Params)
-        // Ejemplo: /api/auditoria?page=1&size=10&search=VENTAS
+        // Query params
         const page = parseInt(req.query.page) || 1;
         const size = parseInt(req.query.size) || 10;
         const search = req.query.search || '';
 
-        connection = await getConnection(); // O oracledb.getConnection(...)
+        connection = await getConnection();
 
-        // IMPORTANTE: Configurar oracledb para que devuelva los CLOB como Strings automáticamente
+        // Convertir CLOB a string automáticamente
         oracledb.fetchAsString = [oracledb.CLOB];
 
         const result = await connection.execute(
@@ -34,32 +32,36 @@ exports.getAuditoria = async(req, res) => {
             }
         );
 
-        // Procesar el cursor
         const resultSet = result.outBinds.p_cursor;
-        const rows = await resultSet.getRows(); // Obtener todas las filas de la página actual
+
+        // ✅ SOLUCIÓN 1: leer el cursor completo correctamente
+        const rows = [];
+        let row;
+
+        while ((row = await resultSet.getRow())) {
+            rows.push(row);
+        }
+
+        await resultSet.close();
+
         const totalRecords = result.outBinds.p_total_recs;
 
-        await resultSet.close(); // Siempre cerrar el ResultSet
-
-        // Estructura de respuesta estándar
         res.status(200).json({
             ok: true,
             data: rows.map(row => ({
-               
                 audi_id: row[0],
                 tabla: row[1],
                 registro_id: row[2],
                 operacion: row[3],
-                dato_antiguo: row[4], // JSON texto
-                dato_nuevo: row[5],   // JSON texto
+                dato_antiguo: row[4],
+                dato_nuevo: row[5],
                 user_id: row[6],
                 user_nombres: row[7],
                 fecha: row[8]
-        
             })),
             pagination: {
-                page: page,
-                size: size,
+                page,
+                size,
                 total: totalRecords
             }
         });
@@ -80,5 +82,4 @@ exports.getAuditoria = async(req, res) => {
             }
         }
     }
-}
-
+};

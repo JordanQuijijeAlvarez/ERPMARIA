@@ -123,3 +123,210 @@
     transform: translateY(0); 
   }
 }
+
+/* =========================================
+   1. ESTRUCTURA DEL MODAL (Overlay y Caja)
+   ========================================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Fondo más oscuro */
+  backdrop-filter: blur(4px); /* Efecto borroso moderno */
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-content {
+  background: #fff;
+  width: 90%;
+  max-width: 900px; /* Ancho amplio para ver los JSON lado a lado */
+  border-radius: 12px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh; /* Para que no se salga de la pantalla */
+  overflow: hidden;
+  animation: slideUp 0.3s ease-out;
+}
+
+/* =========================================
+   2. HEADER Y FOOTER
+   ========================================= */
+.modal-header {
+  padding: 1.2rem 1.5rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #adb5bd;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: #dc3545;
+}
+
+.modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e9ecef;
+  background-color: #fff;
+  text-align: right;
+}
+
+/* =========================================
+   3. CUERPO Y RESUMEN
+   ========================================= */
+.modal-body {
+  padding: 1.5rem;
+  overflow-y: auto; /* Scroll interno si el contenido es muy largo */
+}
+
+.audit-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  background-color: #f1f3f5;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  border-left: 4px solid #3498db;
+}
+
+.audit-summary p {
+  margin: 0;
+  color: #495057;
+  font-size: 0.95rem;
+}
+
+/* =========================================
+   4. VISTA DE COMPARACIÓN (Lado a Lado)
+   ========================================= */
+.comparison-view {
+  display: flex;
+  align-items: stretch;
+  gap: 20px;
+  position: relative;
+}
+
+/* Bloques de Datos */
+.data-block {
+  flex: 1;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.data-block h4 {
+  margin: 0;
+  padding: 10px 15px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Estilo Específico para ANTERIOR (Rojo/Naranja) */
+.data-block.old {
+  border-color: #fadbd8;
+}
+.data-block.old h4 {
+  background-color: #fdedec;
+  color: #c0392b;
+}
+
+/* Estilo Específico para NUEVO (Verde) */
+.data-block.new {
+  border-color: #d4efdf;
+}
+.data-block.new h4 {
+  background-color: #eafaf1;
+  color: #27ae60;
+}
+
+/* Flecha Central */
+.arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #95a5a6;
+  font-size: 1.5rem;
+}
+
+/* =========================================
+   5. EL VISOR DE JSON (PRE)
+   ========================================= */
+.code-wrapper {
+  background-color: #fdfdfd;
+  flex-grow: 1;
+  position: relative;
+}
+
+.code-wrapper pre {
+  margin: 0;
+  padding: 15px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: #333;
+  white-space: pre-wrap; /* Ajuste de línea para que no explote horizontalmente */
+  word-wrap: break-word;
+  line-height: 1.5;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Scrollbar bonito para el código */
+.code-wrapper pre::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.code-wrapper pre::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}
+
+/* =========================================
+   6. ANIMACIONES Y RESPONSIVE
+   ========================================= */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .comparison-view {
+    flex-direction: column;
+  }
+  .arrow {
+    transform: rotate(90deg); /* Flecha hacia abajo en celular */
+    margin: 10px 0;
+  }
+}

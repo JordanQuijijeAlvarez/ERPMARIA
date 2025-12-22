@@ -33,6 +33,7 @@ import { PerfilComponent } from './components/pages/perfil/perfil.component';
 import { frmCajaComponent } from './components/pages/caja/frmcaja/frmcaja.component';
 import { ListacajasComponent } from './components/pages/caja/listacaja/listacajas.component';
 import { ListarAuditoriasComponent } from './components/pages/caja copy/listarauditorias/listarauditorias.component';
+import { CajaAbiertaGuard } from './guards/cajaAbierta.guard';
 
 export const routes: Routes = [
 
@@ -129,7 +130,7 @@ export const routes: Routes = [
       {
         path: 'crearVenta',
         component: FrmventasComponent,
-        canActivate: [RoleGuard],
+        canActivate: [RoleGuard, CajaAbiertaGuard],
         data: { roles: ['ADMINISTRADOR', 'CAJERO'] },
       },
        {
@@ -141,7 +142,7 @@ export const routes: Routes = [
  {
         path: 'actualizarVenta/:id',
         component: FrmventasComponent,
-        canActivate: [RoleGuard],
+        canActivate: [RoleGuard, CajaAbiertaGuard],
         data: { roles: ['ADMINISTRADOR', 'CAJERO'] },
       },
       
@@ -149,7 +150,7 @@ export const routes: Routes = [
       {
         path: 'crearCompra',
         component: FrmComprasComponent,
-        canActivate: [RoleGuard],
+        canActivate: [RoleGuard,CajaAbiertaGuard],
         data: { roles: ['ADMINISTRADOR'] },
       },
        {
@@ -161,7 +162,7 @@ export const routes: Routes = [
  {
         path: 'actualizarCompra/:id',
         component: FrmComprasComponent,
-        canActivate: [RoleGuard],
+        canActivate: [RoleGuard,CajaAbiertaGuard],
         data: { roles: ['ADMINISTRADOR'] },
       },
 

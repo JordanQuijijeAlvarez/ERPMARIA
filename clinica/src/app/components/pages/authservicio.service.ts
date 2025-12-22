@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { InLogin } from '../modelos/InLogin';
-import { InResposeToken } from '../modelos/InResposeToken';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 
@@ -19,17 +17,6 @@ export class AuthService {
   constructor(private http: HttpClient, private router: Router) { }
 
   
-
-  login(usuario: InLogin): Observable<InResposeToken> {
-    console.log(usuario)
-    return this.http.post<InResposeToken>(this.ServidorUrl, usuario).pipe(
-      tap(response => {
-        if (response && response.token) {
-          this.guardarToken(response.token);
-        }
-      })
-    );
-  }
 
   // login(usuarioLogin: InLogin): Observable<InResposeToken> {
   //   return this.http.post<InResposeToken>(this.ServidorUrl, usuarioLogin).pipe(

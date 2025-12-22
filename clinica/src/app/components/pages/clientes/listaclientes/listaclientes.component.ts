@@ -205,7 +205,8 @@ export class ListaclientesComponent {
       'Cancelar'
     ).then((result) => {
       if (result.isConfirmed) {
-        this.ServicioCliente.Eliminarcliente(id).subscribe({
+        const user_id = 1;
+        this.ServicioCliente.Eliminarcliente(id, user_id).subscribe({
           next: (res) => {
             this.listaclientes = this.listaclientes.filter(
               (cliente) => cliente.client_id !== id

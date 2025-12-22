@@ -62,6 +62,8 @@ export class ComponenteloginComponent implements OnInit {
           // Login exitoso - redirigir según rol
           console.log('Login exitoso, redirigiendo...');
           const userRole = this.authservicio.obtenerRol();
+          localStorage.setItem('user_id', res.usuario.id?.toString() || '0');
+
           
           if (userRole === 'ADMINISTRADOR') {
             this.router.navigate(['home/dashboard']);
@@ -94,6 +96,8 @@ export class ComponenteloginComponent implements OnInit {
     return this.formLogin.get('usuario') as FormControl;
 
   }
+
+
   }
 
 

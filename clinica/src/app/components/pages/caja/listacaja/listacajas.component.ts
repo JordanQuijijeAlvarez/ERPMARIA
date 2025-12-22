@@ -10,6 +10,7 @@ import { InClientes } from '../../../../modelos/modelClientes/InClientes';
 import { CajaService } from '../../../../servicios/caja.service';
 import { jsPDF } from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
+import { routes } from '../../../../app.routes';
 
 @Component({
     selector: 'app-listacajas',
@@ -18,15 +19,35 @@ import { autoTable } from 'jspdf-autotable';
     styleUrl: './listacajas.component.css'
 })
 export class ListacajasComponent implements OnInit {
+cerrarCaja() {
+
+      this.router.navigate(['/home/caja']);
+ }
+abrirCaja() {
+      this.router.navigate(['/home/caja']);
+}
 
   listaCajas: any[] = [];
+  tieneCajaAbierta: boolean = false; // <--- VARIABLE QUE CONTROLA LOS BOTONES
 
-  constructor(private cajaService: CajaService) {}
+  constructor(private cajaService: CajaService, private router: Router) {}
 
   ngOnInit(): void {
     this.cargarHistorial();
+    this.verificarEstadoActual();
   }
 
+  // Verificar si el usuario ya tiene una caja abierta
+  verificarEstadoActual() {
+    const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+    const userId = usuario.user_id;
+
+    if (userId) {
+      this.cajaService.verificarEstadoCaja(userId).subscribe((res: any) => {
+        this.tieneCajaAbierta = res.abierta; // True o False desde tu backend
+      });
+    }
+  }
   cargarHistorial() {
     this.cajaService.listarHistorialCajas().subscribe({
       next: (res) => this.listaCajas = res,

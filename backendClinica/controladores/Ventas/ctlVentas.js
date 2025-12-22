@@ -101,7 +101,7 @@ exports.getEncabVentaEstado= async (req, res) => {
     try {
         connection = await getConnection();
         const result = await connection.execute(
-            `SELECT * FROM VW_VENTAS WHERE venta_estadoregistro = :estado`,
+            `SELECT * FROM VW_VENTAS WHERE venta_estadoregistro = :estado ORDER BY venta_id DESC`,
             [estado],
             { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
