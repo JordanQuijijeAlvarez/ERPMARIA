@@ -1,0 +1,54 @@
+;;; 
+Export: Release 19.0.0.0.0 - Production on Mon Dec 22 19:33:55 2025
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle and/or its affiliates.  All rights reserved.
+;;; 
+Connected to: Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Starting "ADMINISTRADOR"."SYS_EXPORT_SCHEMA_01":  administrador/********@pdb_erpmaria schemas=ADMINISTRADOR directory=BACKUP_DIR dumpfile=erpmaria_test.dmp logfile=erpmaria_test_exp.log 
+Processing object type SCHEMA_EXPORT/TABLE/TABLE_DATA
+Processing object type SCHEMA_EXPORT/PACKAGE/PACKAGE_BODY
+Processing object type SCHEMA_EXPORT/TABLE/INDEX/STATISTICS/INDEX_STATISTICS
+Processing object type SCHEMA_EXPORT/TABLE/STATISTICS/TABLE_STATISTICS
+Processing object type SCHEMA_EXPORT/STATISTICS/MARKER
+Processing object type SCHEMA_EXPORT/PRE_SCHEMA/PROCACT_SCHEMA
+Processing object type SCHEMA_EXPORT/SEQUENCE/SEQUENCE
+Processing object type SCHEMA_EXPORT/TABLE/TABLE
+Processing object type SCHEMA_EXPORT/TABLE/COMMENT
+Processing object type SCHEMA_EXPORT/TABLE/IDENTITY_COLUMN
+Processing object type SCHEMA_EXPORT/PACKAGE/PACKAGE_SPEC
+Processing object type SCHEMA_EXPORT/FUNCTION/FUNCTION
+Processing object type SCHEMA_EXPORT/PROCEDURE/PROCEDURE
+Processing object type SCHEMA_EXPORT/PACKAGE/COMPILE_PACKAGE/PACKAGE_SPEC/ALTER_PACKAGE_SPEC
+Processing object type SCHEMA_EXPORT/FUNCTION/ALTER_FUNCTION
+Processing object type SCHEMA_EXPORT/PROCEDURE/ALTER_PROCEDURE
+Processing object type SCHEMA_EXPORT/VIEW/VIEW
+Processing object type SCHEMA_EXPORT/TABLE/INDEX/INDEX
+Processing object type SCHEMA_EXPORT/TABLE/CONSTRAINT/CONSTRAINT
+Processing object type SCHEMA_EXPORT/TABLE/CONSTRAINT/REF_CONSTRAINT
+Processing object type SCHEMA_EXPORT/TABLE/TRIGGER
+. . exported "ADMINISTRADOR"."SESIONES_ACTIVAS"          17.85 KB      34 rows
+. . exported "ADMINISTRADOR"."PRODUCTO"                  12.98 KB      26 rows
+. . exported "ADMINISTRADOR"."CLIENTE"                   11.78 KB      35 rows
+. . exported "ADMINISTRADOR"."AUDITORIA"                 10.79 KB       5 rows
+. . exported "ADMINISTRADOR"."VENTA"                     10.93 KB      14 rows
+. . exported "ADMINISTRADOR"."PROVEEDOR"                 10.23 KB      15 rows
+. . exported "ADMINISTRADOR"."COMPRA"                    10.46 KB       4 rows
+. . exported "ADMINISTRADOR"."APERTURA_CAJA"             10.70 KB       3 rows
+. . exported "ADMINISTRADOR"."MOVIMIENTO_STOCK"          10.64 KB      31 rows
+. . exported "ADMINISTRADOR"."PERMISO"                   8.765 KB      33 rows
+. . exported "ADMINISTRADOR"."DETALLE_VENTA"             8.882 KB      25 rows
+. . exported "ADMINISTRADOR"."DETALLE_COMPRA"            8.765 KB       4 rows
+. . exported "ADMINISTRADOR"."USUARIO"                   8.289 KB       2 rows
+. . exported "ADMINISTRADOR"."USUARIO_2FA"               8.187 KB       1 rows
+. . exported "ADMINISTRADOR"."SUBCATEGORIA"              8.015 KB      18 rows
+. . exported "ADMINISTRADOR"."LOCAL"                     7.726 KB       1 rows
+. . exported "ADMINISTRADOR"."ROL_PERMISO"               7.765 KB      44 rows
+. . exported "ADMINISTRADOR"."CATEGORIA"                 7.289 KB       9 rows
+. . exported "ADMINISTRADOR"."USUARIO_ROL"               6.843 KB       3 rows
+. . exported "ADMINISTRADOR"."ROL"                       6.398 KB       2 rows
+Master table "ADMINISTRADOR"."SYS_EXPORT_SCHEMA_01" successfully loaded/unloaded
+******************************************************************************
+Dump file set for ADMINISTRADOR.SYS_EXPORT_SCHEMA_01 is:
+  /u01/app/oracle/backup/erpmaria_test.dmp
+Job "ADMINISTRADOR"."SYS_EXPORT_SCHEMA_01" successfully completed at Mon Dec 22 19:34:33 2025 elapsed 0 00:00:35
