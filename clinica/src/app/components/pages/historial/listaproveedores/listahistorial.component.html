@@ -1,239 +1,270 @@
+
+
 <div class="auditoria-page">
-  
-    <div class="card auditoria-header">
-      <div class="card__header">
-        <h2 class="card__title">
-          <i class="fas fa-shield-alt"></i> CENTRO DE SEGURIDAD
-        </h2>
-        <p class="card__subtitle">Monitoreo de auditoría de datos y accesos al sistema</p>
-      </div>
-  
-      <div class="tabs-container">
-        <button 
-          class="tab-btn" 
-          [class.active]="activeTab === 'cambios'"
-          (click)="switchTab('cambios')">
-          <i class="fas fa-database"></i> Auditoría de Datos
-        </button>
-        <button 
-          class="tab-btn" 
-          [class.active]="activeTab === 'accesos'"
-          (click)="switchTab('accesos')">
-          <i class="fas fa-key"></i> Historial de Accesos
-        </button>
-      </div>
-  
-      <div class="auditoria-filters" *ngIf="activeTab === 'cambios'">
-        
+
+  <div class="card auditoria-header">
+    <div class="card__header">
+      <h2 class="card__title">
+        <i class="fas fa-shield-alt"></i> CENTRO DE SEGURIDAD
+      </h2>
+      <p class="card__subtitle">Monitoreo de auditoría de datos y accesos al sistema</p>
+    </div>
+
+    <div class="tabs-container">
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'datos'"
+        (click)="switchTab('datos')">
+        <i class="fas fa-database"></i> Auditoría de Datos
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'sesiones'"
+        (click)="switchTab('sesiones')">
+        <i class="fas fa-key"></i> Historial de Accesos
+      </button>
+    </div>
+
+    <div class="auditoria-filters">
+      
+      <ng-container *ngIf="activeTab === 'datos'">
         <div class="filter-box">
-          <select 
-            [(ngModel)]="filterOperacion" 
-            (change)="onSearch()"
-            class="search-box__input filter-select">
+          <select class="search-box__input filter-select">
             <option value="">Todas las Operaciones</option>
             <option value="REGISTRAR">Creación (INSERT)</option>
             <option value="ACTUALIZAR">Modificación (UPDATE)</option>
             <option value="ELIMINAR">Eliminación (DELETE)</option>
           </select>
         </div>
-  
-        <div class="filter-box">
-          <select 
-            [(ngModel)]="filterTabla" 
-            (change)="onSearch()"
-            class="search-box__input filter-select">
-            <option value="">Todas las Tablas</option>
-            <option value="PRODUCTO">Productos</option>
-            <option value="VENTA">Ventas</option>
-            <option value="USUARIO">Usuarios</option>
-            <option value="PROVEEDOR">Proveedores</option>
-            <option value="CLIENTE">Clientes</option>
-          </select>
-        </div>
-  
-        <div class="search-box">
-          <input
-            type="text"
-            [(ngModel)]="searchTerm"
-            (keyup.enter)="onSearch()"
-            placeholder="Buscar por usuario, ID..."
-            class="search-box__input"
-          />
-          <div class="search-box__icon">
-            <i class="fas fa-search"></i>
-          </div>
-          
-          <button
-            *ngIf="searchTerm || filterOperacion || filterTabla"
-            type="button"
-            (click)="clearFilters()"
-            title="Limpiar filtros"
-            class="search-box__clear"
-          >
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  
-    <div *ngIf="activeTab === 'cambios'" class="table-container auditoria-table fade-in">
-      <div class="table-header">
-        <div class="proveedores-table__header">
-          <h3 class="table-header__title">
-            <i class="fas fa-list-alt"></i>
-            Registros de Movimientos
-          </h3>
-          
-          <div *ngIf="loading" class="badge badge--warning">
-            <i class="fas fa-spinner fa-spin"></i> Cargando...
-          </div>
-        </div>
-      </div>
-        
-      <div>
-        <table class="table">
-          <thead>
-            <tr>
-              <th><i class="fas fa-clock"></i> Fecha/Hora</th>
-              <th><i class="fas fa-user"></i> Usuario</th>
-              <th><i class="fas fa-exchange-alt"></i> Operación</th>
-              <th><i class="fas fa-database"></i> Tabla</th>
-              <th><i class="fas fa-fingerprint"></i> ID Ref.</th>
-              <th><i class="fas fa-eye"></i> Detalle</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngIf="!loading && listaAuditoria.length === 0">
-              <td colspan="6">
-                <div class="table__empty">
-                  <div class="table__empty-icon">
-                    <i class="fas fa-history"></i>
-                  </div>
-                  <div>
-                    <p><strong>No se encontraron registros</strong></p>
-                    <p>Intente ajustar los filtros de búsqueda.</p>
-                  </div>
-                </div>
-              </td>
-            </tr>
-            
-            <tr *ngFor="let audit of listaAuditoria">
-              <td>
-                <div class="fecha-container">
-                  <span class="fecha-date">{{ audit.fecha | date:'dd/MM/yyyy' }}</span>
-                  <span class="fecha-time">{{ audit.fecha | date:'mediumTime' }}</span>
-                </div>
-              </td>
-              <td>
-                <div class="user-info">
-                  <span class="user-name">{{ audit.user_nombres || 'Usuario #' + audit.user_id }}</span>
-                </div>
-              </td>
-              <td>
-                <span class="badge" [ngClass]="{
-                  'bg-primary': audit.operacion === 'REGISTRAR' || audit.operacion === 'INSERT',
-                  'bg-warning': audit.operacion === 'ACTUALIZAR' || audit.operacion === 'UPDATE',
-                  'bg-danger': audit.operacion === 'ELIMINAR' || audit.operacion === 'DELETE'
-                }">
-                  {{ audit.operacion }}
-                </span>
-              </td>
-              <td><strong>{{ audit.tabla }}</strong></td>
-              <td>#{{ audit.registro_id }}</td>
-              <td>
-                <div class="table__actions">
-                  <button
-                    (click)="verDetalles(audit)"
-                    type="button"
-                    title="Ver detalles del cambio"
-                    class="btn btn--primary btn--sm btn--icon"
-                  >
-                    <i class="fas fa-search-plus"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      
-      <div *ngIf="totalItems > 0" class="pagination">
-        <div class="pagination__info">
-          <div class="pagination__text">
-            Mostrando {{ getItemRange().start }}-{{ getItemRange().end }} de {{ totalItems }}
-          </div>
-          <div class="pagination__select-wrapper">
-              <select (change)="changeItemsPerPage(+$any($event.target).value)" [value]="itemsPerPage" class="pagination__select">
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-            </select>
-          </div>
+      </ng-container>
+
+      <div class="search-box" [style.flex]="'1'">
+        <input
+          type="text"
+          [(ngModel)]="filtro"
+          (keyup.enter)="buscar()"
+          [placeholder]="activeTab === 'datos' ? 'Buscar tabla, ID, operación...' : 'Buscar IP, Usuario...'"
+          class="search-box__input"
+        />
+        <div class="search-box__icon">
+          <i class="fas fa-search"></i>
         </div>
         
-        <div class="pagination__controls">
-          <button type="button" (click)="previousPage()" [disabled]="currentPage === 1" class="pagination__button">
-            <i class="fas fa-chevron-left"></i>
-          </button>
-          <span class="pagination__current">{{currentPage}} / {{totalPages}}</span>
-          <button type="button" (click)="nextPage()" [disabled]="currentPage === totalPages" class="pagination__button">
-            <i class="fas fa-chevron-right"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  
-    <div *ngIf="activeTab === 'accesos'" class="table-container fade-in">
-      <div class="table__empty" style="padding: 3rem;">
-        <i class="fas fa-tools fa-3x" style="color: #ccc; margin-bottom: 1rem;"></i>
-        <p>Módulo de Historial de Accesos en construcción.</p>
-      </div>
-    </div>
-  
-  </div>
-  
-  <div class="modal-overlay" *ngIf="selectedAudit">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>
-          <i class="fas fa-info-circle"></i> 
-          Detalle del Cambio #{{selectedAudit.audi_id}}
-        </h3>
-        <button (click)="closeModal()" class="close-btn">
+        <button
+          *ngIf="filtro"
+          type="button"
+          (click)="filtro = ''; buscar()"
+          title="Limpiar búsqueda"
+          class="search-box__clear">
           <i class="fas fa-times"></i>
         </button>
       </div>
-      
-      <div class="modal-body">
-        <div class="audit-summary">
-          <p><strong>Operación:</strong> {{selectedAudit.operacion}} en tabla {{selectedAudit.audi_tabla}}</p>
-          <p><strong>Usuario:</strong> {{selectedAudit.user_nombres}}</p>
-          <p><strong>Fecha:</strong> {{selectedAudit.fecha | date:'medium'}}</p>
+    </div>
+  </div>
+
+  <div class="table-container auditoria-table fade-in">
+    
+    <div class="table-header">
+      <div class="proveedores-table__header">
+        <h3 class="table-header__title">
+          <i [class]="activeTab === 'datos' ? 'fas fa-list-alt' : 'fas fa-history'"></i>
+          {{ activeTab === 'datos' ? 'Registros de Movimientos' : 'Bitácora de Inicios de Sesión' }}
+        </h3>
+        
+        <div *ngIf="loading" class="badge badge--warning">
+          <i class="fas fa-spinner fa-spin"></i> Cargando...
         </div>
-  
-        <div class="comparison-view">
-          <div class="data-block old">
-            <h4><i class="fas fa-history"></i> Valor Anterior</h4>
-            <div class="code-wrapper">
-               <pre>{{ formatearJson(selectedAudit.dato_antiguo) }}</pre>
-            </div>
-          </div>
+      </div>
+    </div>
+      
+    <div *ngIf="activeTab === 'datos' && !loading">
+      <table class="table">
+        <thead>
+          <tr>
+            <th><i class="fas fa-clock"></i> Fecha/Hora</th>
+            <th><i class="fas fa-user"></i> Usuario</th>
+            <th><i class="fas fa-exchange-alt"></i> Operación</th>
+            <th><i class="fas fa-database"></i> Tabla</th>
+            <th><i class="fas fa-fingerprint"></i> ID Ref.</th>
+            <th><i class="fas fa-eye"></i> Detalle</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="listaAuditoria.length === 0">
+            <td colspan="6">
+              <div class="table__empty">
+                <div class="table__empty-icon"><i class="fas fa-search-minus"></i></div>
+                <div>
+                  <p><strong>No se encontraron registros de datos</strong></p>
+                  <p>Intente con otros términos de búsqueda.</p>
+                </div>
+              </div>
+            </td>
+          </tr>
           
-          <div class="arrow">
-            <i class="fas fa-arrow-right"></i>
-          </div>
-          
-          <div class="data-block new">
-            <h4><i class="fas fa-check-circle"></i> Valor Nuevo</h4>
-            <div class="code-wrapper">
-              <pre>{{ formatearJson(selectedAudit.dato_nuevo) }}</pre>
-            </div>
-          </div>
+          <tr *ngFor="let audit of listaAuditoria">
+            <td>
+              <div class="fecha-container">
+                <span class="fecha-date">{{ audit.fecha | date:'dd/MM/yyyy' }}</span>
+                <span class="fecha-time">{{' ' }}</span>
+                <span class="fecha-time">{{audit.fecha | date:'mediumTime' }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="user-info">
+                <span class="user-name">{{ audit.user_nombres || 'User ID: ' + audit.user_id }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="badge " [ngClass]="{
+                ' bg-success': audit.operacion === 'REGISTRAR' || audit.audi_operacion === 'REGISTRAR',
+                ' bg-warning': audit.operacion === 'ACTUALIZAR' || audit.audi_operacion === 'ACTUALIZAR',
+                ' bg-danger': audit.operacion === 'ELIMINAR' || audit.audi_operacion === 'ELIMINAR'
+              }">
+                {{ audit.operacion }}
+              </span>
+            </td>
+            <td><strong>{{ audit.tabla }}</strong></td>
+            <td>#{{ audit.registro_id }}</td>
+            <td>
+              <div class="table__actions">
+                <button
+                  type="button"
+                  title="Ver detalles JSON"
+                  class="btn btn--primary btn--sm btn--icon"
+                  (click)="selectedAudit = audit"> <i class="fas fa-code"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="activeTab === 'sesiones' && !loading">
+      <table class="table">
+        <thead>
+          <tr>
+            <th><i class="fas fa-id-badge"></i> ID Sesión</th>
+            <th><i class="fas fa-user-circle"></i> Usuario</th>
+            <th><i class="fas fa-network-wired"></i> IP</th>
+            <th><i class="fas fa-laptop"></i> Dispositivo</th>
+            <th><i class="fas fa-clock"></i> Inicio / Fin</th>
+            <th><i class="fas fa-wifi"></i> Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="listaSesiones.length === 0">
+            <td colspan="6">
+              <div class="table__empty">
+                <div class="table__empty-icon"><i class="fas fa-user-slash"></i></div>
+                <div>
+                  <p><strong>No hay historial de accesos</strong></p>
+                  <p>No se encontraron sesiones recientes.</p>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngFor="let sesion of listaSesiones">
+            <td>#{{ sesion.sesion_id }}</td>
+            <td>
+              <div class="user-info">
+                <span class="user-name" style="font-weight: bold; color: var(--primary-color);">
+                    {{ sesion.usuario }}
+                </span>
+              </div>
+            </td>
+            <td>
+                <span class="badge " style="background-color: #f0f2f5; color: #333; border: 1px solid #ddd;">
+                    {{ sesion.ip_address }}
+                </span>
+            </td>
+            <td>
+                <span title="{{ sesion.user_agent }}" style="display: inline-block; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: help;">
+                    {{ sesion.user_agent }}
+                </span>
+            </td>
+            <td>
+              <div class="fecha-container">
+                <span class="fecha-date">In: {{ sesion.fecha_inicio | date:'dd/MM HH:mm' }}</span>
+                <span class="fecha-time" style="color: #666;">Ult: {{ sesion.ultima_actividad | date:'HH:mm:ss' }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="badge " [ngClass]="sesion.activo ? 'bg-success' : 'bg-secondary'">
+                {{ sesion.activo ? 'En Línea' : 'Off-line' }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <div *ngIf="totalRegistros > 0" class="pagination">
+      <div class="pagination__info">
+        <div class="pagination__text">
+          Total: <strong>{{ totalRegistros }}</strong> registros
         </div>
       </div>
       
-      <div class="modal-footer">
-        <button (click)="closeModal()" class="btn btn--outline">Cerrar</button>
+      <div class="pagination__controls">
+        <button type="button" (click)="cambiarPagina(-1)" [disabled]="page === 1" class="pagination__button">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        
+        <span class="pagination__current">Página {{ page }}</span>
+        
+        <button type="button" (click)="cambiarPagina(1)" [disabled]="(page * size) >= totalRegistros" class="pagination__button">
+          <i class="fas fa-chevron-right"></i>
+        </button>
       </div>
     </div>
   </div>
+
+</div>
+
+<div class="modal-overlay" *ngIf="selectedAudit">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>
+        <i class="fas fa-info-circle"></i> 
+        Detalle del Cambio #{{selectedAudit.audi_id}}
+      </h3>
+      <button (click)="selectedAudit = null" class="close-btn">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="audit-summary">
+        <p><strong>Operación:</strong> {{selectedAudit.operacion}} en tabla {{selectedAudit.tabla}}</p>
+        <p><strong>Fecha:</strong> {{selectedAudit.fecha | date:'medium'}}</p>
+      </div>
+
+      <div class="comparison-view">
+        <div class="data-block old" *ngIf="selectedAudit.dato_antiguo">
+          <h4><i class="fas fa-history"></i> Valor Anterior</h4>
+          <div class="code-wrapper">
+             <pre>{{ formatearJson(selectedAudit.dato_antiguo) }}</pre>
+          </div>
+        </div>
+        
+        <div class="arrow" *ngIf="selectedAudit.dato_antiguo && selectedAudit.dato_nuevo">
+          <i class="fas fa-arrow-right"></i>
+        </div>
+        
+        <div class="data-block new" *ngIf="selectedAudit.dato_nuevo">
+          <h4><i class="fas fa-check-circle"></i> Valor Nuevo</h4>
+          <div class="code-wrapper">
+            <pre>{{ formatearJson(selectedAudit.dato_nuevo) }}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button (click)="selectedAudit = null" class="btn btn--outline">Cerrar</button>
+    </div>
+  </div>
+</div>

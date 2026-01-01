@@ -325,7 +325,7 @@ export class FrmComprasComponent implements OnInit {
       compra_id: this.eventoUpdate ? this.codigoCompra : 0,
       prove_id: this.proveedorId,
       local_id: 1,
-      user_id: 1,
+      user_id: parseInt(localStorage.getItem('user_id') ?? '1'),
       compra_total: this.total,
       compra_iva: this.iva,
       compra_subiva: this.subiva,

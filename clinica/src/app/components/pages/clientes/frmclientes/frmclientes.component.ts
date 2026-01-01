@@ -213,7 +213,7 @@ export class frmClientesComponent {
       client_correo: this.frmCliente.value.txtCorreo,
       client_direccion: this.frmCliente.value.txtDireccion,
       client_id: 0,
-      user_id: 1
+      user_id: parseInt(localStorage.getItem('user_id') ?? '1')
     };
 
     if (this.eventoUpdate) {

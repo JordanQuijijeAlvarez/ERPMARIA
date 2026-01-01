@@ -1,145 +1,121 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuditoriaService } from '../../../../servicios/auditoria.service'; // Asegúrate de la ruta correcta
+import { RouterModule } from '@angular/router';
+import { AuditoriaService } from '../../../../servicios/auditoria.service';
+// Si no usas directivas personalizadas en este HTML específico, puedes quitar DirectivasModule para probar
+import { DirectivasModule } from '../../../../directivas/directivas.module'; 
 
 @Component({
-  selector: 'app-listahistorial',
+  selector: 'app-listarauditorias',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, RouterModule, DirectivasModule, FormsModule],
   templateUrl: './listahistorial.component.html',
-  styleUrls: ['./listahistorial.component.css']
+  styleUrl: './listahistorial.component.css'
 })
 export class ListahistorialComponent implements OnInit {
-  
-  // == CONTROL DE PESTAÑAS ==
-  activeTab: 'cambios' | 'accesos' = 'cambios';
 
-  // == DATOS AUDITORÍA (REALES) ==
-  listaAuditoria: any[] = []; // Datos que vienen del API
+  // Tipado estricto para evitar errores de asignación
+  activeTab: 'datos' | 'sesiones' = 'datos';
+
+  listaAuditoria: any[] = [];
+  listaSesiones: any[] = []; 
+
+  page: number = 1;
+  size: number = 10;
+  totalRegistros: number = 0;
+  filtro: string = '';
   loading: boolean = false;
+  selectedAudit: any = null;
 
-  // == FILTROS ==
-  searchTerm: string = '';
-  filterOperacion: string = '';
-  filterTabla: string = '';
-
-  // == PAGINACIÓN SERVER-SIDE ==
-  currentPage: number = 1;
-  itemsPerPage: number = 10;
-  totalItems: number = 0;
-  totalPages: number = 0;
-
-  // == MODAL ==
-  selectedAudit: any | null = null;
-
-  constructor(private auditoriaService: AuditoriaService) { }
+  constructor(private auditoriaService: AuditoriaService) { 
+    console.log('>>> Constructor: Componente ListarAuditorias iniciado');
+  }
 
   ngOnInit(): void {
-    this.cargarAuditoria();
+    this.cargarDatos();
   }
 
-  // ==========================================
-  // LÓGICA DE TABS
-  // ==========================================
-  switchTab(tab: 'cambios' | 'accesos') {
+  // Cambiar pestaña
+  switchTab(tab: 'datos' | 'sesiones') {
+    // 1. Log inicial para confirmar que el clic entró
+    console.log('>>> CLICK DETECTADO. Cambiando a:', tab);
+
+    // 2. Si ya estamos en esa pestaña, no hacemos nada (opcional)
+    if (this.activeTab === tab) {
+        console.log('>>> Ya estás en la pestaña ' + tab);
+        return;
+    }
+
     this.activeTab = tab;
-    // Si quisieras cargar accesos, aquí llamarías a ese servicio
+
+    // 3. Resetear variables
+    this.page = 1;
+    this.filtro = '';
+    this.totalRegistros = 0;
+    this.listaAuditoria = [];
+    this.listaSesiones = [];
+
+    // 4. Cargar datos
+    this.cargarDatos();
   }
 
-  // ==========================================
-  // CARGA DE DATOS (REAL CON API)
-  // ==========================================
-  cargarAuditoria() {
+  cargarDatos() {
     this.loading = true;
+    console.log(`>>> Cargando datos para [${this.activeTab}]...`);
 
-    // Truco: Como el Backend recibe un solo string de filtro,
-    // enviamos el que tenga valor. Prioridad: Buscador > Tabla > Operación
-    // Si quisieras filtrar estricto por columna, habría que editar el SP.
-    // Por ahora, combinamos para que busque "lo que sea que el usuario ponga"
-    let filtroParaEnviar = this.searchTerm;
-    if (!filtroParaEnviar && this.filterTabla) filtroParaEnviar = this.filterTabla;
-    if (!filtroParaEnviar && this.filterOperacion) filtroParaEnviar = this.filterOperacion;
-
-    this.auditoriaService.listar(this.currentPage, this.itemsPerPage, filtroParaEnviar)
-      .subscribe({
+    if (this.activeTab === 'datos') {
+      // --- LOGICA DE DATOS ---
+      this.auditoriaService.listar(this.page, this.size, this.filtro).subscribe({
         next: (res: any) => {
-          this.listaAuditoria = res.data;
-          this.totalItems = res.total;
-          this.totalPages = res.total_paginas || Math.ceil(this.totalItems / this.itemsPerPage);
+          console.log('>>> Datos recibidos:', res);
+          this.listaAuditoria = res.data || [];
+          this.totalRegistros = res.total || (res.pagination ? res.pagination.total : 0);
           this.loading = false;
         },
         error: (err) => {
-          console.error('Error cargando auditoría', err);
+          console.error('>>> Error en Datos:', err);
           this.loading = false;
         }
       });
-  }
 
-  // ==========================================
-  // FILTROS Y BÚSQUEDA
-  // ==========================================
-  onSearch() {
-    this.currentPage = 1; // Siempre volver a pág 1 al filtrar
-    this.cargarAuditoria();
-  }
-
-  clearFilters() {
-    this.searchTerm = '';
-    this.filterOperacion = '';
-    this.filterTabla = '';
-    this.onSearch();
-  }
-
-  // ==========================================
-  // PAGINACIÓN (SERVER SIDE)
-  // ==========================================
-  nextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.cargarAuditoria();
+    } else {
+      // --- LOGICA DE SESIONES ---
+      this.auditoriaService.getAuditoriaSesiones(this.page, this.size, this.filtro).subscribe({
+        next: (res: any) => {
+          console.log('>>> Sesiones recibidas:', res);
+          this.listaSesiones = res.data || [];
+          this.totalRegistros = res.total || (res.pagination ? res.pagination.total : 0);
+          this.loading = false;
+        },
+        error: (err) => {
+          console.error('>>> Error en Sesiones:', err);
+          this.loading = false;
+        }
+      });
     }
   }
 
-  previousPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.cargarAuditoria();
+  buscar() {
+    this.page = 1;
+    this.cargarDatos();
+  }
+
+  cambiarPagina(delta: number) {
+    const nuevaPagina = this.page + delta;
+    if (nuevaPagina >= 1) {
+      this.page = nuevaPagina;
+      this.cargarDatos();
     }
   }
 
-  changeItemsPerPage(cant: number) {
-    this.itemsPerPage = cant;
-    this.currentPage = 1;
-    this.cargarAuditoria();
-  }
-  
-  getItemRange() {
-    const start = (this.currentPage - 1) * this.itemsPerPage + 1;
-    const end = Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
-    return { start, end };
-  }
-
-  // ==========================================
-  // MODAL Y UTILIDADES
-  // ==========================================
-  
-  verDetalles(audit: any) {
-    this.selectedAudit = audit;
-  }
-
-  closeModal() {
-    this.selectedAudit = null;
-  }
-
-  // Ayuda para mostrar JSON bonito en el modal
-  formatearJson(jsonString: string): string {
-    if (!jsonString) return '(Sin datos / Nulo)';
+  formatearJson(jsonString: any): string {
+    if (!jsonString) return '---';
     try {
-      const obj = JSON.parse(jsonString);
-      return JSON.stringify(obj, null, 2); // Identación de 2 espacios
+      const obj = typeof jsonString === 'string' ? JSON.parse(jsonString) : jsonString;
+      return JSON.stringify(obj, null, 2); 
     } catch (e) {
-      return jsonString; // Si no es JSON, devolver texto plano
+      return String(jsonString);
     }
   }
 }

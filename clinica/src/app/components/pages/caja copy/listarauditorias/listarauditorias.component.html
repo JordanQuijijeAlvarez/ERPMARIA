@@ -1,87 +1,141 @@
-<div class="card">
-  <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-    <h3 class="mb-0"><i class="fas fa-history"></i> Auditoría del Sistema</h3>
-    
-    <div class="input-group" style="max-width: 300px;">
-      <input type="text" 
-             class="form-control" 
-             placeholder="Buscar tabla, operación..." 
-             [(ngModel)]="filtro" 
-             (keyup.enter)="buscar()">
-      <button class="btn btn-light" (click)="buscar()">
-        <i class="fas fa-search"></i>
-      </button>
+<div class="card shadow-sm">
+
+  <div class="card-header bg-primary text-white">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <h3 class="mb-0 h5">
+        <i class="fas fa-shield-alt"></i> Módulo de Auditoría
+      </h3>
+
+      <div class="input-group" style="max-width: 350px;">
+        <input
+          type="text"
+          class="form-control border-0"
+          [placeholder]="activeTab === 'datos' ? 'Buscar tabla...' : 'Buscar IP/Usuario...'"
+          [(ngModel)]="filtro"
+          (keyup.enter)="buscar()">
+
+        <button class="btn btn-light text-primary" type="button" (click)="buscar()">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
     </div>
   </div>
 
   <div class="card-body">
-    
-    <div *ngIf="loading" class="text-center p-4">
-      <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
-      <p>Cargando registros...</p>
+
+    <ul class="nav nav-tabs mb-4">
+      <li class="nav-item">
+        <div class="nav-link" 
+             [class.active]="activeTab === 'datos'" 
+             (click)="switchTab('datos')"
+             style="cursor: pointer; user-select: none;">
+             <i class="fas fa-database me-1"></i> Cambios en Datos
+        </div>
+      </li>
+
+      <li class="nav-item">
+        <div class="nav-link" 
+             [class.active]="activeTab === 'sesiones'" 
+             (click)="switchTab('sesiones')"
+             style="cursor: pointer; user-select: none;">
+             <i class="fas fa-user-clock me-1"></i> Historial de Accesos
+        </div>
+      </li>
+    </ul>
+
+    <div *ngIf="loading" class="text-center p-5">
+      <i class="fas fa-spinner fa-spin fa-3x text-primary"></i>
+      <p class="mt-2 text-muted">Cargando...</p>
     </div>
 
-    <div class="table-responsive" *ngIf="!loading">
-      <table class="table table-bordered table-hover">
-        <thead class="thead-light">
-          <tr>
-            <th>ID</th>
-            <th>Fecha</th>
-            <th>Usuario</th>
-            <th>Operación</th>
-            <th>Detalles (JSON)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of listaAuditoria">
-            <td>{{ item.audi_id }}</td>
-            <td>{{ item.fecha | date:'dd/MM/yy HH:mm' }}</td>
-            <td>
-              <span class="font-weight-bold">{{ item.user_nombres }}</span>
-            </td>
-            <td>
-              <span class="badge" 
-                [ngClass]="{
-                  ' bg-success': item.operacion === 'REGISTRAR',
-                  ' bg-warning': item.operacion === 'ACTUALIZAR',
-                  ' bg-danger': item.operacion === 'ELIMINAR' || item.operacion === 'ANULAR'
-                }">
-                {{ item.operacion }}
-              </span>
-              <br>
-              <small class="text-muted">{{ item.tabla }} (ID: {{ item.registro_id }})</small>
-            </td>
-            <td style="font-size: 0.85rem;">
-              <div *ngIf="item.dato_antiguo">
-                <strong class="text-danger">Anterior:</strong>
-                <pre class="bg-light p-1 border">{{ formatearJson(item.dato_antiguo) }}</pre>
-              </div>
-              <div *ngIf="item.dato_nuevo">
-                <strong class="text-success">Nuevo:</strong>
-                <pre class="bg-light p-1 border">{{ formatearJson(item.dato_nuevo) }}</pre>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <div *ngIf="!loading">
 
-    <div class="d-flex justify-content-between align-items-center mt-3">
-      <small>Total registros: {{ totalRegistros }}</small>
-      <div>
-        <button class="btn btn-sm btn-outline-secondary" 
-                [disabled]="page === 1" 
-                (click)="cambiarPagina(-1)">
-          Anterior
-        </button>
-        <span class="mx-3">Pág {{ page }}</span>
-        <button class="btn btn-sm btn-outline-secondary" 
-                [disabled]="(page * size) >= totalRegistros" 
-                (click)="cambiarPagina(1)">
-          Siguiente
-        </button>
+      <div *ngIf="activeTab === 'datos'" class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th>
+              <th>Fecha / Usuario</th>
+              <th>Operación</th>
+              <th>Detalles</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of listaAuditoria">
+              <td>{{ item.audi_id }}</td>
+              <td>
+                <div>{{ item.audi_fechregistro | date:'dd/MM/yy HH:mm' }}</div>
+                <small class="text-muted">User ID: {{ item.user_id }}</small>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="{
+                  'bg-success': item.audi_operacion === 'INSERT' || item.audi_operacion === 'REGISTRAR',
+                  'bg-warning text-dark': item.audi_operacion === 'UPDATE' || item.audi_operacion === 'ACTUALIZAR',
+                  'bg-danger': item.audi_operacion === 'DELETE' || item.audi_operacion === 'ELIMINAR'
+                }">{{ item.audi_operacion }}</span>
+                <div class="small text-muted">{{ item.audi_tabla }}</div>
+              </td>
+              <td style="font-size: 0.85rem;">
+                <div *ngIf="item.audi_datoantig" class="mb-1">
+                    <strong class="text-danger">Ant:</strong>
+                    <pre class="bg-light p-1 border m-0">{{ formatearJson(item.audi_datoantig) }}</pre>
+                </div>
+                <div *ngIf="item.audi_datonuevo">
+                    <strong class="text-success">Nue:</strong>
+                    <pre class="bg-light p-1 border m-0">{{ formatearJson(item.audi_datonuevo) }}</pre>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="listaAuditoria.length === 0"><td colspan="4" class="text-center p-3">Sin resultados</td></tr>
+          </tbody>
+        </table>
       </div>
-    </div>
 
+      <div *ngIf="activeTab === 'sesiones'" class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th>
+              <th>Usuario</th>
+              <th>IP</th>
+              <th>Navegador</th>
+              <th>Fechas</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let sesion of listaSesiones">
+              <td>{{ sesion.sesion_id }}</td>
+              <td class="fw-bold">{{ sesion.usuario }}</td>
+              <td><span class="badge bg-light text-dark border">{{ sesion.ip_address }}</span></td>
+              <td class="text-truncate" style="max-width: 200px;" [title]="sesion.user_agent">
+                {{ sesion.user_agent }}
+              </td>
+              <td>
+                <div><small>In:</small> {{ sesion.fecha_inicio | date:'short' }}</div>
+                <div><small>Ult:</small> {{ sesion.ultima_actividad | date:'shortTime' }}</div>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="sesion.activo ? 'bg-success' : 'bg-secondary'">
+                  {{ sesion.activo ? 'On' : 'Off' }}
+                </span>
+              </td>
+            </tr>
+            <tr *ngIf="listaSesiones.length === 0"><td colspan="6" class="text-center p-3">No hay sesiones</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top" *ngIf="totalRegistros > 0">
+         <span class="text-muted small">Total: {{ totalRegistros }}</span>
+         <div>
+            <button class="btn btn-sm btn-outline-secondary me-2" type="button" 
+                    [disabled]="page === 1" (click)="cambiarPagina(-1)">Anterior</button>
+            <button class="btn btn-sm btn-outline-secondary" type="button" 
+                    [disabled]="(page * size) >= totalRegistros" (click)="cambiarPagina(1)">Siguiente</button>
+         </div>
+      </div>
+
+    </div>
   </div>
 </div>

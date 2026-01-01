@@ -1,22 +1,37 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
+// Asegúrate de que la ruta de importación sea correcta
+import { AuditoriaSesion, RespuestaPaginada } from '../modelos/modelHistorial/InHistorial';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuditoriaService {
 
-  private urlServidor = 'http://localhost:3000/auditoria';
-
+  // IMPORTANTE: Verifica si tu backend usa /api/auditoria o solo /auditoria
+  private urlServidor = 'http://localhost:3000/auditoria'; 
 
   constructor(private http: HttpClient) { }
-listar(page: number, size: number, filtro: string): Observable<any> {
+
+  // 1. Listar Auditoría de Datos
+  listar(page: number, size: number, filtro: string): Observable<any> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString())
-      .set('filtro', filtro);
+      // CAMBIO: El backend espera 'search', no 'filtro'
+      .set('search', filtro); 
 
     return this.http.get<any>(this.urlServidor, { params });
+  }
+
+  // 2. Listar Historial de Sesiones
+  getAuditoriaSesiones(page: number, size: number, search: string): Observable<RespuestaPaginada<AuditoriaSesion>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('search', search);
+
+    return this.http.get<RespuestaPaginada<AuditoriaSesion>>(`${this.urlServidor}/sesiones`, { params });
   }
 }

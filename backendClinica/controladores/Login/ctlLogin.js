@@ -110,10 +110,15 @@ exports.validacionUsers = async (req, res) => {
     const contraseñaValida = await bcrypt.compare(contrasenia, usuario.contrasenia);
 
     if (!contraseñaValida) {
+            console.log('Contraseña incorrecta');
+
       return res.status(401).json({ 
         success: false,
         message: 'Contraseña Incorrecta' 
       });
+
+
+
     }
 
     // Si no se proporciona código OTP, enviar uno y solicitar verificación

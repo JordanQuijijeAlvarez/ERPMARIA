@@ -9,3 +9,26 @@ export interface Auditoria {
   usuario_nombre?: string;  // Campo calculado (JOIN con tabla USUARIO en backend)
   audi_fechregistro: Date;
 }
+
+export interface AuditoriaSesion {
+  sesion_id: number;
+  usuario: string;
+  ip_address: string;
+  user_agent: string;
+  fecha_inicio: string;
+  ultima_actividad: string;
+  activo: boolean;
+  fingerprint: string;
+}
+
+// Interfaz genérica para la respuesta paginada del backend
+export interface RespuestaPaginada<T> {
+  total: number;
+  ok: boolean;
+  data: T[];
+  pagination: {
+    page: number;
+    size: number;
+    total: number;
+  };
+}

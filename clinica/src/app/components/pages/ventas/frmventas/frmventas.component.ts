@@ -349,7 +349,8 @@ export class FrmventasComponent implements OnInit {
       venta_total: this.total,
       local_id: 1,
       cliente_id: this.clienteId,
-      user_id: 1,
+      user_id: parseInt(localStorage.getItem('user_id') ?? '1'),
+
       venta_descripcion: '',
       detalle_venta: detalles
     };
