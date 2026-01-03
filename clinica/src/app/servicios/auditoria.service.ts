@@ -34,4 +34,14 @@ export class AuditoriaService {
 
     return this.http.get<RespuestaPaginada<AuditoriaSesion>>(`${this.urlServidor}/sesiones`, { params });
   }
+
+  getFallos(page: number, size: number, search: string): Observable<any> {
+  let params = new HttpParams()
+    .set('page', page.toString())
+    .set('size', size.toString())
+    .set('search', search);
+
+  return this.http.get<any>(`${this.urlServidor}/fallos`, { params });
+}
+
 }

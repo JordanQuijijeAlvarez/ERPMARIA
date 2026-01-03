@@ -152,3 +152,64 @@ exports.getSesiones = async(req, res) => {
         }
     }
 };
+
+// ... imports y otras funciones ...
+
+exports.getFallos = async (req, res) => {
+    let connection;
+
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const size = parseInt(req.query.size) || 10;
+        const search = req.query.search || '';
+
+        connection = await getConnection();
+
+        const result = await connection.execute(
+            `BEGIN 
+                PKG_AUDITORIA.SP_LISTAR_FALLOS(
+                    :p_page_number, :p_page_size, :p_filtro,
+                    :p_total_recs, :p_cursor
+                ); 
+             END;`,
+            {
+                p_page_number: page,
+                p_page_size: size,
+                p_filtro: search,
+                p_total_recs: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER },
+                p_cursor: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR }
+            }
+        );
+
+        const resultSet = result.outBinds.p_cursor;
+        const rows = await resultSet.getRows();
+        const totalRecords = result.outBinds.p_total_recs;
+
+        await resultSet.close();
+
+        res.status(200).json({
+            ok: true,
+            data: rows.map(row => ({
+                fallo_id: row[0],
+                ip_address: row[1],
+                usuario_intento: row[2],
+                user_agent: row[3],
+                fecha: row[4],
+                motivo: row[5]
+            })),
+            pagination: {
+                page: page,
+                size: size,
+                total: totalRecords
+            }
+        });
+
+    } catch (err) {
+        console.error('Error en getFallos:', err);
+        res.status(500).json({ ok: false, msg: 'Error al obtener fallos', error: err.message });
+    } finally {
+        if (connection) {
+            try { await connection.close(); } catch (e) { console.error(e); }
+        }
+    }
+};

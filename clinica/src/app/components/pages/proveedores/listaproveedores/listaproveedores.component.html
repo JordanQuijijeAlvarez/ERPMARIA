@@ -156,7 +156,7 @@
               <div class="table__actions">
                 <!-- Edit Button -->
                 <button
-                  (click)="ActualizarProveedor(proveedor.prove_ruc,proveedor.prove_id)"
+                  (click)="ActualizarProveedor(proveedor.prove_id)"
                   type="button"
                   title="Editar proveedor"
                   class="btn btn--warning btn--sm btn--icon"
@@ -167,7 +167,7 @@
                 <!-- Delete Button -->
                 <button
                   *appMostrarSiRol="['ADMINISTRADOR']"
-                  (click)="eliminarProveedor(proveedor.prove_id, proveedor.prove_nombre)"
+                  (click)="eliminarProveedor(proveedor.prove_id!, proveedor.prove_nombre)"
                   type="button"
                   title="Eliminar proveedor"
                   class="btn btn--danger btn--sm btn--icon"

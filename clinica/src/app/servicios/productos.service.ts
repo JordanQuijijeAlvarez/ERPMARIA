@@ -44,8 +44,8 @@ export class productosService {
     return this.http.post(`${this.urlServidor}/productos/Registrar`, producto);
   }
 
-  EliminarProducto(id:number):Observable<any>{
-    return this.http.delete(`${this.urlServidor}/productos/Eliminar/${id}`);
+  EliminarProducto(id:number,user_id:number):Observable<any>{
+    return this.http.delete(`${this.urlServidor}/productos/Eliminar/${id}}`, { body: { user_id: user_id } });
 
   }
   Actualizarproducto(producto: InProducto): Observable<any> {

@@ -1,7 +1,4 @@
-
-
 <div class="auditoria-page">
-
   <div class="card auditoria-header">
     <div class="card__header">
       <h2 class="card__title">
@@ -11,22 +8,20 @@
     </div>
 
     <div class="tabs-container">
-      <button 
-        class="tab-btn" 
-        [class.active]="activeTab === 'datos'"
-        (click)="switchTab('datos')">
+      <button class="tab-btn" [class.active]="activeTab === 'datos'" (click)="switchTab('datos')">
         <i class="fas fa-database"></i> Auditoría de Datos
       </button>
-      <button 
-        class="tab-btn" 
-        [class.active]="activeTab === 'sesiones'"
-        (click)="switchTab('sesiones')">
+      <button class="tab-btn" [class.active]="activeTab === 'sesiones'" (click)="switchTab('sesiones')">
         <i class="fas fa-key"></i> Historial de Accesos
+      </button>
+
+      <button class="tab-btn" [class.active]="activeTab === 'fallos'" (click)="switchTab('fallos')">
+        <i class="fas fa-exclamation-triangle"></i> Intentos Fallidos
       </button>
     </div>
 
     <div class="auditoria-filters">
-      
+
       <ng-container *ngIf="activeTab === 'datos'">
         <div class="filter-box">
           <select class="search-box__input filter-select">
@@ -39,22 +34,14 @@
       </ng-container>
 
       <div class="search-box" [style.flex]="'1'">
-        <input
-          type="text"
-          [(ngModel)]="filtro"
-          (keyup.enter)="buscar()"
+        <input type="text" [(ngModel)]="filtro" (keyup.enter)="buscar()"
           [placeholder]="activeTab === 'datos' ? 'Buscar tabla, ID, operación...' : 'Buscar IP, Usuario...'"
-          class="search-box__input"
-        />
+          class="search-box__input" />
         <div class="search-box__icon">
           <i class="fas fa-search"></i>
         </div>
-        
-        <button
-          *ngIf="filtro"
-          type="button"
-          (click)="filtro = ''; buscar()"
-          title="Limpiar búsqueda"
+
+        <button *ngIf="filtro" type="button" (click)="filtro = ''; buscar()" title="Limpiar búsqueda"
           class="search-box__clear">
           <i class="fas fa-times"></i>
         </button>
@@ -63,20 +50,20 @@
   </div>
 
   <div class="table-container auditoria-table fade-in">
-    
+
     <div class="table-header">
       <div class="proveedores-table__header">
         <h3 class="table-header__title">
           <i [class]="activeTab === 'datos' ? 'fas fa-list-alt' : 'fas fa-history'"></i>
           {{ activeTab === 'datos' ? 'Registros de Movimientos' : 'Bitácora de Inicios de Sesión' }}
         </h3>
-        
+
         <div *ngIf="loading" class="badge badge--warning">
           <i class="fas fa-spinner fa-spin"></i> Cargando...
         </div>
       </div>
     </div>
-      
+
     <div *ngIf="activeTab === 'datos' && !loading">
       <table class="table">
         <thead>
@@ -101,7 +88,7 @@
               </div>
             </td>
           </tr>
-          
+
           <tr *ngFor="let audit of listaAuditoria">
             <td>
               <div class="fecha-container">
@@ -117,9 +104,9 @@
             </td>
             <td>
               <span class="badge " [ngClass]="{
-                ' bg-success': audit.operacion === 'REGISTRAR' || audit.audi_operacion === 'REGISTRAR',
-                ' bg-warning': audit.operacion === 'ACTUALIZAR' || audit.audi_operacion === 'ACTUALIZAR',
-                ' bg-danger': audit.operacion === 'ELIMINAR' || audit.audi_operacion === 'ELIMINAR'
+                ' bg-success': audit.operacion === 'REGISTRAR' || audit.operacion === 'REGISTRAR VENTA',
+                ' bg-warning': audit.operacion === 'ACTUALIZAR' || audit.operacion === 'ACTUALIZAR VENTA',
+                ' bg-danger': audit.operacion === 'ELIMINAR' || audit.operacion=== 'ELIMINAR VENTA'
               }">
                 {{ audit.operacion }}
               </span>
@@ -128,10 +115,7 @@
             <td>#{{ audit.registro_id }}</td>
             <td>
               <div class="table__actions">
-                <button
-                  type="button"
-                  title="Ver detalles JSON"
-                  class="btn btn--primary btn--sm btn--icon"
+                <button type="button" title="Ver detalles JSON" class="btn btn--primary btn--sm btn--icon"
                   (click)="selectedAudit = audit"> <i class="fas fa-code"></i>
                 </button>
               </div>
@@ -150,7 +134,7 @@
             <th><i class="fas fa-network-wired"></i> IP</th>
             <th><i class="fas fa-laptop"></i> Dispositivo</th>
             <th><i class="fas fa-clock"></i> Inicio / Fin</th>
-            <th><i class="fas fa-wifi"></i> Estado</th>
+            <!-- <th><i class="fas fa-wifi"></i> Estado</th> -->
           </tr>
         </thead>
         <tbody>
@@ -171,51 +155,112 @@
             <td>
               <div class="user-info">
                 <span class="user-name" style="font-weight: bold; color: var(--primary-color);">
-                    {{ sesion.usuario }}
+                  {{ sesion.usuario }}
                 </span>
               </div>
             </td>
             <td>
-                <span class="badge " style="background-color: #f0f2f5; color: #333; border: 1px solid #ddd;">
-                    {{ sesion.ip_address }}
-                </span>
+              <span class="badge " style="background-color: #f0f2f5; color: #333; border: 1px solid #ddd;">
+                {{ sesion.ip_address }}
+              </span>
             </td>
             <td>
-                <span title="{{ sesion.user_agent }}" style="display: inline-block; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: help;">
-                    {{ sesion.user_agent }}
-                </span>
+              <span title="{{ sesion.user_agent }}"
+                style="display: inline-block; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: help;">
+                {{ sesion.user_agent }}
+              </span>
             </td>
             <td>
               <div class="fecha-container">
                 <span class="fecha-date">In: {{ sesion.fecha_inicio | date:'dd/MM HH:mm' }}</span>
-                <span class="fecha-time" style="color: #666;">Ult: {{ sesion.ultima_actividad | date:'HH:mm:ss' }}</span>
+                <span class="fecha-time" style="color: #666;"> Ult: {{ sesion.ultima_actividad | date:'HH:mm:ss'
+                  }}</span>
+              </div>
+            </td>
+            <!-- <td>
+              <span class="badge " [ngClass]="sesion.activo ? 'bg-success' : 'bg-secondary'">
+                {{ sesion.activo ? 'En Línea' : 'Off-line' }}
+              </span>
+            </td> -->
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="activeTab === 'fallos' && !loading">
+      <table class="table">
+        <thead style="background-color: #fff5f5;">
+          <tr>
+            <th class="text-danger"><i class="fas fa-siren"></i> IP Origen</th>
+            <th><i class="fas fa-user-secret"></i> Usuario Intentado</th>
+            <th><i class="fas fa-laptop-code"></i> Huella (User Agent)</th>
+            <th><i class="fas fa-clock"></i> Cuándo</th>
+            <th><i class="fas fa-info-circle"></i> Motivo Bloqueo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="listaFallos.length === 0">
+            <td colspan="5">
+              <div class="table__empty">
+                <div class="table__empty-icon" style="color: #28a745;">
+                  <i class="fas fa-check-circle"></i>
+                </div>
+                <div>
+                  <p><strong>Sistema Seguro</strong></p>
+                  <p>No se han detectado intentos fallidos recientes.</p>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngFor="let fallo of listaFallos" style="background-color: #fff0f0;">
+            <td>
+                <span class="badge bg-danger text-white">
+                    {{ fallo.ip_address }}
+                </span>
+            </td>
+            <td class="fw-bold text-danger">
+                {{ fallo.usuario_intento }}
+            </td>
+            <td>
+                <span title="{{ fallo.user_agent }}" style="display: inline-block; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.85rem; color: #666;">
+                    {{ fallo.user_agent }}
+                </span>
+            </td>
+            <td>
+              <div class="fecha-container">
+                <span class="fecha-date">{{ fallo.fecha | date:'dd/MM/yyyy' }}</span>
+                                <span class="fecha-date">{{ ' ' }}</span>
+
+                <span class="fecha-time">{{ fallo.fecha | date:'mediumTime' }}</span>
               </div>
             </td>
             <td>
-              <span class="badge " [ngClass]="sesion.activo ? 'bg-success' : 'bg-secondary'">
-                {{ sesion.activo ? 'En Línea' : 'Off-line' }}
+              <span class="badge bg-warning text-dark">
+                 <i class="fas fa-lock me-1"></i> {{ fallo.motivo }}
               </span>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-    
+
     <div *ngIf="totalRegistros > 0" class="pagination">
       <div class="pagination__info">
         <div class="pagination__text">
           Total: <strong>{{ totalRegistros }}</strong> registros
         </div>
       </div>
-      
+
       <div class="pagination__controls">
         <button type="button" (click)="cambiarPagina(-1)" [disabled]="page === 1" class="pagination__button">
           <i class="fas fa-chevron-left"></i>
         </button>
-        
+
         <span class="pagination__current">Página {{ page }}</span>
-        
-        <button type="button" (click)="cambiarPagina(1)" [disabled]="(page * size) >= totalRegistros" class="pagination__button">
+
+        <button type="button" (click)="cambiarPagina(1)" [disabled]="(page * size) >= totalRegistros"
+          class="pagination__button">
           <i class="fas fa-chevron-right"></i>
         </button>
       </div>
@@ -228,14 +273,14 @@
   <div class="modal-content">
     <div class="modal-header">
       <h3>
-        <i class="fas fa-info-circle"></i> 
+        <i class="fas fa-info-circle"></i>
         Detalle del Cambio #{{selectedAudit.audi_id}}
       </h3>
       <button (click)="selectedAudit = null" class="close-btn">
         <i class="fas fa-times"></i>
       </button>
     </div>
-    
+
     <div class="modal-body">
       <div class="audit-summary">
         <p><strong>Operación:</strong> {{selectedAudit.operacion}} en tabla {{selectedAudit.tabla}}</p>
@@ -246,14 +291,14 @@
         <div class="data-block old" *ngIf="selectedAudit.dato_antiguo">
           <h4><i class="fas fa-history"></i> Valor Anterior</h4>
           <div class="code-wrapper">
-             <pre>{{ formatearJson(selectedAudit.dato_antiguo) }}</pre>
+            <pre>{{ formatearJson(selectedAudit.dato_antiguo) }}</pre>
           </div>
         </div>
-        
+
         <div class="arrow" *ngIf="selectedAudit.dato_antiguo && selectedAudit.dato_nuevo">
           <i class="fas fa-arrow-right"></i>
         </div>
-        
+
         <div class="data-block new" *ngIf="selectedAudit.dato_nuevo">
           <h4><i class="fas fa-check-circle"></i> Valor Nuevo</h4>
           <div class="code-wrapper">
@@ -262,7 +307,7 @@
         </div>
       </div>
     </div>
-    
+
     <div class="modal-footer">
       <button (click)="selectedAudit = null" class="btn btn--outline">Cerrar</button>
     </div>

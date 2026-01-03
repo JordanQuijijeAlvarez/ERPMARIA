@@ -130,23 +130,42 @@ exports.getProductoId = async (req, res) => {
         if (connection) await connection.close();
     }
 };
-
+// ==========================================
+// 1. REGISTRAR PRODUCTO (ACTUALIZADO)
+// ==========================================
 exports.RegistrarProducto = async (req, res) => {
-    const { subcat_id, prod_nombre, prod_codbarra,prod_descripcion,prod_preciocompra,prod_precioventa,prod_stock, prod_stockmin } = req.body;
+    // 1. Agregamos user_id
+    const { user_id, subcat_id, prod_nombre, prod_codbarra, prod_descripcion, prod_preciocompra, prod_precioventa, prod_stock, prod_stockmin } = req.body;
     let connection;
+
+    // Validación básica
+    if (!user_id || !prod_nombre || !subcat_id) {
+        return res.status(400).json({ error: "Faltan datos obligatorios (Usuario, Nombre o Subcategoría)" });
+    }
 
     try {
         connection = await getConnection();
 
-        const query = `BEGIN registrarProducto(:1, :2, :3, :4, :5, :6, :7, :8); END;`;
+        // 2. Modificamos Query: Agregamos :1 al inicio (Total 9 parámetros ahora)
+        // SP esperado: registrarProducto(p_user_id, p_subcat_id, ...)
+        const query = `BEGIN registrarProducto(:1, :2, :3, :4, :5, :6, :7, :8, :9); END;`;
 
+        // 3. user_id va PRIMERO en el array
         const params = [
-            subcat_id, prod_nombre, prod_codbarra,prod_descripcion,prod_preciocompra,prod_precioventa,prod_stock, prod_stockmin
+            user_id, 
+            subcat_id, 
+            prod_nombre, 
+            prod_codbarra, 
+            prod_descripcion, 
+            prod_preciocompra, 
+            prod_precioventa, 
+            prod_stock, 
+            prod_stockmin
         ];
 
         await connection.execute(query, params, { autoCommit: true });
 
-        res.json({ message: "producto registrado" });
+        res.json({ message: "Producto registrado y auditado correctamente" });
 
     } catch (error) {
         console.log(error);
@@ -156,22 +175,42 @@ exports.RegistrarProducto = async (req, res) => {
     }
 };
 
+// ==========================================
+// 2. ACTUALIZAR PRODUCTO (ACTUALIZADO)
+// ==========================================
 exports.Actualizarproducto = async (req, res) => {
-    const { prod_id, subcat_id,  prod_nombre, prod_codbarra, prod_descripcion,prod_preciocompra,prod_precioventa, prod_stock, prod_stockmin } = req.body;
+    // 1. Agregamos user_id
+    const { user_id, prod_id, subcat_id, prod_nombre, prod_codbarra, prod_descripcion, prod_preciocompra, prod_precioventa, prod_stock, prod_stockmin } = req.body;
     let connection;
+
+    if (!user_id) {
+        return res.status(400).json({ error: "Falta el ID del usuario para auditar" });
+    }
 
     try {
         connection = await getConnection();
 
-        const query = `BEGIN actualizarProducto(:1, :2, :3, :4, :5, :6, :7, :8, :9); END;`;
+        // 2. Modificamos Query: Agregamos :1 al inicio (Total 10 parámetros)
+        // SP esperado: actualizarProducto(p_user_id, p_prod_id, ...)
+        const query = `BEGIN actualizarProducto(:1, :2, :3, :4, :5, :6, :7, :8, :9, :10); END;`;
 
+        // 3. user_id va PRIMERO
         const params = [
-            prod_id, subcat_id, prod_nombre, prod_codbarra, prod_descripcion,prod_preciocompra,prod_precioventa, prod_stock, prod_stockmin
+            user_id, 
+            prod_id, 
+            subcat_id, 
+            prod_nombre, 
+            prod_codbarra, 
+            prod_descripcion, 
+            prod_preciocompra, 
+            prod_precioventa, 
+            prod_stock, 
+            prod_stockmin
         ];
 
         await connection.execute(query, params, { autoCommit: true });
 
-        res.json({ message: "producto actualizado" });
+        res.json({ message: "Producto actualizado y auditado" });
 
     } catch (error) {
         console.log(error);
@@ -181,18 +220,29 @@ exports.Actualizarproducto = async (req, res) => {
     }
 };
 
+// ==========================================
+// 3. ELIMINAR PRODUCTO (ACTUALIZADO)
+// ==========================================
 exports.eliminarproducto = async (req, res) => {
     const { id } = req.params;
+    // Recibimos user_id por body o query
+    const user_id = req.body.user_id || req.query.user_id; 
     let connection;
+
+    if (!user_id) {
+        return res.status(400).json({ error: "Falta el ID del usuario para auditar la eliminación" });
+    }
 
     try {
         connection = await getConnection();
 
-        const query = `BEGIN eliminarProducto(:1); END;`;
+        // SP esperado: eliminarProducto(p_user_id, p_prod_id)
+        const query = `BEGIN eliminarProducto(:1, :2); END;`;
 
-        await connection.execute(query, [id], { autoCommit: true });
+        // user_id va PRIMERO
+        await connection.execute(query, [user_id, id], { autoCommit: true });
 
-        res.json({ message: "producto eliminado correctamente" });
+        res.json({ message: "Producto eliminado correctamente" });
 
     } catch (error) {
         console.log(error);
@@ -202,13 +252,27 @@ exports.eliminarproducto = async (req, res) => {
     }
 };
 
-
-// 2. ACTUALIZACIÓN RÁPIDA DE PRECIO (Para el Modal)
+// ==========================================
+// 4. ACTUALIZACIÓN PRECIO RÁPIDA (ESPECIAL)
+// ==========================================
+// Como este usa UPDATE directo (sin SP), debemos setear el identificador manualmente
+// para que el Trigger lo capture.
 exports.actualizarPrecioVenta = async (req, res) => {
-    const { prod_id, nuevo_precio } = req.body;
+    const { user_id, prod_id, nuevo_precio } = req.body; // Agregamos user_id
     let connection;
+
+    if (!user_id) return res.status(400).json({ error: "Falta user_id" });
+
     try {
         connection = await getConnection();
+
+        // PASO CLAVE: Seteamos el identificador de sesión ANTES del update
+        // Esto hace que el Trigger detecte el usuario sin cambiar el SQL del update
+        await connection.execute(
+            `BEGIN DBMS_SESSION.SET_IDENTIFIER(:1); END;`,
+            [user_id.toString()] // Debe ser string
+        );
+
         const query = `UPDATE PRODUCTO SET prod_precioventa = :p_precio WHERE prod_id = :p_id`;
         
         await connection.execute(query, {
@@ -223,7 +287,6 @@ exports.actualizarPrecioVenta = async (req, res) => {
         if (connection) await connection.close();
     }
 };
-
 exports.getProductosBajoStock = async (req, res) => {
     let connection;
     try {

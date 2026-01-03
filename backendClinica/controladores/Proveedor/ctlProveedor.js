@@ -162,22 +162,42 @@ exports.getproveedorId = async (req, res) => {
 // ==========================================
 // 4. REGISTRAR PROVEEDOR
 // ==========================================
+// ==========================================
+// 1. REGISTRAR PROVEEDOR (CON AUDITORÍA)
+// ==========================================
 exports.RegistrarProveedor = async (req, res) => {
-    const { prove_ruc, prove_nombre, prove_telefono, prove_correo,prove_direccion, prove_descripcion} = req.body;
+    // 1. Recibimos user_id para la auditoría
+    const { user_id, prove_ruc, prove_nombre, prove_telefono, prove_correo, prove_direccion, prove_descripcion } = req.body;
     let connection;
+
+    // Validación de seguridad
+    if (!user_id) {
+        return res.status(400).json({ error: "Falta el ID del usuario para auditar el registro." });
+    }
 
     try {
         connection = await getConnection();
         
-        // Cambio de sintaxis SELECT funcion() -> BEGIN funcion(); END;
-        const query = `BEGIN registrarproveedor(:1, :2, :3, :4, :5,:6); END;`;
-        const values = [prove_ruc, prove_nombre, prove_telefono, prove_correo,prove_direccion, prove_descripcion];
+        // 2. Modificamos el Query: Agregamos :1 al inicio (Total 7 parámetros)
+        // SP esperado: registrarProveedor(p_user_id, p_ruc, p_nombre, p_telefono, p_correo, p_dir, p_desc)
+        const query = `BEGIN registrarproveedor(:1, :2, :3, :4, :5, :6, :7); END;`;
+        
+        // 3. user_id va PRIMERO en el array
+        const values = [
+            user_id, 
+            prove_ruc, 
+            prove_nombre, 
+            prove_telefono, 
+            prove_correo, 
+            prove_direccion, 
+            prove_descripcion
+        ];
 
-        console.log("Registrando valores:", values);
+        console.log("Registrando Proveedor con Auditoría:", values);
 
         await connection.execute(query, values, { autoCommit: true });
         
-        res.status(200).json({ message: 'Proveedor registrado correctamente' });
+        res.status(200).json({ message: 'Proveedor registrado y auditado correctamente' });
     
     } catch (error) {
         console.log(error);
@@ -188,23 +208,41 @@ exports.RegistrarProveedor = async (req, res) => {
 };
 
 // ==========================================
-// 5. ACTUALIZAR PROVEEDOR
+// 2. ACTUALIZAR PROVEEDOR (CON AUDITORÍA)
 // ==========================================
 exports.ActualizarProveedor = async (req, res) => {
-    const { prove_id, prove_ruc, prove_nombre, prove_telefono, prove_correo,prove_direccion, prove_descripcion } = req.body;
+    // 1. Recibimos user_id
+    const { user_id, prove_id, prove_ruc, prove_nombre, prove_telefono, prove_correo, prove_direccion, prove_descripcion } = req.body;
     let connection;
+
+    if (!user_id) {
+        return res.status(400).json({ error: "Falta el ID del usuario para auditar la actualización." });
+    }
 
     try {
         connection = await getConnection();
 
-        const query = `BEGIN actualizarproveedor(:1, :2, :3, :4, :5, :6,:7); END;`;
-        const values = [ prove_id, prove_ruc, prove_nombre, prove_telefono,prove_correo, prove_direccion, prove_descripcion];
+        // 2. Modificamos el Query: Agregamos :1 al inicio (Total 8 parámetros)
+        // SP esperado: actualizarProveedor(p_user_id, p_id, p_ruc, ...)
+        const query = `BEGIN actualizarproveedor(:1, :2, :3, :4, :5, :6, :7, :8); END;`;
         
-        console.log("Actualizando valores:", values);
+        // 3. user_id va PRIMERO
+        const values = [
+            user_id, 
+            prove_id, 
+            prove_ruc, 
+            prove_nombre, 
+            prove_telefono, 
+            prove_correo, 
+            prove_direccion, 
+            prove_descripcion
+        ];
+        
+        console.log("Actualizando Proveedor con Auditoría:", values);
 
         await connection.execute(query, values, { autoCommit: true });
         
-        res.status(200).json({ message: 'Proveedor actualizado correctamente' });
+        res.status(200).json({ message: 'Proveedor actualizado y auditado correctamente' });
     
     } catch (error) {
         console.log(error);
@@ -215,20 +253,28 @@ exports.ActualizarProveedor = async (req, res) => {
 };
 
 // ==========================================
-// 6. ELIMINAR PROVEEDOR (LÓGICO)
+// 3. ELIMINAR PROVEEDOR (CON AUDITORÍA)
 // ==========================================
 exports.eliminarProveedor = async (req, res) => {
     const { id } = req.params;
+    // user_id puede venir en el body (si usas axios.delete con data) o en query params (?user_id=5)
+    const user_id = req.body.user_id || req.query.user_id; 
     let connection;
+
+    if (!user_id) {
+        return res.status(400).json({ error: "Falta el ID del usuario para auditar la eliminación." });
+    }
 
     try {
         connection = await getConnection();
         
-        const query = `BEGIN eliminarproveedor(:1); END;`;
+        // SP esperado: eliminarProveedor(p_user_id, p_prove_id)
+        const query = `BEGIN eliminarproveedor(:1, :2); END;`;
         
-        await connection.execute(query, [id], { autoCommit: true });
+        // user_id primero, luego el id del proveedor
+        await connection.execute(query, [user_id, id], { autoCommit: true });
         
-        res.status(200).json({ message: "El registro se eliminó correctamente" });
+        res.status(200).json({ message: "El registro se eliminó y auditó correctamente" });
         
     } catch (error) {
         console.log(error);
@@ -237,4 +283,3 @@ exports.eliminarProveedor = async (req, res) => {
         if (connection) await connection.close();
     }
 };
-

@@ -68,15 +68,15 @@ async function verificar2FAUsuario(connection, userId, token2FA) {
 
 exports.validacionUsers = async (req, res) => {
   const { nombre_usuario, contrasenia, codigo_otp } = req.body;
-  
+
   // Validación básica
   if (!nombre_usuario || !contrasenia) {
-    return res.status(400).json({ 
+    return res.status(400).json({
       success: false,
-      message: 'Nombre de usuario y contraseña son requeridos' 
+      message: 'Nombre de usuario y contraseña son requeridos'
     });
   }
-  
+
   // Query para obtener datos del usuario incluyendo email
   const query = `
     SELECT 
@@ -100,9 +100,9 @@ exports.validacionUsers = async (req, res) => {
     const result = await pool.query(query, values);
 
     if (result.rows.length === 0) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        message: 'Usuario no encontrado' 
+        message: 'Usuario no encontrado'
       });
     }
 
@@ -110,11 +110,11 @@ exports.validacionUsers = async (req, res) => {
     const contraseñaValida = await bcrypt.compare(contrasenia, usuario.contrasenia);
 
     if (!contraseñaValida) {
-            console.log('Contraseña incorrecta');
+      console.log('Contraseña incorrecta');
 
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        message: 'Contraseña Incorrecta' 
+        message: 'Contraseña Incorrecta'
       });
 
 
@@ -132,11 +132,11 @@ exports.validacionUsers = async (req, res) => {
 
         await sendOTPEmail(usuario.email, codigoOTP);
 
-        return res.json({ 
+        return res.json({
           success: true,
           requiresOTP: true,
           message: 'Código OTP enviado al correo',
-          usuario_codigo: usuario.id_usuario 
+          usuario_codigo: usuario.id_usuario
         });
       } catch (otpError) {
         console.error('Error enviando OTP:', otpError);
@@ -156,26 +156,26 @@ exports.validacionUsers = async (req, res) => {
     );
 
     if (otpResult.rows.length === 0) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        message: 'Código OTP incorrecto o expirado' 
+        message: 'Código OTP incorrecto o expirado'
       });
     }
 
     // Marcar OTP como usado
     await pool.query(
-      `UPDATE verificacion_2pasos SET expirado = true WHERE id = $1`, 
+      `UPDATE verificacion_2pasos SET expirado = true WHERE id = $1`,
       [otpResult.rows[0].id]
     );
 
     // Generar ID único para el token (JWT ID)
     const tokenJti = crypto.randomUUID();
-    
+
     // Crear el JWT incluyendo el código del médico y jti
     const token = jwt.sign(
-      { 
-        id: usuario.id_usuario, 
-        nombreUsuario: usuario.nombre_usuario, 
+      {
+        id: usuario.id_usuario,
+        nombreUsuario: usuario.nombre_usuario,
         rol: usuario.rol,
         codigoMedico: usuario.codigo_medico,
         nombresMedico: usuario.nombre_medico ? 'Dr.' + usuario.nombre_medico + ' ' + usuario.apellido_medico : null,
@@ -190,7 +190,7 @@ exports.validacionUsers = async (req, res) => {
     const userAgent = req.get('User-Agent');
     const ipAddress = req.ip || req.connection.remoteAddress || req.socket.remoteAddress;
     const deviceFingerprint = SessionManager.generateDeviceFingerprint(userAgent, ipAddress);
-    
+
     console.log('Fingerprint generado:', deviceFingerprint);
     // Crear sesión activa
     const sessionResult = await SessionManager.createSession(usuario.id_usuario, tokenJti, {
@@ -198,16 +198,16 @@ exports.validacionUsers = async (req, res) => {
       ipAddress,
       fingerprint: deviceFingerprint
     });
-    
+
     if (!sessionResult.success) {
-      return res.status(500).json({ 
+      return res.status(500).json({
         success: false,
-        message: 'Error creando sesión de usuario' 
+        message: 'Error creando sesión de usuario'
       });
     }
 
     // Respuesta exitosa
-    res.json({ 
+    res.json({
       success: true,
       message: 'Login exitoso',
       token,
@@ -219,12 +219,12 @@ exports.validacionUsers = async (req, res) => {
         nombresMedico: usuario.nombre_medico ? 'Dr.' + usuario.nombre_medico + ' ' + usuario.apellido_medico : null
       }
     });
-    
+
   } catch (error) {
     console.error('Error en login:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: 'Error interno del servidor' 
+      message: 'Error interno del servidor'
     });
   }
 };
@@ -236,11 +236,11 @@ exports.logout = async (req, res) => {
     const authHeader = req.header('Authorization');
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.substring(7);
-      
+
       try {
         // Decodificar token para obtener el jti
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
+
         if (decoded.jti) {
           // Invalidar la sesión específica
           await SessionManager.invalidateSession(decoded.jti);
@@ -250,12 +250,12 @@ exports.logout = async (req, res) => {
         console.log('Token ya inválido en logout:', jwtError.message);
       }
     }
-    
+
     res.json({
       success: true,
       message: 'Logout exitoso'
     });
-    
+
   } catch (error) {
     console.error('Error en logout:', error);
     res.status(500).json({
@@ -270,12 +270,12 @@ exports.getSesionesActivas = async (req, res) => {
   try {
     const userId = req.user.id; // Del middleware de autenticación
     const sesiones = await SessionManager.getUserActiveSessions(userId);
-    
+
     res.json({
       success: true,
       sesiones
     });
-    
+
   } catch (error) {
     console.error('Error obteniendo sesiones:', error);
     res.status(500).json({
@@ -290,15 +290,15 @@ exports.invalidarOtrasSesiones = async (req, res) => {
   try {
     const userId = req.user.id;
     const currentTokenJti = req.user.jti;
-    
+
     const invalidatedCount = await SessionManager.invalidateAllUserSessions(userId, currentTokenJti);
-    
+
     res.json({
       success: true,
       message: `${invalidatedCount} sesiones invalidadas`,
       invalidatedCount
     });
-    
+
   } catch (error) {
     console.error('Error invalidando sesiones:', error);
     res.status(500).json({
@@ -308,14 +308,14 @@ exports.invalidarOtrasSesiones = async (req, res) => {
   }
 
 
-  
+
 };
 
 
 
-  exports.obtenerCorreo = async (req, res) => {
+exports.obtenerCorreo = async (req, res) => {
   const { nombreUsuario } = req.body;
-console.log(nombreUsuario);
+  console.log(nombreUsuario);
   const query = `
     SELECT u.email
     FROM usuario u
@@ -334,26 +334,26 @@ console.log(nombreUsuario);
     const correo = result.rows[0].email;
     const oculto = correo.replace(/(.{4}).+(@.+)/, '$1********$2');
 
-  res.json({ correoOculto: oculto }); 
+    res.json({ correoOculto: oculto });
   }
   catch (error) {
     console.error(error);
     res.status(500).json({ mensaje: 'Error interno del servidor' });
-  } 
+  }
 };
 
-const codigos = new Map(); 
+const codigos = new Map();
 
 
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'clinicacomunitariautm@gmail.com',           
-    pass: 'tvaxrtljvgympqpj'             
+    user: 'clinicacomunitariautm@gmail.com',
+    pass: 'tvaxrtljvgympqpj'
   },
 
-   tls: {
+  tls: {
     rejectUnauthorized: false
   }
 });
@@ -392,7 +392,7 @@ exports.enviarCodigo = async (req, res) => {
     const correo = result.rows[0].email;
     const codigo = Math.floor(1000 + Math.random() * 9000).toString();
 
-    codigos.set(nombreUsuario, codigo); 
+    codigos.set(nombreUsuario, codigo);
 
     await enviarCorreo(correo, 'Código de recuperación', `Tu código es: ${codigo}`);
 
@@ -442,22 +442,22 @@ exports.cambiarContrasenia = async (req, res) => {
 
 
 /////////////////////
-
-
 exports.validacionProvUsers = async (req, res) => {
   const { nombre_usuario, contrasenia, token2fa } = req.body;
-  
+  const userAgenty = req.headers['user-agent'] || 'Desconocido';
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+
   if (!nombre_usuario || !contrasenia) {
-    return res.status(400).json({ 
+    return res.status(400).json({
       success: false,
-      message: 'Nombre de usuario y contraseña son requeridos' 
+      message: 'Nombre de usuario y contraseña son requeridos'
     });
   }
 
   let connection;
   try {
     connection = await getConnection();
-    
+
     const query = `
     SELECT 
           u.user_id          AS id_usuario,
@@ -478,9 +478,9 @@ exports.validacionProvUsers = async (req, res) => {
     );
 
     if (result.rows.length === 0) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        message: 'Usuario no encontrado' 
+        message: 'Usuario no encontrado'
       });
     }
 
@@ -488,16 +488,20 @@ exports.validacionProvUsers = async (req, res) => {
 
     const contraseñaValida = await bcrypt.compare(contrasenia, usuario.CONTRASENIA);
     if (!contraseñaValida) {
-      return res.status(401).json({ 
+
+      await registrarFallo(ip, usuario, userAgenty, 'Credenciales inválidas');
+      return res.status(401).json({
         success: false,
-        message: 'Contraseña Incorrecta' 
+        message: 'Contraseña Incorrecta'
       });
     }
 
     // Verificar 2FA
     const verificacion2FA = await verificar2FAUsuario(connection, usuario.ID_USUARIO, token2fa);
-    
+
     if (verificacion2FA.required && !verificacion2FA.valid) {
+      await registrarFallo(ip, usuario, userAgenty, 'Credenciales inválidas: Código 2FA inválido');
+
       return res.status(401).json({
         success: false,
         requires2FA: true,
@@ -505,15 +509,15 @@ exports.validacionProvUsers = async (req, res) => {
         userId: usuario.ID_USUARIO
       });
     }
-   
+
     const tokenJti = crypto.randomUUID();
 
     const token = jwt.sign(
-      { 
-        id: usuario.ID_USUARIO, 
-        nombreUsuario: usuario.NOMBRE_USUARIO, 
+      {
+        id: usuario.ID_USUARIO,
+        nombreUsuario: usuario.NOMBRE_USUARIO,
         rol: usuario.ROL,
-        jti: tokenJti, 
+        jti: tokenJti,
         iat: Math.floor(Date.now() / 1000)
       },
       process.env.JWT_SECRET,
@@ -523,22 +527,22 @@ exports.validacionProvUsers = async (req, res) => {
     const userAgent = req.get('User-Agent');
     const ipAddress = req.ip || req.connection.remoteAddress || req.socket.remoteAddress;
     const deviceFingerprint = SessionManager.generateDeviceFingerprint(userAgent, ipAddress);
-    
+
     console.log('Fingerprint generado:', deviceFingerprint);
     const sessionResult = await SessionManager.createSession(usuario.ID_USUARIO, tokenJti, {
       userAgent,
       ipAddress,
       fingerprint: deviceFingerprint
     });
-    
+
     if (!sessionResult.success) {
-      return res.status(500).json({ 
+      return res.status(500).json({
         success: false,
-        message: 'Error creando sesión de usuario' 
+        message: 'Error creando sesión de usuario'
       });
     }
 
-    res.json({ 
+    res.json({
       success: true,
       message: 'Login exitoso',
       token,
@@ -548,16 +552,64 @@ exports.validacionProvUsers = async (req, res) => {
         rol: usuario.ROL,
       }
     });
-    
+
   } catch (error) {
+
+
     console.error('Error en login:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: 'Error interno del servidor' 
+      message: 'Error interno del servidor'
     });
   } finally {
     if (connection) {
       try { await connection.close(); } catch (e) { console.error('Error cerrando conexión:', e); }
     }
   }
+
+  
+
 };
+async function registrarFallo(ip, usuario, agent, motivo) {
+    let connection;
+
+    try {
+        // 1. Sanitización del Usuario: 
+        // Si 'usuario' es un objeto (porque encontraste el usuario pero la pass estaba mal), extrae el nombre.
+        // Si 'usuario' es un texto (porque el usuario no existe), úsalo tal cual.
+        let nombreUsuarioStr = 'Desconocido';
+
+        if (usuario && typeof usuario === 'object') {
+            // Intenta sacar el nombre de las propiedades comunes
+            nombreUsuarioStr = usuario.NOMBRE_USUARIO || usuario.user_nombres || JSON.stringify(usuario);
+        } else if (usuario) {
+            nombreUsuarioStr = String(usuario);
+        }
+
+        connection = await getConnection();
+
+        const query = `BEGIN SP_REGISTRAR_FALLO(:1, :2, :3, :4); END;`;
+
+        const params = [
+            ip || 'IP Desconocida',
+            nombreUsuarioStr,          // <--- AQUI YA VA SOLO EL TEXTO
+            agent || 'Sin User-Agent',
+            motivo || 'Error no especificado'
+        ];
+
+        // console.log("Guardando fallo con params:", params); // Descomenta si quieres verificar
+
+        await connection.execute(query, params, { autoCommit: true });
+
+    } catch (e) {
+        console.error("Error crítico: No se pudo registrar log de fallo en BD", e);
+    } finally {
+        if (connection) {
+            try {
+                await connection.close();
+            } catch (err) {
+                console.error("Error cerrando conexión de log", err);
+            }
+        }
+    }
+}

@@ -6,5 +6,6 @@ export interface InProveedor {
     prove_correo:string;
     prove_direccion: string;
     prove_descripcion?: string; // Opcional
-    prove_fechregistro?:Date
+    prove_fechregistro?:Date,
+    user_id?:number;
 }

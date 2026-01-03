@@ -16,10 +16,10 @@ import { DirectivasModule } from '../../../../directivas/directivas.module';
 export class ListahistorialComponent implements OnInit {
 
   // Tipado estricto para evitar errores de asignación
-  activeTab: 'datos' | 'sesiones' = 'datos';
-
+activeTab: 'datos' | 'sesiones' | 'fallos' = 'datos';
   listaAuditoria: any[] = [];
   listaSesiones: any[] = []; 
+  listaFallos: any[] = []; // <--- NUEVA LISTA
 
   page: number = 1;
   size: number = 10;
@@ -37,7 +37,7 @@ export class ListahistorialComponent implements OnInit {
   }
 
   // Cambiar pestaña
-  switchTab(tab: 'datos' | 'sesiones') {
+  switchTab(tab: 'datos' | 'sesiones' | 'fallos') {
     // 1. Log inicial para confirmar que el clic entró
     console.log('>>> CLICK DETECTADO. Cambiando a:', tab);
 
@@ -55,6 +55,7 @@ export class ListahistorialComponent implements OnInit {
     this.totalRegistros = 0;
     this.listaAuditoria = [];
     this.listaSesiones = [];
+    this.listaFallos = []; 
 
     // 4. Cargar datos
     this.cargarDatos();
@@ -79,7 +80,7 @@ export class ListahistorialComponent implements OnInit {
         }
       });
 
-    } else {
+    } else if (this.activeTab === 'sesiones') {
       // --- LOGICA DE SESIONES ---
       this.auditoriaService.getAuditoriaSesiones(this.page, this.size, this.filtro).subscribe({
         next: (res: any) => {
@@ -93,8 +94,24 @@ export class ListahistorialComponent implements OnInit {
           this.loading = false;
         }
       });
+    }else
+    {
+
+      // --- LÓGICA NUEVA: FALLOS ---
+       this.auditoriaService.getFallos(this.page, this.size, this.filtro).subscribe({
+         next: (res: any) => {
+           this.listaFallos = res.data || [];
+           this.totalRegistros = res.total || (res.pagination ? res.pagination.total : 0);
+           this.loading = false;
+         },
+         error: (err) => {
+           console.error('Error cargando fallos:', err);
+           this.loading = false;
+         }
+       });
     }
-  }
+    }
+  
 
   buscar() {
     this.page = 1;

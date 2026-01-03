@@ -138,7 +138,9 @@ export class FrmproductoComponent {
         prod_stockmin: parseFloat(this.frmProducto.value.txtstockminimo),
         prod_stock: parseFloat(this.frmProducto.value.txtstock),
         subcat_id: this.frmProducto.value.cbxSubcategoria,
-        prod_id: 0
+        prod_id: 0,
+        user_id: parseInt(localStorage.getItem('user_id') ?? '1')
+
       };
 
       if (this.eventoUpdate) {
@@ -305,7 +307,7 @@ export class FrmproductoComponent {
               // Llamada AJAX rápida para crear la CATEGORÍA
               // NOTA: Ajusta el objeto según tu backend
               const objCat: InCategoria = {
-                cat_id:0,
+                cat_id: 0,
                 cat_nombre: nombreCat,
                 cat_descripcion: 'Creada desde Productos'
               };
@@ -372,56 +374,55 @@ export class FrmproductoComponent {
     });
   }
   // Lógica de guardado (Ajustada para recibir el ID padre)
- registrarSubcategoriaExpress(idPadre: number, nombreSub: string) {
+  registrarSubcategoriaExpress(idPadre: number, nombreSub: string) {
 
-    const nuevaSubcat: InSubcategoria = {
-      subcat_id: 0,
-      cat_id: idPadre,
-      subcat_nombre: nombreSub,
-      subcat_descripcion: ''
-    };
+    const nuevaSubcat: InSubcategoria = {
+      subcat_id: 0,
+      cat_id: idPadre,
+      subcat_nombre: nombreSub,
+      subcat_descripcion: ''
+    };
 
-    this.alertaServ.loading('Creando subcategoría...');
+    this.alertaServ.loading('Creando subcategoría...');
 
-    this.subcategoriaServ.CrearSubcategorias(nuevaSubcat).subscribe({
-      next: (res: any) => {
-        this.alertaServ.close();
-        this.alertaServ.success('Éxito', 'Subcategoría agregada');
+    this.subcategoriaServ.CrearSubcategorias(nuevaSubcat).subscribe({
+      next: (res: any) => {
+        this.alertaServ.close();
+        this.alertaServ.success('Éxito', 'Subcategoría agregada');
 
-        // 1. Recargamos la lista del formulario principal
+        // 1. Recargamos la lista del formulario principal
         // IMPORTANTE: Pasamos una función callback para ejecutar DESPUÉS de cargar la lista
-        this.recargarListaYSeleccionar(res); 
-      },
-      error: (err) => {
-        console.error(err);
-        this.alertaServ.error('Error', 'No se pudo registrar');
-      }
-    });
-  }
-
-// Método auxiliar para recargar y seleccionar
+        this.recargarListaYSeleccionar(res);
+      },
+      error: (err) => {
+        console.error(err);
+        this.alertaServ.error('Error', 'No se pudo registrar');
+      }
+    });
+  }
+  // Método auxiliar para recargar y seleccionar
   recargarListaYSeleccionar(nuevaSubcatGuardada: any) {
     this.subcategoriaServ.LSubcategoriasEstado(1).subscribe({
       next: (res) => {
         this.listaSubcategorias = res;
-        
+
         // 2. Buscamos el ID correcto. 
         // A veces el backend devuelve el objeto creado en 'res', o un mensaje.
         // Si 'nuevaSubcatGuardada' tiene el ID, úsalo. Si no, búscalo por nombre en la lista nueva.
-        
+
         let idParaSeleccionar = nuevaSubcatGuardada.subcat_id; // Opción A: Backend devuelve el objeto
 
         if (!idParaSeleccionar) {
-           // Opción B: Si el backend no devuelve ID, buscamos por nombre en la lista recién cargada
-           const encontrada = this.listaSubcategorias.find(s => s.subcat_nombre === nuevaSubcatGuardada.subcat_nombre); // O usa el nombre que enviaste
-           if (encontrada) idParaSeleccionar = encontrada.subcat_id;
+          // Opción B: Si el backend no devuelve ID, buscamos por nombre en la lista recién cargada
+          const encontrada = this.listaSubcategorias.find(s => s.subcat_nombre === nuevaSubcatGuardada.subcat_nombre); // O usa el nombre que enviaste
+          if (encontrada) idParaSeleccionar = encontrada.subcat_id;
         }
 
         // 3. SELECCIONAR EN EL FORMULARIO
         if (idParaSeleccionar) {
-            this.frmProducto.patchValue({
-                cbxSubcategoria: idParaSeleccionar
-            });
+          this.frmProducto.patchValue({
+            cbxSubcategoria: idParaSeleccionar
+          });
         }
       }
     });

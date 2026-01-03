@@ -97,11 +97,10 @@ rucExistsValidator(): AsyncValidatorFn {
   ngOnInit(): void {
     this.route.paramMap.subscribe((parametros) => {
       const id = parametros.get('id'); // El parámetro en la URL debe ser el RUC
-      const ruc = parametros.get('ruc') ; // El parámetro en la URL debe ser el RUC
-      if (id && ruc) {
+      console.log('ID recibido en ngOnInit:', id);
+      if (id ) {
         this.eventoUpdate = true;
         this.idEditar = id;
-        this.rucEditar = ruc;
         this.cargarProveedor(this.idEditar);
         // Deshabilitar el campo RUC en edición si es clave primaria y no se debe cambiar
         this.frmProveedor.get('txtRuc')?.disable(); 
@@ -209,7 +208,9 @@ rucExistsValidator(): AsyncValidatorFn {
       prove_telefono: formValues.txtTelefono,
       prove_direccion: formValues.txtDireccion,
       prove_correo: formValues.txtCorreo, // Asegúrate que esté en tu interfaz InProveedor
-      prove_descripcion: formValues.txtDescripcion
+      prove_descripcion: formValues.txtDescripcion,
+              user_id: parseInt(localStorage.getItem('user_id') ?? '1')
+
     };
 
     if (this.eventoUpdate) {

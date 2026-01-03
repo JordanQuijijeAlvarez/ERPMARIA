@@ -55,10 +55,10 @@ export class ProveedorService {
    * Elimina un proveedor
    * Nota: Se usa el RUC como identificador
    */
-  EliminarProveedor(id: string): Observable<any> {
+  EliminarProveedor(id: string, user_id: number): Observable<any> {
     // Si tu backend requiere que el ID sea numérico, cambia esto. 
     // Pero por la imagen 'PROVE_RUC', asumo que se elimina por string.
-    return this.http.delete(`${this.urlServidor}/proveedores/Eliminar/${id}`);
+    return this.http.delete(`${this.urlServidor}/proveedores/Eliminar/${id}`, { body: { user_id: user_id } });
   }
 
   /**

@@ -239,7 +239,9 @@ export class ListaproductosComponent {
       denyButtonText: "Cancelar Acción"
     }).then((result) => {
       if (result.isConfirmed) {
-        this.ServicioProducto.EliminarProducto(id).subscribe({
+                const user_id = parseInt(localStorage.getItem('user_id') ?? '1');
+
+        this.ServicioProducto.EliminarProducto(id,user_id).subscribe({
           next: res => {
             this.listaProductos = this.listaProductos.filter(producto => producto.prod_id !== id);
 

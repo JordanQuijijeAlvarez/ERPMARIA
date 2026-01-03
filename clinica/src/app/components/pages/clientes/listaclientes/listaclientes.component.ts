@@ -210,7 +210,7 @@ export class ListaclientesComponent {
       'Cancelar'
     ).then((result) => {
       if (result.isConfirmed) {
-        const user_id = 1;
+        const user_id = parseInt(localStorage.getItem('user_id') ?? '1');
         this.ServicioCliente.Eliminarcliente(id, user_id).subscribe({
           next: (res) => {
             this.listaclientes = this.listaclientes.filter(

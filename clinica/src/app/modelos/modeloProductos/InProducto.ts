@@ -7,7 +7,10 @@ export interface InProducto {
 	prod_preciocompra:number,
 	prod_stock: number,
 	prod_stockmin:number,
-	subcat_id:number
+	subcat_id:number,
+	  user_id?:number;
+
+
 	    //estado: string,
     //usuario:string,
     //fecha_registro:string;

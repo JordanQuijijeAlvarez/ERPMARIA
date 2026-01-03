@@ -222,7 +222,9 @@ export class ListaproveedoresComponent implements OnInit {
       if (result.isConfirmed) {
         
         // REEMPLAZAR CON TU SERVICIO REAL:
-         this.ServicioProveedor.EliminarProveedor(id).subscribe({
+                        const user_id = parseInt(localStorage.getItem('user_id') ?? '1');
+
+         this.ServicioProveedor.EliminarProveedor(id,user_id).subscribe({
           next: (res) => {
             this.listaProveedores = this.listaProveedores.filter(
               (proveedor) => proveedor.prove_id !== id
@@ -267,8 +269,7 @@ export class ListaproveedoresComponent implements OnInit {
     }
   }
 
-  ActualizarProveedor(ruc:any,id: any): void {
-    // Redirige a la ruta de edición de proveedores
+  ActualizarProveedor(id: any): void {
     this.router.navigate(['home/actualizarProveedor', id]);
   }
 
